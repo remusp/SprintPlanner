@@ -42,6 +42,7 @@
                     Grid.Column="2" />
             <DataGrid AutoGenerateColumns="False"
                       ItemsSource="{Binding Users}"
+                      IsReadOnly="True"
                       Grid.Row="1"
                       Grid.Column="0"
                       Grid.ColumnSpan="3">
@@ -62,7 +63,7 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTextColumn Header="Capacity"
+                    <DataGridTextColumn Header="Capacity (h)"
                                         Binding="{Binding Capacity, Mode=OneWay}" />
                 </DataGrid.Columns>
             </DataGrid>

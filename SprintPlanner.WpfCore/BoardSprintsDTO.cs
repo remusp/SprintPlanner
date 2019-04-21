@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SprintPlanner.WpfCore
+namespace SprintPlanner.CoreFramework
 {
     public class Value
     {

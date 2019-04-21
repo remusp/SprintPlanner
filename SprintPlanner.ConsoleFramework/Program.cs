@@ -1,31 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using Newtonsoft.Json;
-using SprintPlanner.Core;
+﻿using SprintPlanner.CoreFramework;
+using System;
 
-namespace SprintPlanner
+namespace SprintPlanner.ConsoleFramework
 {
-    class Program
+    static class Program
     {
-        static void Main(string[] args)
+        internal static void Main(string[] args)
         {
+
             JiraHelper jh = new JiraHelper();
+            jh.Url = "https://jira.sdl.com";
+            jh.Url = "https://issues.apache.org/jira";
             bool isLoggedIn = false;
-            while (!isLoggedIn)
-            {
-                Console.Write("Please enter username: ");
-                var username = Console.ReadLine();
+            //while (!isLoggedIn)
+            //{
+            //    Console.Write("Please enter username: ");
+            //    var username = Console.ReadLine();
 
-                Console.Write("Please enter password: ");
-                var password = Console.ReadLine();
+            //    Console.Write("Please enter password: ");
+            //    var password = Console.ReadLine();
 
-                isLoggedIn = jh.Login(username, password);
-                Console.WriteLine("--------------------");
-            }
+            //    isLoggedIn = jh.Login(username, password);
+            //    Console.WriteLine("--------------------");
+            //}
+
+            var username = "remusp";
+            var password = "rumegn'padure8";
+            isLoggedIn = jh.Login(username, password);
+            Console.WriteLine("--------------------");
 
             var boards = jh.GetBoards();
             foreach (var board in boards)
@@ -34,7 +36,7 @@ namespace SprintPlanner
             }
             Console.WriteLine("--------------------");
 
-            var sprints = jh.GetOpenSprints(1137);
+            var sprints = jh.GetOpenSprints(147);
             foreach (var sprint in sprints)
             {
                 Console.WriteLine("Sprint: " + sprint.Value);

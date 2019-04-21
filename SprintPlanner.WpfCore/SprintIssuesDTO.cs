@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SprintPlanner.WpfCore
+namespace SprintPlanner.CoreFramework
 {
     public class StatusCategory
     {

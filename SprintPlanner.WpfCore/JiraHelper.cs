@@ -6,12 +6,14 @@ using System.Linq;
 using System.Net;
 using System.Text;
 
-namespace SprintPlanner.WpfCore
+namespace SprintPlanner.CoreFramework
 {
     public class JiraHelper
     {
         private static string _username;
         private static string _password;
+
+        public string Url { get; set; }
 
         public bool Login(string username, string password)
         {
@@ -46,7 +48,7 @@ namespace SprintPlanner.WpfCore
             return result;
         }
 
-        public Dictionary<int,string> GetOpenSprints(int boardId)
+        public Dictionary<int, string> GetOpenSprints(int boardId)
         {
             var values = GetOpenSprintsbyBoardId(boardId);
             Dictionary<int, string> result = new Dictionary<int, string>();
@@ -74,19 +76,22 @@ namespace SprintPlanner.WpfCore
 
         #region private
 
-        private static string GetSprintIssuesPath(int retries, int boardId, int sprintId)
+        private string GetSprintIssuesPath(int retries, int boardId, int sprintId)
         {
-            return "https://jira.sdl.com/rest/agile/1.0/board/"+ boardId +"/sprint/" + sprintId + "/issue?startAt=" + retries * 50 + "&maxResults=" + (retries + 1) * 50;
+            string uri = new Uri(Url).Append("/rest/agile/1.0/board", boardId.ToString(), "sprint", sprintId.ToString(), "issue").AbsoluteUri;
+            return uri + "?startAt=" + retries * 50 + "&maxResults=" + (retries + 1) * 50;
         }
 
-        private static string GetBoardSprintPath(int retries, int boardId)
+        private string GetBoardSprintPath(int retries, int boardId)
         {
-            return "https://jira.sdl.com/rest/agile/1.0/board/" + boardId + "/sprint?startAt=" + retries * 50 + "&maxResults=" + (retries + 1) * 50;
+            string uri = new Uri(Url).Append("/rest/agile/1.0/board", boardId.ToString(), "sprint").AbsoluteUri;
+            return uri + "?startAt=" + retries * 50 + "&maxResults=" + (retries + 1) * 50;
         }
 
-        private static string GetBoards(int retries)
+        private string GetBoards(int retries)
         {
-            return "https://jira.sdl.com/rest/agile/1.0/board?startAt=" + retries * 50 + "&maxResults=" + (retries + 1) * 50;
+            string uri = new Uri(Url).Append("/rest/agile/1.0/board").AbsoluteUri;
+            return uri + "?startAt=" + retries * 50 + "&maxResults=" + (retries + 1) * 50;
         }
 
         private static string HttpGetByWebRequest(string uri, string username, string password)
@@ -140,7 +145,7 @@ namespace SprintPlanner.WpfCore
             {
                 string x = HttpGetByWebRequest(GetBoardSprintPath(retries, boardId), _username, _password);
                 var deserializedCall = JsonConvert.DeserializeObject<BoardSprintsDTO>(x);
-                issues.AddRange(deserializedCall.values.Where(s=>s.state != "closed"));
+                issues.AddRange(deserializedCall.values.Where(s => s.state != "closed"));
                 issueCount = deserializedCall.values.Select(s => s.id).Count();
                 retries++;
             }
@@ -171,7 +176,8 @@ namespace SprintPlanner.WpfCore
         {
             try
             {
-                HttpGetByWebRequest("https://jira.sdl.com/rest/agile/1.0/board/1", _username, _password);
+                string uri = new Uri(Url).Append("/rest/agile/1.0/board/1").AbsoluteUri;
+                HttpGetByWebRequest(uri, _username, _password);
                 return true;
             }
             catch (System.Net.WebException e)

@@ -1,6 +1,7 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using SprintPlanner.WpfCore;
+using SprintPlanner.CoreFramework;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
@@ -103,19 +104,28 @@ namespace SprintPlanner.WpfApp.UI.Capacity
             Task<List<string>>.Factory.StartNew(() =>
             {
                 JiraHelper jh = new JiraHelper();
-                jh.Login("ropop", "");
-                return jh.GetAllAssigneesInSprint(1137, 6182);
+                jh.Url = "https://issues.apache.org/jira";
+                jh.Login("remusp", "rumegn'padure8");
+                var boardId = 147;
+                var sprintId = 349;
+                return jh.GetAllAssigneesInSprint(boardId, sprintId);
             }).ContinueWith((t) =>
             {
-                foreach (var item in t.Result)
+                try
                 {
-                    Users.Add(new UserDetails
+                    foreach (var item in t.Result)
                     {
-                        UserName = item
-                    });
+                        Users.Add(new UserDetails
+                        {
+                            UserName = item
+                        });
+                    }
+                }
+                finally
+                {
+                    IsBusy = false;
                 }
 
-                IsBusy = false;
             }, TaskScheduler.FromCurrentSynchronizationContext());
 
         }

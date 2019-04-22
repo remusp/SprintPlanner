@@ -1,11 +1,12 @@
-﻿using System.Windows;
+﻿using MahApps.Metro.Controls;
+using System.Windows;
 
 namespace SprintPlanner.WpfApp.UI.Capacity
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class CapacityWindow : Window
+    public partial class CapacityWindow : MetroWindow
     {
         public CapacityWindow()
         {
@@ -14,7 +15,17 @@ namespace SprintPlanner.WpfApp.UI.Capacity
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            DataContext = new CapacityWindowViewModel();
+            var vm = new CapacityWindowViewModel();
+            DataContext = vm;
+            vm.Load();
+        }
+
+        private void MetroWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (DataContext is CapacityWindowViewModel vm)
+            {
+                vm.Persist();
+            }
         }
     }
 }

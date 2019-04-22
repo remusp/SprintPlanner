@@ -1,9 +1,12 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using Newtonsoft.Json;
 using SprintPlanner.CoreFramework;
+using SprintPlanner.WpfApp.Properties;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -18,6 +21,17 @@ namespace SprintPlanner.WpfApp.UI.Capacity
             PropertyChanged += CapacityWindowViewModel_PropertyChanged;
         }
 
+        public void Load()
+        {
+            string fileName = "CapacityData.json";
+            if (File.Exists(fileName))
+            {
+                var cm = JsonConvert.DeserializeObject<CapacityModel>(File.ReadAllText(fileName));
+                DaysInSprint = cm.DaysInSprint;
+                Users = cm.Users;
+            }
+        }
+
         private void CapacityWindowViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
@@ -27,8 +41,21 @@ namespace SprintPlanner.WpfApp.UI.Capacity
                     {
                         u.DaysInSprint = DaysInSprint;
                     }
+
                     break;
             }
+        }
+
+        public void Persist()
+        {
+            var cm = new CapacityModel()
+            {
+                DaysInSprint = DaysInSprint,
+                Users = Users
+            };
+
+            string data = JsonConvert.SerializeObject(cm);
+            File.WriteAllText("CapacityData.json", data);
         }
 
         private int daysInSprint;
@@ -103,12 +130,9 @@ namespace SprintPlanner.WpfApp.UI.Capacity
             Users.Clear();
             Task<List<string>>.Factory.StartNew(() =>
             {
-                JiraHelper jh = new JiraHelper();
-                jh.Url = "https://issues.apache.org/jira";
-                jh.Login("remusp", "rumegn'padure8");
-                var boardId = 147;
-                var sprintId = 349;
-                return jh.GetAllAssigneesInSprint(boardId, sprintId);
+                var boardId = 1137;//147;
+                var sprintId = 6182;//349;
+                return Business.Jira.GetAllAssigneesInSprint(boardId, sprintId);
             }).ContinueWith((t) =>
             {
                 try

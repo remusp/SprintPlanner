@@ -10,7 +10,7 @@ namespace SprintPlanner.ConsoleFramework
 
             JiraHelper jh = new JiraHelper();
             jh.Url = "https://jira.sdl.com";
-            jh.Url = "https://issues.apache.org/jira";
+            //jh.Url = "https://issues.apache.org/jira";
             bool isLoggedIn = false;
             //while (!isLoggedIn)
             //{
@@ -24,8 +24,8 @@ namespace SprintPlanner.ConsoleFramework
             //    Console.WriteLine("--------------------");
             //}
 
-            var username = "remusp";
-            var password = "rumegn'padure8";
+            var username = "ropop";
+            var password = "";
             isLoggedIn = jh.Login(username, password);
             Console.WriteLine("--------------------");
 
@@ -36,7 +36,7 @@ namespace SprintPlanner.ConsoleFramework
             }
             Console.WriteLine("--------------------");
 
-            var sprints = jh.GetOpenSprints(147);
+            var sprints = jh.GetOpenSprints(1137);
             foreach (var sprint in sprints)
             {
                 Console.WriteLine("Sprint: " + sprint.Value);

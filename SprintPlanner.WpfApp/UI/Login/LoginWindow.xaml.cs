@@ -1,4 +1,5 @@
 ﻿using MahApps.Metro.Controls;
+using SprintPlanner.WpfApp.Properties;
 using System.Windows;
 
 namespace SprintPlanner.WpfApp.UI.Login
@@ -15,7 +16,7 @@ namespace SprintPlanner.WpfApp.UI.Login
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            DataContext = new LoginWindowViewModel(this);
+            DataContext = new LoginWindowViewModel(this) { StoreCredentials = Settings.Default.StoreCredentials };
         }
     }
 }

@@ -7,40 +7,50 @@
                 xmlns:mh="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                 Loaded="Window_Loaded"
                 mc:Ignorable="d"
-                Title="LoginWindow"
+                Title="Log in"
+                SizeToContent="WidthAndHeight"
+                MinWidth="300"
+                MinHeight="250"
                 d:DesignHeight="450"
                 d:DesignWidth="800">
-  <Grid>
-    <Grid.RowDefinitions>
-      <RowDefinition />
-      <RowDefinition />
-      <RowDefinition />
-      <RowDefinition />
-    </Grid.RowDefinitions>
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition />
-      <ColumnDefinition />
-    </Grid.ColumnDefinitions>
-    <TextBlock Text="User name" />
-    <TextBox Text="{Binding UserName}"
-             mh:TextBoxHelper.ClearTextButton="True"
-             Grid.Row="0"
-             Grid.Column="1" />
-    <TextBlock Text="Password"
-               Grid.Row="1"
-               Grid.Column="0" />
-    <PasswordBox inf:PasswordHelper.Attach="True"
-                 inf:PasswordHelper.Password="{Binding Password, Mode=TwoWay}"
+    <Grid Style="{StaticResource LayoutGrid}">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <TextBlock Text="User name"
+                   Style="{StaticResource TextBlockStyle}" />
+        <TextBox Text="{Binding UserName}"
+                 VerticalAlignment="Top"
                  mh:TextBoxHelper.ClearTextButton="True"
-                 Grid.Row="1"
+                 Grid.Row="0"
                  Grid.Column="1" />
-    <CheckBox Content="Keep me logged in"
-              IsChecked="{Binding StoreCredentials}"
-              Grid.Row="2"
-              Grid.ColumnSpan="2" />
-    <Button Content="Login"
-            Command="{Binding LoginCommand}"
-            Grid.Row="3"
-            Grid.ColumnSpan="2" />
-  </Grid>
+        <TextBlock Text="Password"
+                   Style="{StaticResource TextBlockStyle}"
+                   Grid.Row="1"
+                   Grid.Column="0" />
+        <PasswordBox inf:PasswordHelper.Attach="True"
+                     VerticalAlignment="Top"
+                     inf:PasswordHelper.Password="{Binding Password, Mode=TwoWay}"
+                     mh:TextBoxHelper.ClearTextButton="True"
+                     Grid.Row="1"
+                     Grid.Column="1" />
+        <CheckBox Content="Keep me logged in"
+                  Margin="5"
+                  IsChecked="{Binding StoreCredentials}"
+                  Grid.Row="2"
+                  Grid.ColumnSpan="2" />
+        <Button Content="Login"
+                VerticalAlignment="Top"
+                Style="{StaticResource ButtonStyle}"
+                Command="{Binding LoginCommand}"
+                Grid.Row="3"
+                Grid.ColumnSpan="2" />
+    </Grid>
 </mh:MetroWindow>

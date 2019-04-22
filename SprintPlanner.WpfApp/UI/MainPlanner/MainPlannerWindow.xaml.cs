@@ -18,6 +18,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             var vm = new MainPlannerWindowViewModel(this);
             DataContext = vm;
             vm.EnsureLoggedIn();
+            vm.Load();
 
         }
 
@@ -27,6 +28,11 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             {
                 Settings.Default.User = string.Empty;
                 Settings.Default.Pass = string.Empty;
+            }
+
+            if (DataContext is MainPlannerWindowViewModel vm)
+            {
+                vm.Persist();
             }
         }
     }

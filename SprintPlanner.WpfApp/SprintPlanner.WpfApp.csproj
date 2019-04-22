@@ -67,6 +67,7 @@
       <DependentUpon>MainPlannerWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\MainPlanner\MainPlannerWindowViewModel.cs" />
+    <Compile Include="UI\MainPlanner\SprintModel.cs" />
     <Compile Include="UserDetails.cs" />
     <Page Include="Styles.xaml">
       <SubType>Designer</SubType>

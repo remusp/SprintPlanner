@@ -48,14 +48,17 @@ namespace SprintPlanner.WpfApp.UI.Capacity
 
         public void Persist()
         {
-            var cm = new CapacityModel()
+            if (Users.Count > 0)
             {
-                DaysInSprint = DaysInSprint,
-                Users = Users
-            };
+                var cm = new CapacityModel()
+                {
+                    DaysInSprint = DaysInSprint,
+                    Users = Users
+                };
 
-            string data = JsonConvert.SerializeObject(cm);
-            File.WriteAllText("CapacityData.json", data);
+                string data = JsonConvert.SerializeObject(cm);
+                File.WriteAllText("CapacityData.json", data);
+            }
         }
 
         private int daysInSprint;

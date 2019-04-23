@@ -19,6 +19,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         public MainPlannerWindowViewModel(Window w)
         {
             _window = w;
+            UserLoads = new ObservableCollection<UserLoadViewModel>();
             PropertyChanged += MainPlannerWindowViewModel_PropertyChanged;
         }
 
@@ -66,6 +67,19 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
                 RaisePropertyChanged();
             }
         }
+
+        private ObservableCollection<UserLoadViewModel> userLoads;
+
+        public ObservableCollection<UserLoadViewModel> UserLoads
+        {
+            get { return userLoads; }
+            set
+            {
+                userLoads = value;
+                RaisePropertyChanged();
+            }
+        }
+
 
         private KeyValuePair<int, string> selectedBoard;
 
@@ -120,6 +134,36 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
                 }
 
                 return reloadCommand;
+            }
+        }
+
+        //SyncLoadCommand
+
+        private ICommand syncLoadCommand;
+
+        public ICommand SyncLoadCommand
+        {
+            get
+            {
+                if (syncLoadCommand == null)
+                {
+                    syncLoadCommand = new RelayCommand(SyncLoadComandExecute);
+                }
+
+                return syncLoadCommand;
+            }
+        }
+
+        private void SyncLoadComandExecute()
+        {
+            // TODO: duplicate code: capacity load
+            string fileName = "CapacityData.json";
+            if (File.Exists(fileName))
+            {
+                var cm = JsonConvert.DeserializeObject<CapacityModel>(File.ReadAllText(fileName));
+                var loads = Business.Jira.GetAllAssigneesAndWorkInSprint(SelectedBoard.Key, SelectedSprint.Key);
+                var capacities = from u in cm.Users select new UserLoadViewModel { Name = u.UserName, Capacity = u.Capacity, Load = loads.FirstOrDefault(l => l.Item1.Equals(u.UserName)).Item2 };
+                UserLoads = new ObservableCollection<UserLoadViewModel>(capacities);
             }
         }
 

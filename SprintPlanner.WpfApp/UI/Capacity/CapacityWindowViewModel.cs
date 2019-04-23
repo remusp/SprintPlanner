@@ -23,6 +23,7 @@ namespace SprintPlanner.WpfApp.UI.Capacity
 
         public void Load()
         {
+            // TODO: duplicate code: capacity load
             string fileName = "CapacityData.json";
             if (File.Exists(fileName))
             {

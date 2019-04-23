@@ -5,6 +5,7 @@
                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                 xmlns:mh="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                 xmlns:ip="http://metro.mahapps.com/winfx/xaml/iconpacks"
+                xmlns:l="clr-namespace:SprintPlanner.WpfApp.UI.MainPlanner"
                 mc:Ignorable="d"
                 Title="Sprint Planner"
                 Loaded="MetroWindow_Loaded"
@@ -18,6 +19,7 @@
     </Window.Background>-->
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -44,9 +46,21 @@
                   Style="{StaticResource ComboStyle}"
                   Grid.Column="3"
                   VerticalAlignment="Top" />
+        <ListBox Grid.Row="1"
+                 Grid.ColumnSpan="4"
+                 ItemsSource="{Binding UserLoads}"
+                 Grid.IsSharedSizeScope="True">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <l:UserLoadView MinWidth="150"
+                                    HorizontalAlignment="Left" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
         <StackPanel Orientation="Vertical"
                     HorizontalAlignment="Right"
-                    Grid.Column="4">
+                    Grid.Column="4"
+                    Grid.RowSpan="2">
             <Button ToolTip="Reload"
                     Style="{StaticResource ButtonStyle}"
                     Command="{Binding ReloadCommand}"
@@ -63,7 +77,10 @@
                     Style="{StaticResource ButtonStyle}"
                     Command="{Binding OpenCapacityWindowCommand}"
                     Content="{ip:PackIcon {x:Static ip:PackIconModernKind.ScaleUnbalanced}, Width=48, Height=48}" />
-            <!--<iconPacks:PackIconModern Kind="ScaleUnbalanced" />-->
+            <Button ToolTip="Sync load"
+                    Style="{StaticResource ButtonStyle}"
+                    Command="{Binding SyncLoadCommand}"
+                    Content="{ip:FontAwesome SpinnerSolid, Width=48, Height=48}" />
         </StackPanel>
     </Grid>
 </mh:MetroWindow>

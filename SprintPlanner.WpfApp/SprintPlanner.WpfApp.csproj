@@ -68,6 +68,10 @@
     </Compile>
     <Compile Include="UI\MainPlanner\MainPlannerWindowViewModel.cs" />
     <Compile Include="UI\MainPlanner\SprintModel.cs" />
+    <Compile Include="UI\MainPlanner\UserLoadView.xaml.cs">
+      <DependentUpon>UserLoadView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\MainPlanner\UserLoadViewModel.cs" />
     <Compile Include="UserDetails.cs" />
     <Page Include="Styles.xaml">
       <SubType>Designer</SubType>
@@ -90,6 +94,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\MainPlanner\MainPlannerWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\MainPlanner\UserLoadView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

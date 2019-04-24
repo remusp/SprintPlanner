@@ -9,6 +9,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />
+            <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition SharedSizeGroup="UserName" />
@@ -25,5 +26,8 @@
             <TextBlock Text="{Binding Capacity}"
                        Style="{StaticResource TextBlockStyle}" />
         </StackPanel>
+        <ListBox Grid.Row="1"
+                 Grid.ColumnSpan="4"
+                 ItemsSource="{Binding Issues}" />
     </Grid>
 </UserControl>

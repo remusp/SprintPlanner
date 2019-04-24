@@ -161,8 +161,15 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             if (File.Exists(fileName))
             {
                 var cm = JsonConvert.DeserializeObject<CapacityModel>(File.ReadAllText(fileName));
-                var loads = Business.Jira.GetAllAssigneesAndWorkInSprint(SelectedBoard.Key, SelectedSprint.Key);
-                var capacities = from u in cm.Users select new UserLoadViewModel { Name = u.UserName, Capacity = u.Capacity, Load = loads.FirstOrDefault(l => l.Item1.Equals(u.UserName)).Item2 };
+                var loads = Business.Jira.GetIssuesPerAssignee(SelectedBoard.Key, SelectedSprint.Key);
+                var capacities = from u in cm.Users
+                                 select new UserLoadViewModel
+                                 {
+                                     Name = u.UserName,
+                                     Capacity = u.Capacity,
+                                     Load = loads.FirstOrDefault(l => l.Key.Equals(u.UserName)).Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m,
+                                     Issues = new ObservableCollection<string>(loads.FirstOrDefault(l => l.Key.Equals(u.UserName)).Select(i => i.key))
+                                 };
                 UserLoads = new ObservableCollection<UserLoadViewModel>(capacities);
             }
         }

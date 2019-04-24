@@ -35,7 +35,6 @@ namespace SprintPlanner.CoreFramework
         {
             var issues = GetAllIssuesBySprint(boardId, sprintId);
 
-            var topLevelIssues = issues.Where(i => i.fields.parent is null).ToList();
             IEnumerable<IGrouping<string, Issue>> issuesPerAssignee = issues.Where(l => l.fields.assignee != null).GroupBy(i => i.fields.assignee.name);
             List<Tuple<string, decimal>> result = new List<Tuple<string, decimal>>();
 
@@ -46,6 +45,12 @@ namespace SprintPlanner.CoreFramework
             }
 
             return result;
+        }
+
+        public IEnumerable<IGrouping<string, Issue>> GetIssuesPerAssignee(int boardId, int sprintId)
+        {
+            var issues = GetAllIssuesBySprint(boardId, sprintId);
+            return issues.Where(l => l.fields.assignee != null).GroupBy(i => i.fields.assignee.name);
         }
 
         public Dictionary<int, string> GetOpenSprints(int boardId)

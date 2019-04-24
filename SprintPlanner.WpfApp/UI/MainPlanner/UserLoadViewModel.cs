@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight;
+using System.Collections.ObjectModel;
 
 namespace SprintPlanner.WpfApp.UI.MainPlanner
 {
@@ -38,6 +39,18 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             set
             {
                 load = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        private ObservableCollection<string> issues;
+
+        public ObservableCollection<string> Issues
+        {
+            get { return issues; }
+            set
+            {
+                issues = value;
                 RaisePropertyChanged();
             }
         }

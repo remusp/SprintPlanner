@@ -26,7 +26,7 @@ namespace SprintPlanner.CoreFramework
         public List<string> GetAllAssigneesInSprint(int boardId, int sprintId)
         {
             var issues = GetAllIssuesBySprint(boardId, sprintId);
-            var persons = issues.Where(l => l.fields.assignee != null).Select(j => j.fields.assignee.displayName).Distinct().ToList();
+            var persons = issues.Where(l => l.fields.assignee != null).Select(j => j.fields.assignee.name).Distinct().ToList();
 
             return persons;
         }
@@ -72,6 +72,14 @@ namespace SprintPlanner.CoreFramework
             }
 
             return result;
+        }
+
+        public string GetUserDisplayName(string uid)
+        {
+            string uri = new Uri(Url).Append($"/rest/api/2/user?username={uid}").AbsoluteUri;
+            string x = HttpGetByWebRequest(uri, _username, _password);
+            var asignee = JsonConvert.DeserializeObject<Assignee>(x);
+            return asignee.displayName;
         }
 
         #region private

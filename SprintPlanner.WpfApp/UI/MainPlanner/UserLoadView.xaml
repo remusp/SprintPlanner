@@ -6,24 +6,27 @@
              mc:Ignorable="d"
              d:DesignHeight="450"
              d:DesignWidth="800">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition SharedSizeGroup="UserName" />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-        <TextBlock Text="{Binding Name}"
-                   Style="{StaticResource TextBlockStyle}" />
-        <StackPanel Orientation="Horizontal"
-                    Grid.Column="1">
-            <TextBlock Text="{Binding Load}"
-                       Style="{StaticResource TextBlockStyle}" />
-            <TextBlock Text="/"
-                       Style="{StaticResource TextBlockStyle}" />
-            <TextBlock Text="{Binding Capacity}"
-                       Style="{StaticResource TextBlockStyle}" />
-        </StackPanel>
-    </Grid>
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition />
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition SharedSizeGroup="UserName" />
+      <ColumnDefinition SharedSizeGroup="Load"/>
+      <ColumnDefinition SharedSizeGroup="Slash"/>
+      <ColumnDefinition SharedSizeGroup="Capacity"/>
+    </Grid.ColumnDefinitions>
+    <TextBlock Text="{Binding Name}"
+               Style="{StaticResource TextBlockStyle}" />
+
+    <TextBlock Text="{Binding Load}"
+               Style="{StaticResource TextBlockStyle}"
+               Grid.Column="1" />
+    <TextBlock Text="/"
+               Style="{StaticResource TextBlockStyle}"
+               Grid.Column="2" />
+    <TextBlock Text="{Binding Capacity}"
+               Style="{StaticResource TextBlockStyle}"
+               Grid.Column="3" />
+  </Grid>
 </UserControl>

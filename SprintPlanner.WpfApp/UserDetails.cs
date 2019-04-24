@@ -4,6 +4,18 @@ namespace SprintPlanner.WpfApp
 {
     public class UserDetails : ViewModelBase
     {
+        private string uid;
+
+        public string Uid
+        {
+            get { return uid; }
+            set
+            {
+                uid = value;
+                RaisePropertyChanged();
+            }
+        }
+
         private string userName;
 
         public string UserName

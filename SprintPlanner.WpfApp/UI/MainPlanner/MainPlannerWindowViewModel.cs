@@ -119,7 +119,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
         private void OpenCapacityWindowCommandExecute()
         {
-            new CapacityWindow().Show();
+            new CapacityWindow(SelectedBoard.Key, SelectedSprint.Key).Show();
         }
 
         private ICommand reloadCommand;
@@ -162,7 +162,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             {
                 var cm = JsonConvert.DeserializeObject<CapacityModel>(File.ReadAllText(fileName));
                 var loads = Business.Jira.GetAllAssigneesAndWorkInSprint(SelectedBoard.Key, SelectedSprint.Key);
-                var capacities = from u in cm.Users select new UserLoadViewModel { Name = u.UserName, Capacity = u.Capacity, Load = loads.FirstOrDefault(l => l.Item1.Equals(u.UserName)).Item2 };
+                var capacities = from u in cm.Users select new UserLoadViewModel { Name = u.UserName, Capacity = u.Capacity, Load = loads.FirstOrDefault(l => l.Item1.Equals(u.Uid)).Item2 / 3600m };
                 UserLoads = new ObservableCollection<UserLoadViewModel>(capacities);
             }
         }

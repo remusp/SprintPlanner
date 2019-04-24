@@ -8,14 +8,19 @@ namespace SprintPlanner.WpfApp.UI.Capacity
     /// </summary>
     public partial class CapacityWindow : MetroWindow
     {
-        public CapacityWindow()
+        private int _boardId;
+        private int _sprintId;
+
+        public CapacityWindow(int boardId, int sprintId)
         {
             InitializeComponent();
+            _boardId = boardId;
+            _sprintId = sprintId;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            var vm = new CapacityWindowViewModel();
+            var vm = new CapacityWindowViewModel(){ BoardId = _boardId, SprintId = _sprintId};
             DataContext = vm;
             vm.Load();
         }

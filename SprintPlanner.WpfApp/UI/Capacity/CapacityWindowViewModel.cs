@@ -126,6 +126,8 @@ namespace SprintPlanner.WpfApp.UI.Capacity
             }
         }
 
+        public int SprintId { get;  set; }
+        public int BoardId { get;  set; }
 
         private void RefreshCommandExecute()
         {
@@ -134,18 +136,18 @@ namespace SprintPlanner.WpfApp.UI.Capacity
             Users.Clear();
             Task<List<string>>.Factory.StartNew(() =>
             {
-                var boardId = 1137;//147;
-                var sprintId = 6182;//349;
-                return Business.Jira.GetAllAssigneesInSprint(boardId, sprintId);
+                return Business.Jira.GetAllAssigneesInSprint(BoardId, SprintId);
             }).ContinueWith((t) =>
             {
                 try
                 {
                     foreach (var item in t.Result)
                     {
+                        string name = Business.Jira.GetUserDisplayName(item);
                         Users.Add(new UserDetails
                         {
-                            UserName = item
+                            Uid = item,
+                            UserName = name
                         });
                     }
                 }

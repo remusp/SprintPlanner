@@ -119,7 +119,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
         private void OpenCapacityWindowCommandExecute()
         {
-            new CapacityWindow().Show();
+            new CapacityWindow(SelectedBoard.Key, SelectedSprint.Key).Show();
         }
 
         private ICommand reloadCommand;
@@ -167,8 +167,8 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
                                  {
                                      Name = u.UserName,
                                      Capacity = u.Capacity,
-                                     Load = loads.FirstOrDefault(l => l.Key.Equals(u.UserName)).Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m,
-                                     Issues = new ObservableCollection<string>(loads.FirstOrDefault(l => l.Key.Equals(u.UserName)).Select(i => i.key))
+                                     Load = loads.FirstOrDefault(l => l.Key.Equals(u.Uid)).Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m,
+                                     Issues = new ObservableCollection<string>(loads.FirstOrDefault(l => l.Key.Equals(u.Uid)).Select(i => i.key))
                                  };
                 UserLoads = new ObservableCollection<UserLoadViewModel>(capacities);
             }

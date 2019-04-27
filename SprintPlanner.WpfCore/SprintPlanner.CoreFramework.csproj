@@ -42,10 +42,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BoardSprintsDTO.cs" />
+    <Compile Include="CachingHttpRequester.cs" />
+    <Compile Include="IHttpRequester.cs" />
+    <Compile Include="SimpleHttpRequester.cs" />
     <Compile Include="JiraHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SprintIssuesDTO.cs" />
     <Compile Include="UriExtensions.cs" />
+    <Compile Include="WebCacheEntry.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json">

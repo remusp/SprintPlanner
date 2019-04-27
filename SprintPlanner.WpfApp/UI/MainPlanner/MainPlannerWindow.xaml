@@ -6,6 +6,7 @@
                 xmlns:mh="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                 xmlns:ip="http://metro.mahapps.com/winfx/xaml/iconpacks"
                 xmlns:l="clr-namespace:SprintPlanner.WpfApp.UI.MainPlanner"
+                xmlns:sdl="http://schemas.sdl.com/xaml"
                 mc:Ignorable="d"
                 Title="Sprint Planner"
                 Loaded="MetroWindow_Loaded"
@@ -30,25 +31,44 @@
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <TextBlock Text="Board"
+                   VerticalAlignment="Center"
                    Style="{StaticResource TextBlockStyle}" />
-        <ComboBox ItemsSource="{Binding Boards}"
-                  SelectedItem="{Binding SelectedBoard}"
-                  DisplayMemberPath="Value"
-                  Style="{StaticResource ComboStyle}"
-                  Grid.Column="1"
-                  VerticalAlignment="Top" />
+        <sdl:MultiSelectComboBox ItemsSource="{Binding Boards}"
+                                 SelectedItems="{Binding SelectedBoards}"
+                                 sdl:SelectedItemsChangedBehaviour.SelectedItemsChanged="{Binding SelectedBoardChangedCommand}"
+                                 ClearFilterOnDropdownClosing="True"
+                                 SelectionMode="Single"
+                                 IsEditable="True"
+                                 MinHeight="38"
+                                 Margin="5"
+                                 Grid.Column="1">
+            <sdl:MultiSelectComboBox.SelectedItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Item2}"
+                               VerticalAlignment="Center" />
+                </DataTemplate>
+            </sdl:MultiSelectComboBox.SelectedItemTemplate>
+            <sdl:MultiSelectComboBox.DropdownItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Item2}"
+                               VerticalAlignment="Center" />
+                </DataTemplate>
+            </sdl:MultiSelectComboBox.DropdownItemTemplate>
+        </sdl:MultiSelectComboBox>
         <TextBlock Text="Sprint"
+                   VerticalAlignment="Center"
                    Style="{StaticResource TextBlockStyle}"
                    Grid.Column="2" />
         <ComboBox ItemsSource="{Binding Sprints}"
                   SelectedItem="{Binding SelectedSprint}"
-                  DisplayMemberPath="Value"
+                  DisplayMemberPath="Item2"
                   Style="{StaticResource ComboStyle}"
                   Grid.Column="3"
-                  VerticalAlignment="Top" />
+                  VerticalAlignment="Center" />
         <ListBox Grid.Row="1"
                  Grid.ColumnSpan="4"
                  ItemsSource="{Binding UserLoads}"
+                 PreviewMouseWheel="ListBox_PreviewMouseWheel"
                  Grid.IsSharedSizeScope="True">
             <ListBox.ItemTemplate>
                 <DataTemplate>

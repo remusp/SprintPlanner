@@ -43,9 +43,9 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             }
         }
 
-        private ObservableCollection<string> issues;
+        private ObservableCollection<IssueViewModel> issues;
 
-        public ObservableCollection<string> Issues
+        public ObservableCollection<IssueViewModel> Issues
         {
             get { return issues; }
             set

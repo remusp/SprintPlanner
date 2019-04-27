@@ -3,34 +3,55 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:l="clr-namespace:SprintPlanner.WpfApp.UI.MainPlanner"
              mc:Ignorable="d"
              d:DesignHeight="450"
              d:DesignWidth="800">
-  <Grid>
-    <Grid.RowDefinitions>
-      <RowDefinition />
-        <RowDefinition />
-    </Grid.RowDefinitions>
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition SharedSizeGroup="UserName" />
-      <ColumnDefinition SharedSizeGroup="Load"/>
-      <ColumnDefinition SharedSizeGroup="Slash"/>
-      <ColumnDefinition SharedSizeGroup="Capacity"/>
-    </Grid.ColumnDefinitions>
-    <TextBlock Text="{Binding Name}"
-               Style="{StaticResource TextBlockStyle}" />
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition SharedSizeGroup="UserName" />
+            <ColumnDefinition SharedSizeGroup="Load" />
+            <ColumnDefinition SharedSizeGroup="Slash" />
+            <ColumnDefinition SharedSizeGroup="Capacity" />
+        </Grid.ColumnDefinitions>
+        <TextBlock Text="{Binding Name}"
+                   Style="{StaticResource TextBlockStyle}" />
 
-    <TextBlock Text="{Binding Load}"
-               Style="{StaticResource TextBlockStyle}"
-               Grid.Column="1" />
-    <TextBlock Text="/"
-               Style="{StaticResource TextBlockStyle}"
-               Grid.Column="2" />
-    <TextBlock Text="{Binding Capacity}"
-               Style="{StaticResource TextBlockStyle}"
-               Grid.Column="3" />
-      <ListBox Grid.Row="1"
+        <TextBlock Text="{Binding Load}"
+                   Style="{StaticResource TextBlockStyle}"
+                   Grid.Column="1" />
+        <TextBlock Text="/"
+                   Style="{StaticResource TextBlockStyle}"
+                   Grid.Column="2" />
+        <TextBlock Text="{Binding Capacity}"
+                   Style="{StaticResource TextBlockStyle}"
+                   Grid.Column="3" />
+        <DataGrid Grid.Row="1"
+                  Grid.ColumnSpan="4"
+                  ItemsSource="{Binding Issues}"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Key"
+                                    Binding="{Binding Key}" />
+                <DataGridTextColumn Header="Parent"
+                                    Binding="{Binding ParentName}" />
+                <DataGridTextColumn Header="Name"
+                                    Binding="{Binding Name}" />
+            </DataGrid.Columns>
+        </DataGrid>
+        <!--<ListBox Grid.Row="1"
                  Grid.ColumnSpan="4"
-                 ItemsSource="{Binding Issues}" />
-  </Grid>
+                 ItemsSource="{Binding Issues}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <l:IssueView HorizontalAlignment="Left"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>-->
+    </Grid>
 </UserControl>

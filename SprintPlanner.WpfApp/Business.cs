@@ -10,11 +10,6 @@ namespace SprintPlanner.WpfApp
 {
     public static class Business
     {
-        static Business()
-        {
-            Jira = new JiraHelper() { Url = Settings.Default.Server};
-        }
-
         public static JiraHelper Jira { get; set; }
     }
 }

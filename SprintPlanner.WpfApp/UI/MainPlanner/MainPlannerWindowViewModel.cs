@@ -19,11 +19,9 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         public MainPlannerWindowViewModel(Window w)
         {
             _window = w;
+            selectedBoards = new ObservableCollection<Tuple<int, string>>();
             UserLoads = new ObservableCollection<UserLoadViewModel>();
-            PropertyChanged += MainPlannerWindowViewModel_PropertyChanged;
         }
-
-
 
         private Window _window;
 
@@ -44,9 +42,9 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
 
 
-        private ObservableCollection<KeyValuePair<int, string>> boards;
+        private ObservableCollection<Tuple<int, string>> boards;
 
-        public ObservableCollection<KeyValuePair<int, string>> Boards
+        public ObservableCollection<Tuple<int, string>> Boards
         {
             get { return boards; }
             set
@@ -56,9 +54,9 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             }
         }
 
-        private ObservableCollection<KeyValuePair<int, string>> sprints;
+        private ObservableCollection<Tuple<int, string>> sprints;
 
-        public ObservableCollection<KeyValuePair<int, string>> Sprints
+        public ObservableCollection<Tuple<int, string>> Sprints
         {
             get { return sprints; }
             set
@@ -81,21 +79,21 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         }
 
 
-        private KeyValuePair<int, string> selectedBoard;
+        private ObservableCollection<Tuple<int, string>> selectedBoards;
 
-        public KeyValuePair<int, string> SelectedBoard
+        public ObservableCollection<Tuple<int, string>> SelectedBoards
         {
-            get { return selectedBoard; }
+            get { return selectedBoards; }
             set
             {
-                selectedBoard = value;
+                selectedBoards = value;
                 RaisePropertyChanged();
             }
         }
 
-        private KeyValuePair<int, string> selectedSprint;
+        private Tuple<int, string> selectedSprint;
 
-        public KeyValuePair<int, string> SelectedSprint
+        public Tuple<int, string> SelectedSprint
         {
             get { return selectedSprint; }
             set
@@ -119,7 +117,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
         private void OpenCapacityWindowCommandExecute()
         {
-            new CapacityWindow(SelectedBoard.Key, SelectedSprint.Key).Show();
+            new CapacityWindow(SelectedBoards.First().Item1, SelectedSprint.Item1).Show();
         }
 
         private ICommand reloadCommand;
@@ -154,6 +152,36 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             }
         }
 
+        private ICommand selectedBoardChangedCommand;
+
+        public ICommand SelectedBoardChangedCommand
+        {
+            get
+            {
+                if (selectedBoardChangedCommand == null)
+                {
+                    selectedBoardChangedCommand = new RelayCommand(SelectedBoardChangedComandExecute);
+                }
+
+                return selectedBoardChangedCommand;
+            }
+        }
+
+        private void SelectedBoardChangedComandExecute()
+        {
+            if (!initializing && !SelectedBoards.Equals(default(Tuple<int, string>)))
+            {
+                try
+                {
+                    Sprints = new ObservableCollection<Tuple<int, string>>(Business.Jira.GetOpenSprints(SelectedBoards.First().Item1));
+                    SelectedSprint = Sprints.FirstOrDefault();
+                }
+                catch (Exception)
+                {
+                }
+            }
+        }
+
         private void SyncLoadComandExecute()
         {
             // TODO: duplicate code: capacity load
@@ -161,14 +189,19 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             if (File.Exists(fileName))
             {
                 var cm = JsonConvert.DeserializeObject<CapacityModel>(File.ReadAllText(fileName));
-                var loads = Business.Jira.GetIssuesPerAssignee(SelectedBoard.Key, SelectedSprint.Key);
+                var loads = Business.Jira.GetIssuesPerAssignee(SelectedBoards.First().Item1, SelectedSprint.Item1);
                 var capacities = from u in cm.Users
                                  select new UserLoadViewModel
                                  {
                                      Name = u.UserName,
                                      Capacity = u.Capacity,
                                      Load = loads.FirstOrDefault(l => l.Key.Equals(u.Uid)).Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m,
-                                     Issues = new ObservableCollection<string>(loads.FirstOrDefault(l => l.Key.Equals(u.Uid)).Select(i => i.key))
+                                     Issues = new ObservableCollection<IssueViewModel>(loads.FirstOrDefault(l => l.Key.Equals(u.Uid)).Select(i => new IssueViewModel
+                                     {
+                                         Key = i.key,
+                                         ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : string.Empty,
+                                         Name = i.fields.summary
+                                     }))
                                  };
                 UserLoads = new ObservableCollection<UserLoadViewModel>(capacities);
             }
@@ -176,23 +209,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
         private void ReloadComandExecute()
         {
-            Boards = new ObservableCollection<KeyValuePair<int, string>>(Business.Jira.GetBoards().ToList());
-            SelectedBoard = Boards.FirstOrDefault();
-        }
-
-        private void MainPlannerWindowViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            switch (e.PropertyName)
-            {
-                case nameof(SelectedBoard):
-                    if (!initializing && !SelectedBoard.Equals(default(KeyValuePair<int, string>)))
-                    {
-                        Sprints = new ObservableCollection<KeyValuePair<int, string>>(Business.Jira.GetOpenSprints(SelectedBoard.Key).ToList());
-                        SelectedSprint = Sprints.FirstOrDefault();
-                    }
-
-                    break;
-            }
+            Boards = new ObservableCollection<Tuple<int, string>>(Business.Jira.GetBoards().Select(b => new Tuple<int, string>(b.Key, b.Value)));
         }
 
         public void Persist()
@@ -202,12 +219,12 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
                 var data = new SprintModel
                 {
                     Boards = Boards,
-                    SelectedBoard = SelectedBoard.Key,
+                    SelectedBoard = SelectedBoards.First().Item1,
                     Sprints = Sprints,
-                    SelectedSprint = SelectedSprint.Key
+                    SelectedSprint = SelectedSprint.Item1
                 };
 
-                string serialized = JsonConvert.SerializeObject(data);
+                string serialized = JsonConvert.SerializeObject(data, Formatting.Indented);
                 File.WriteAllText("SprintData.json", serialized);
             }
         }
@@ -221,8 +238,10 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
                 var sm = JsonConvert.DeserializeObject<SprintModel>(File.ReadAllText(fileName));
                 Boards = sm.Boards;
                 Sprints = sm.Sprints;
-                SelectedBoard = Boards.First(i => i.Key == sm.SelectedBoard);
-                SelectedSprint = Sprints.First(i => i.Key == sm.SelectedSprint);
+
+                SelectedBoards.Add(Boards.First(i => i.Item1 == sm.SelectedBoard));
+                RaisePropertyChanged(nameof(SelectedBoards));
+                SelectedSprint = Sprints.First(i => i.Item1 == sm.SelectedSprint);
                 initializing = false;
             }
         }

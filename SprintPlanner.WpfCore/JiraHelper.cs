@@ -10,8 +10,14 @@ namespace SprintPlanner.CoreFramework
 {
     public class JiraHelper
     {
-        private static string _username;
-        private static string _password;
+        private string _username;
+        private string _password;
+        private IHttpRequester _webRequester;
+
+        public JiraHelper(IHttpRequester webRequester)
+        {
+            _webRequester = webRequester;
+        }
 
         public string Url { get; set; }
 
@@ -50,17 +56,17 @@ namespace SprintPlanner.CoreFramework
         public IEnumerable<IGrouping<string, Issue>> GetIssuesPerAssignee(int boardId, int sprintId)
         {
             var issues = GetAllIssuesBySprint(boardId, sprintId);
-            return issues.Where(l => l.fields.assignee != null).GroupBy(i => i.fields.assignee.name);
+            return issues.Where(l => l.fields.assignee != null && l.fields.subtasks.Count == 0).GroupBy(i => i.fields.assignee.name);
         }
 
-        public Dictionary<int, string> GetOpenSprints(int boardId)
+        public List<Tuple<int, string>> GetOpenSprints(int boardId)
         {
             var values = GetOpenSprintsbyBoardId(boardId);
-            Dictionary<int, string> result = new Dictionary<int, string>();
+            List<Tuple<int, string>> result = new List<Tuple<int, string>>();
 
             foreach (var value in values)
             {
-                result.Add(value.id, value.name);
+                result.Add(new Tuple<int, string>(value.id, value.name));
             }
 
             return result;
@@ -82,7 +88,7 @@ namespace SprintPlanner.CoreFramework
         public string GetUserDisplayName(string uid)
         {
             string uri = new Uri(Url).Append($"/rest/api/2/user?username={uid}").AbsoluteUri;
-            string x = HttpGetByWebRequest(uri, _username, _password);
+            string x = _webRequester.HttpGetByWebRequest(uri, _username, _password);
             var asignee = JsonConvert.DeserializeObject<Assignee>(x);
             return asignee.displayName;
         }
@@ -107,28 +113,7 @@ namespace SprintPlanner.CoreFramework
             return uri + "?startAt=" + retries * 50 + "&maxResults=" + (retries + 1) * 50;
         }
 
-        private static string HttpGetByWebRequest(string uri, string username, string password)
-        {
-            //For Basic Authentication
-            string authInfo = username + ":" + password;
-            authInfo = Convert.ToBase64String(Encoding.Default.GetBytes(authInfo));
 
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
-            request.Method = "GET";
-            request.Accept = "application/json; charset=utf-8";
-
-            request.Headers["Authorization"] = "Basic " + authInfo;
-
-            var response = (HttpWebResponse)request.GetResponse();
-
-            string strResponse = "";
-            using (var sr = new StreamReader(response.GetResponseStream()))
-            {
-                strResponse = sr.ReadToEnd();
-            }
-
-            return strResponse;
-        }
 
         private List<Issue> GetAllIssuesBySprint(int boardId, int sprintId)
         {
@@ -138,7 +123,7 @@ namespace SprintPlanner.CoreFramework
 
             while (!issueCount.HasValue || issueCount.Value > 49)
             {
-                string x = HttpGetByWebRequest(GetSprintIssuesPath(retries, boardId, sprintId), _username, _password);
+                string x = _webRequester.HttpGetByWebRequest(GetSprintIssuesPath(retries, boardId, sprintId), _username, _password);
                 var deserializedCall = JsonConvert.DeserializeObject<SprintIssuesDTO>(x);
                 issues.AddRange(deserializedCall.issues);
                 issueCount = deserializedCall.issues.Count;
@@ -156,7 +141,7 @@ namespace SprintPlanner.CoreFramework
 
             while (!issueCount.HasValue || issueCount.Value > 49)
             {
-                string x = HttpGetByWebRequest(GetBoardSprintPath(retries, boardId), _username, _password);
+                string x = _webRequester.HttpGetByWebRequest(GetBoardSprintPath(retries, boardId), _username, _password);
                 var deserializedCall = JsonConvert.DeserializeObject<BoardSprintsDTO>(x);
                 issues.AddRange(deserializedCall.values.Where(s => s.state != "closed"));
                 issueCount = deserializedCall.values.Select(s => s.id).Count();
@@ -174,7 +159,7 @@ namespace SprintPlanner.CoreFramework
 
             while (!boardCount.HasValue || boardCount.Value > 49)
             {
-                string x = HttpGetByWebRequest(GetBoards(retries), _username, _password);
+                string x = _webRequester.HttpGetByWebRequest(GetBoards(retries), _username, _password);
                 var deserializedCall = JsonConvert.DeserializeObject<BoardSprintsDTO>(x);
                 boards.AddRange(deserializedCall.values.Where(s => s.state != "closed"));
                 boardCount = deserializedCall.values.Select(s => s.id).Count();
@@ -190,7 +175,7 @@ namespace SprintPlanner.CoreFramework
             try
             {
                 string uri = new Uri(Url).Append("/rest/agile/1.0/board/1").AbsoluteUri;
-                HttpGetByWebRequest(uri, _username, _password);
+                _webRequester.HttpGetByWebRequest(uri, _username, _password);
                 return true;
             }
             catch (System.Net.WebException e)

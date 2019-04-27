@@ -1,5 +1,10 @@
 ﻿using MahApps.Metro.Controls;
+using SprintPlanner.CoreFramework;
 using SprintPlanner.WpfApp.Properties;
+using System.IO;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace SprintPlanner.WpfApp.UI.MainPlanner
 {
@@ -8,13 +13,30 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
     /// </summary>
     public partial class MainPlannerWindow : MetroWindow
     {
+        private IHttpRequester _webRequester;
         public MainPlannerWindow()
         {
             InitializeComponent();
+            _webRequester = new CachingHttpRequester("requestCache.txt");
+            //_webRequester = new SimpleHttpRequester();
         }
 
         private void MetroWindow_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
+            if (_webRequester is CachingHttpRequester cr)
+            {
+                try
+                {
+                    cr.Load();
+                }
+                catch (FileNotFoundException)
+                {
+                    MessageBox.Show("Cache file not found");
+                }
+
+            }
+
+            Business.Jira = new JiraHelper(_webRequester) { Url = Settings.Default.Server };
             var vm = new MainPlannerWindowViewModel(this);
             DataContext = vm;
             vm.EnsureLoggedIn();
@@ -24,6 +46,11 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
         private void MetroWindow_Closed(object sender, System.EventArgs e)
         {
+            if (_webRequester is CachingHttpRequester cr)
+            {
+                cr.FlushCacheToDisk();
+            }
+
             if (!Settings.Default.StoreCredentials)
             {
                 Settings.Default.User = string.Empty;
@@ -34,6 +61,45 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             {
                 vm.Persist();
             }
+        }
+
+        private void ListBox_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        {
+            var scrollViwer = GetScrollViewer(sender as DependencyObject) as ScrollViewer;
+            if (scrollViwer != null)
+            {
+                if (e.Delta < 0)
+                {
+                    scrollViwer.ScrollToVerticalOffset(scrollViwer.VerticalOffset + 3);
+                }
+                else if (e.Delta > 0)
+                {
+                    scrollViwer.ScrollToVerticalOffset(scrollViwer.VerticalOffset - 3);
+                }
+            }
+        }
+
+
+        public static DependencyObject GetScrollViewer(DependencyObject o)
+        {
+            if (o is ScrollViewer)
+            { return o; }
+
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(o); i++)
+            {
+                var child = VisualTreeHelper.GetChild(o, i);
+
+                var result = GetScrollViewer(child);
+                if (result == null)
+                {
+                    continue;
+                }
+                else
+                {
+                    return result;
+                }
+            }
+            return null;
         }
     }
 }

@@ -57,7 +57,7 @@ namespace SprintPlanner.WpfApp.UI.Capacity
                     Users = Users
                 };
 
-                string data = JsonConvert.SerializeObject(cm);
+                string data = JsonConvert.SerializeObject(cm, Formatting.Indented);
                 File.WriteAllText("CapacityData.json", data);
             }
         }

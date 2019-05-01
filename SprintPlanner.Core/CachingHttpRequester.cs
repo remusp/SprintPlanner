@@ -22,13 +22,12 @@ namespace SprintPlanner.Core
 
             for (int i = 0; i < lines.Length; i += 2)
             {
-                _webCache.Add(lines[i],
-                                new WebCacheEntry
-                                {
-                                    Request = lines[i],
-                                    Response = lines[i + 1],
-                                    IsNew = false
-                                });
+                _webCache.Add(lines[i], new WebCacheEntry
+                {
+                    Request = lines[i],
+                    Response = lines[i + 1],
+                    IsNew = false
+                });
             }
         }
 

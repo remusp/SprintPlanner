@@ -59,66 +59,66 @@ namespace SprintPlanner.WpfApp.UI.Capacity
             }
         }
 
-        private int daysInSprint;
+        private int _daysInSprint;
 
         public int DaysInSprint
         {
-            get { return daysInSprint; }
+            get { return _daysInSprint; }
             set
             {
-                daysInSprint = value;
+                _daysInSprint = value;
                 RaisePropertyChanged();
             }
         }
 
-        private ObservableCollection<UserDetails> users;
+        private ObservableCollection<UserDetails> _users;
 
         public ObservableCollection<UserDetails> Users
         {
-            get { return users; }
+            get { return _users; }
             set
             {
-                users = value;
+                _users = value;
                 RaisePropertyChanged();
             }
         }
 
-        private ICommand refreshCommand;
+        private ICommand _refreshCommand;
 
         public ICommand RefreshCommand
         {
             get
             {
-                if (refreshCommand == null)
+                if (_refreshCommand == null)
                 {
-                    refreshCommand = new RelayCommand(RefreshCommandExecute);
+                    _refreshCommand = new RelayCommand(RefreshCommandExecute);
                 }
 
-                return refreshCommand;
+                return _refreshCommand;
             }
         }
 
-        private bool isBusy;
+        private bool _isBusy;
 
         public bool IsBusy
         {
-            get { return isBusy; }
+            get { return _isBusy; }
             set
             {
-                isBusy = value;
+                _isBusy = value;
                 RaisePropertyChanged();
             }
         }
 
 
-        private string busyReason;
+        private string _busyReason;
 
         public string BusyReason
         {
-            get { return busyReason; }
+            get { return _busyReason; }
             set
             {
-                busyReason = value;
+                _busyReason = value;
                 RaisePropertyChanged();
             }
         }

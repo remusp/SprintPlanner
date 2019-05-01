@@ -15,54 +15,54 @@ namespace SprintPlanner.WpfApp.UI.Login
             _window = w;
         }
 
-        private string userName;
+        private string _userName;
 
         public string UserName
         {
-            get { return userName; }
+            get { return _userName; }
             set
             {
-                userName = value;
+                _userName = value;
                 RaisePropertyChanged();
             }
         }
 
-        private string password;
+        private string _password;
 
         public string Password
         {
-            get { return password; }
+            get { return _password; }
             set
             {
-                password = value;
+                _password = value;
                 RaisePropertyChanged();
             }
         }
 
-        private bool storeCredentials;
+        private bool _storeCredentials;
 
         public bool StoreCredentials
         {
-            get { return storeCredentials; }
+            get { return _storeCredentials; }
             set
             {
-                storeCredentials = value;
+                _storeCredentials = value;
                 RaisePropertyChanged();
             }
         }
 
-        private ICommand loginCommand;
+        private ICommand _loginCommand;
 
         public ICommand LoginCommand
         {
             get
             {
-                if (loginCommand == null)
+                if (_loginCommand == null)
                 {
-                    loginCommand = new RelayCommand(LoginCommandExecute);
+                    _loginCommand = new RelayCommand(LoginCommandExecute);
                 }
 
-                return loginCommand;
+                return _loginCommand;
             }
         }
 

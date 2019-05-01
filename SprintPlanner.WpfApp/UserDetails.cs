@@ -4,64 +4,64 @@ namespace SprintPlanner.WpfApp
 {
     public class UserDetails : ViewModelBase
     {
-        private string uid;
+        private string _uid;
 
         public string Uid
         {
-            get { return uid; }
+            get { return _uid; }
             set
             {
-                uid = value;
+                _uid = value;
                 RaisePropertyChanged();
             }
         }
 
-        private string userName;
+        private string _userName;
 
         public string UserName
         {
-            get { return userName; }
+            get { return _userName; }
             set
             {
-                userName = value;
+                _userName = value;
                 RaisePropertyChanged();
             }
         }
 
-        private int hoursPerDay;
+        private int _hoursPerDay;
 
         public int HoursPerDay
         {
-            get { return hoursPerDay; }
+            get { return _hoursPerDay; }
             set
             {
-                hoursPerDay = value;
+                _hoursPerDay = value;
                 RaisePropertyChanged();
                 RaisePropertyChanged(nameof(Capacity));
             }
         }
 
-        private int daysOff;
+        private int _daysOff;
 
         public int DaysOff
         {
-            get { return daysOff; }
+            get { return _daysOff; }
             set
             {
-                daysOff = value;
+                _daysOff = value;
                 RaisePropertyChanged();
                 RaisePropertyChanged(nameof(Capacity));
             }
         }
 
-        private int daysInSprint;
+        private int _daysInSprint;
 
         public int DaysInSprint
         {
-            get { return daysInSprint; }
+            get { return _daysInSprint; }
             set
             {
-                daysInSprint = value;
+                _daysInSprint = value;
                 RaisePropertyChanged();
                 RaisePropertyChanged(nameof(Capacity));
             }

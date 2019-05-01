@@ -5,52 +5,52 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 {
     public class UserLoadViewModel : ViewModelBase
     {
-        private string name;
+        private string _name;
 
         public string Name
         {
-            get { return name; }
+            get { return _name; }
             set
             {
-                name = value;
+                _name = value;
                 RaisePropertyChanged();
             }
         }
 
 
-        private int capacity;
+        private int _capacity;
 
         public int Capacity
         {
-            get { return capacity; }
+            get { return _capacity; }
             set
             {
-                capacity = value;
+                _capacity = value;
                 RaisePropertyChanged();
             }
         }
 
 
-        private decimal load;
+        private decimal _load;
 
         public decimal Load
         {
-            get { return load; }
+            get { return _load; }
             set
             {
-                load = value;
+                _load = value;
                 RaisePropertyChanged();
             }
         }
 
-        private ObservableCollection<IssueViewModel> issues;
+        private ObservableCollection<IssueViewModel> _issues;
 
         public ObservableCollection<IssueViewModel> Issues
         {
-            get { return issues; }
+            get { return _issues; }
             set
             {
-                issues = value;
+                _issues = value;
                 RaisePropertyChanged();
             }
         }

@@ -9,38 +9,38 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 {
     public class IssueViewModel : ViewModelBase
     {
-        private string key;
+        private string _key;
 
         public string Key
         {
-            get { return key; }
+            get { return _key; }
             set
             {
-                key = value;
+                _key = value;
                 RaisePropertyChanged();
             }
         }
 
-        private string name;
+        private string _name;
 
         public string Name
         {
-            get { return name; }
+            get { return _name; }
             set
             {
-                name = value;
+                _name = value;
                 RaisePropertyChanged();
             }
         }
 
-        private string parentName;
+        private string _parentName;
 
         public string ParentName
         {
-            get { return parentName; }
+            get { return _parentName; }
             set
             {
-                parentName = value;
+                _parentName = value;
                 RaisePropertyChanged();
             }
         }

@@ -5,7 +5,6 @@ using SprintPlanner.WpfApp.Properties;
 using SprintPlanner.WpfApp.UI.Capacity;
 using SprintPlanner.WpfApp.UI.Login;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -16,89 +15,91 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 {
     public class MainPlannerWindowViewModel : ViewModelBase
     {
+        bool _initializing;
+
         public MainPlannerWindowViewModel(Window w)
         {
             _window = w;
-            selectedBoards = new ObservableCollection<Tuple<int, string>>();
+            _selectedBoards = new ObservableCollection<Tuple<int, string>>();
             UserLoads = new ObservableCollection<UserLoadViewModel>();
         }
 
         private Window _window;
 
-        private ICommand openCapacityWindowCommand;
+        private ICommand _openCapacityWindowCommand;
 
         public ICommand OpenCapacityWindowCommand
         {
             get
             {
-                if (openCapacityWindowCommand == null)
+                if (_openCapacityWindowCommand == null)
                 {
-                    openCapacityWindowCommand = new RelayCommand(OpenCapacityWindowCommandExecute);
+                    _openCapacityWindowCommand = new RelayCommand(OpenCapacityWindowCommandExecute);
                 }
 
-                return openCapacityWindowCommand;
+                return _openCapacityWindowCommand;
             }
         }
 
 
 
-        private ObservableCollection<Tuple<int, string>> boards;
+        private ObservableCollection<Tuple<int, string>> _boards;
 
         public ObservableCollection<Tuple<int, string>> Boards
         {
-            get { return boards; }
+            get { return _boards; }
             set
             {
-                boards = value;
+                _boards = value;
                 RaisePropertyChanged();
             }
         }
 
-        private ObservableCollection<Tuple<int, string>> sprints;
+        private ObservableCollection<Tuple<int, string>> _sprints;
 
         public ObservableCollection<Tuple<int, string>> Sprints
         {
-            get { return sprints; }
+            get { return _sprints; }
             set
             {
-                sprints = value;
+                _sprints = value;
                 RaisePropertyChanged();
             }
         }
 
-        private ObservableCollection<UserLoadViewModel> userLoads;
+        private ObservableCollection<UserLoadViewModel> _userLoads;
 
         public ObservableCollection<UserLoadViewModel> UserLoads
         {
-            get { return userLoads; }
+            get { return _userLoads; }
             set
             {
-                userLoads = value;
+                _userLoads = value;
                 RaisePropertyChanged();
             }
         }
 
 
-        private ObservableCollection<Tuple<int, string>> selectedBoards;
+        private ObservableCollection<Tuple<int, string>> _selectedBoards;
 
         public ObservableCollection<Tuple<int, string>> SelectedBoards
         {
-            get { return selectedBoards; }
+            get { return _selectedBoards; }
             set
             {
-                selectedBoards = value;
+                _selectedBoards = value;
                 RaisePropertyChanged();
             }
         }
 
-        private Tuple<int, string> selectedSprint;
+        private Tuple<int, string> _selectedSprint;
 
         public Tuple<int, string> SelectedSprint
         {
-            get { return selectedSprint; }
+            get { return _selectedSprint; }
             set
             {
-                selectedSprint = value;
+                _selectedSprint = value;
                 RaisePropertyChanged();
             }
         }
@@ -120,56 +121,56 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             new CapacityWindow(SelectedBoards.First().Item1, SelectedSprint.Item1).Show();
         }
 
-        private ICommand reloadCommand;
+        private ICommand _reloadCommand;
 
         public ICommand ReloadCommand
         {
             get
             {
-                if (reloadCommand == null)
+                if (_reloadCommand == null)
                 {
-                    reloadCommand = new RelayCommand(ReloadComandExecute);
+                    _reloadCommand = new RelayCommand(ReloadComandExecute);
                 }
 
-                return reloadCommand;
+                return _reloadCommand;
             }
         }
 
         //SyncLoadCommand
 
-        private ICommand syncLoadCommand;
+        private ICommand _syncLoadCommand;
 
         public ICommand SyncLoadCommand
         {
             get
             {
-                if (syncLoadCommand == null)
+                if (_syncLoadCommand == null)
                 {
-                    syncLoadCommand = new RelayCommand(SyncLoadComandExecute);
+                    _syncLoadCommand = new RelayCommand(SyncLoadComandExecute);
                 }
 
-                return syncLoadCommand;
+                return _syncLoadCommand;
             }
         }
 
-        private ICommand selectedBoardChangedCommand;
+        private ICommand _selectedBoardChangedCommand;
 
         public ICommand SelectedBoardChangedCommand
         {
             get
             {
-                if (selectedBoardChangedCommand == null)
+                if (_selectedBoardChangedCommand == null)
                 {
-                    selectedBoardChangedCommand = new RelayCommand(SelectedBoardChangedComandExecute);
+                    _selectedBoardChangedCommand = new RelayCommand(SelectedBoardChangedComandExecute);
                 }
 
-                return selectedBoardChangedCommand;
+                return _selectedBoardChangedCommand;
             }
         }
 
         private void SelectedBoardChangedComandExecute()
         {
-            if (!initializing && !SelectedBoards.Equals(default(Tuple<int, string>)))
+            if (!_initializing && !SelectedBoards.Equals(default(Tuple<int, string>)))
             {
                 try
                 {
@@ -234,7 +235,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             string fileName = "SprintData.json";
             if (File.Exists(fileName))
             {
-                initializing = true;
+                _initializing = true; 
                 var sm = JsonConvert.DeserializeObject<SprintModel>(File.ReadAllText(fileName));
                 Boards = sm.Boards;
                 Sprints = sm.Sprints;
@@ -242,10 +243,10 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
                 SelectedBoards.Add(Boards.First(i => i.Item1 == sm.SelectedBoard));
                 RaisePropertyChanged(nameof(SelectedBoards));
                 SelectedSprint = Sprints.First(i => i.Item1 == sm.SelectedSprint);
-                initializing = false;
+                _initializing = false;
             }
         }
 
-        bool initializing;
+        
     }
 }

@@ -111,8 +111,6 @@ namespace SprintPlanner.Core
             return uri + "?startAt=" + (retries * 50) + "&maxResults=" + ((retries + 1) * 50);
         }
 
-
-
         private List<Issue> GetAllIssuesBySprint(int boardId, int sprintId)
         {
             var issues = new List<Issue>();
@@ -166,7 +164,6 @@ namespace SprintPlanner.Core
 
             return boards;
         }
-
 
         private bool CheckValidLogin(string username, string password)
         {

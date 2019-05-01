@@ -13,94 +13,89 @@
                 Closed="MetroWindow_Closed"
                 d:DesignHeight="450"
                 d:DesignWidth="800">
-    <!--Icon="{ip:FontAwesome PaperPlaneSolid, Width=32, Height=32}"-->
-    <!--<Window.Background>
-        <ImageBrush ImageSource="/Images/placeholder.jpg" Stretch="UniformToFill"
-                    />
-    </Window.Background>-->
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition />
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition />
-            <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
-        <TextBlock Text="Board"
-                   VerticalAlignment="Center"
-                   Style="{StaticResource TextBlockStyle}" />
-        <sdl:MultiSelectComboBox ItemsSource="{Binding Boards}"
-                                 SelectedItems="{Binding SelectedBoards}"
-                                 sdl:SelectedItemsChangedBehaviour.SelectedItemsChanged="{Binding SelectedBoardChangedCommand}"
-                                 ClearFilterOnDropdownClosing="True"
-                                 SelectionMode="Single"
-                                 IsEditable="True"
-                                 MinHeight="38"
-                                 Margin="5"
-                                 Grid.Column="1">
-            <sdl:MultiSelectComboBox.SelectedItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Item2}"
-                               VerticalAlignment="Center" />
-                </DataTemplate>
-            </sdl:MultiSelectComboBox.SelectedItemTemplate>
-            <sdl:MultiSelectComboBox.DropdownItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Item2}"
-                               VerticalAlignment="Center" />
-                </DataTemplate>
-            </sdl:MultiSelectComboBox.DropdownItemTemplate>
-        </sdl:MultiSelectComboBox>
-        <TextBlock Text="Sprint"
-                   VerticalAlignment="Center"
-                   Style="{StaticResource TextBlockStyle}"
-                   Grid.Column="2" />
-        <ComboBox ItemsSource="{Binding Sprints}"
-                  SelectedItem="{Binding SelectedSprint}"
-                  DisplayMemberPath="Item2"
-                  Style="{StaticResource ComboStyle}"
-                  Grid.Column="3"
-                  VerticalAlignment="Center" />
-        <ListBox Grid.Row="1"
-                 Grid.ColumnSpan="4"
-                 ItemsSource="{Binding UserLoads}"
-                 PreviewMouseWheel="ListBox_PreviewMouseWheel"
-                 Grid.IsSharedSizeScope="True">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <l:UserLoadView MinWidth="150"
-                                    HorizontalAlignment="Left" />
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-        <StackPanel Orientation="Vertical"
-                    HorizontalAlignment="Right"
-                    Grid.Column="4"
-                    Grid.RowSpan="2">
-            <Button ToolTip="Reload"
-                    Style="{StaticResource ButtonStyle}"
-                    Command="{Binding ReloadCommand}"
-                    Content="{ip:FontAwesome {x:Static ip:PackIconFontAwesomeKind.SyncAltSolid}, Width=48, Height=48}">
-            </Button>
-            <Button ToolTip="Settings"
-                    Style="{StaticResource ButtonStyle}"
-                    Content="{ip:PackIcon {x:Static ip:PackIconMaterialKind.Settings}, Width=48, Height=48}">
-            </Button>
-            <Button ToolTip="Team"
-                    Style="{StaticResource ButtonStyle}"
-                    Content="{ip:FontAwesome UsersSolid, Width=48, Height=48}" />
-            <Button ToolTip="Team Capacity"
-                    Style="{StaticResource ButtonStyle}"
-                    Command="{Binding OpenCapacityWindowCommand}"
-                    Content="{ip:PackIcon {x:Static ip:PackIconModernKind.ScaleUnbalanced}, Width=48, Height=48}" />
-            <Button ToolTip="Sync load"
-                    Style="{StaticResource ButtonStyle}"
-                    Command="{Binding SyncLoadCommand}"
-                    Content="{ip:FontAwesome SpinnerSolid, Width=48, Height=48}" />
-        </StackPanel>
-    </Grid>
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition />
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="Auto" />
+      <ColumnDefinition />
+      <ColumnDefinition Width="Auto" />
+      <ColumnDefinition />
+      <ColumnDefinition Width="Auto" />
+    </Grid.ColumnDefinitions>
+    <TextBlock Text="Board"
+               VerticalAlignment="Center"
+               Style="{StaticResource TextBlockStyle}" />
+    <sdl:MultiSelectComboBox ItemsSource="{Binding Boards}"
+                             SelectedItems="{Binding SelectedBoards}"
+                             sdl:SelectedItemsChangedBehaviour.SelectedItemsChanged="{Binding SelectedBoardChangedCommand}"
+                             ClearFilterOnDropdownClosing="True"
+                             SelectionMode="Single"
+                             IsEditable="True"
+                             MinHeight="38"
+                             Margin="5"
+                             Grid.Column="1">
+      <sdl:MultiSelectComboBox.SelectedItemTemplate>
+        <DataTemplate>
+          <TextBlock Text="{Binding Item2}"
+                     VerticalAlignment="Center" />
+        </DataTemplate>
+      </sdl:MultiSelectComboBox.SelectedItemTemplate>
+      <sdl:MultiSelectComboBox.DropdownItemTemplate>
+        <DataTemplate>
+          <TextBlock Text="{Binding Item2}"
+                     VerticalAlignment="Center" />
+        </DataTemplate>
+      </sdl:MultiSelectComboBox.DropdownItemTemplate>
+    </sdl:MultiSelectComboBox>
+    <TextBlock Text="Sprint"
+               VerticalAlignment="Center"
+               Style="{StaticResource TextBlockStyle}"
+               Grid.Column="2" />
+    <ComboBox ItemsSource="{Binding Sprints}"
+              SelectedItem="{Binding SelectedSprint}"
+              DisplayMemberPath="Item2"
+              Style="{StaticResource ComboStyle}"
+              Grid.Column="3"
+              VerticalAlignment="Center" />
+    <ListBox Grid.Row="1"
+             Grid.ColumnSpan="4"
+             ItemsSource="{Binding UserLoads}"
+             PreviewMouseWheel="ListBox_PreviewMouseWheel"
+             Grid.IsSharedSizeScope="True">
+      <ListBox.ItemTemplate>
+        <DataTemplate>
+          <l:UserLoadView MinWidth="150"
+                          HorizontalAlignment="Left" />
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+    <StackPanel Orientation="Vertical"
+                HorizontalAlignment="Right"
+                Grid.Column="4"
+                Grid.RowSpan="2">
+      <Button ToolTip="Reload"
+              Style="{StaticResource ButtonStyle}"
+              Command="{Binding ReloadCommand}"
+              Content="{ip:FontAwesome {x:Static ip:PackIconFontAwesomeKind.SyncAltSolid}, Width=48, Height=48}">
+      </Button>
+      <Button ToolTip="Settings"
+              Style="{StaticResource ButtonStyle}"
+              Content="{ip:PackIcon {x:Static ip:PackIconMaterialKind.Settings}, Width=48, Height=48}">
+      </Button>
+      <Button ToolTip="Team"
+              Style="{StaticResource ButtonStyle}"
+              Content="{ip:FontAwesome UsersSolid, Width=48, Height=48}" />
+      <Button ToolTip="Team Capacity"
+              Style="{StaticResource ButtonStyle}"
+              Command="{Binding OpenCapacityWindowCommand}"
+              Content="{ip:PackIcon {x:Static ip:PackIconModernKind.ScaleUnbalanced}, Width=48, Height=48}" />
+      <Button ToolTip="Sync load"
+              Style="{StaticResource ButtonStyle}"
+              Command="{Binding SyncLoadCommand}"
+              Content="{ip:FontAwesome SpinnerSolid, Width=48, Height=48}" />
+    </StackPanel>
+  </Grid>
 </mh:MetroWindow>

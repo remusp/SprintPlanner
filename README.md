@@ -9,3 +9,5 @@
 * Multiselect combo for sprint list
 * Navigation instead of windows ?
 * Decouple window launching functionality from VMs
+* Installer
+

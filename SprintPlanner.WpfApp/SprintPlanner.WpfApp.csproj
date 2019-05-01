@@ -128,12 +128,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SprintPlanner.WpfCore\SprintPlanner.CoreFramework.csproj">
-      <Project>{3e8a8696-ab53-40c7-8328-3cee86eafae4}</Project>
-      <Name>SprintPlanner.CoreFramework</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\placeholder.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
@@ -154,6 +148,12 @@
     <PackageReference Include="Sdl.MultiSelectComboBox">
       <Version>1.0.4</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SprintPlanner.Core\SprintPlanner.Core.csproj">
+      <Project>{61c683ce-8d63-4b03-9987-9c727f0502ac}</Project>
+      <Name>SprintPlanner.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

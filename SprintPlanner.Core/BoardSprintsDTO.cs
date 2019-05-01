@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace SprintPlanner.WpfCore
+namespace SprintPlanner.Core
 {
     public class Value
     {

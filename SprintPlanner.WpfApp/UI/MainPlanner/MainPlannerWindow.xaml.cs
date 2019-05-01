@@ -1,5 +1,5 @@
 ﻿using MahApps.Metro.Controls;
-using SprintPlanner.CoreFramework;
+using SprintPlanner.Core;
 using SprintPlanner.WpfApp.Properties;
 using System.IO;
 using System.Windows;
@@ -36,7 +36,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
             }
 
-            Business.Jira = new JiraHelper(_webRequester) { Url = Settings.Default.Server };
+            Business.Jira = new JiraWrapper(_webRequester) { Url = Settings.Default.Server };
             var vm = new MainPlannerWindowViewModel(this);
             DataContext = vm;
             vm.EnsureLoggedIn();
@@ -65,8 +65,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
         private void ListBox_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
         {
-            var scrollViwer = GetScrollViewer(sender as DependencyObject) as ScrollViewer;
-            if (scrollViwer != null)
+            if (GetScrollViewer(sender as DependencyObject) is ScrollViewer scrollViwer)
             {
                 if (e.Delta < 0)
                 {

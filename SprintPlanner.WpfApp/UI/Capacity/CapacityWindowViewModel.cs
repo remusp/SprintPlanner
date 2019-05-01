@@ -1,9 +1,6 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Newtonsoft.Json;
-using SprintPlanner.CoreFramework;
-using SprintPlanner.WpfApp.Properties;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;

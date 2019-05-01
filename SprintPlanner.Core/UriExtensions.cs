@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace SprintPlanner.CoreFramework
+namespace SprintPlanner.Core
 {
     public static class UriExtensions
     {

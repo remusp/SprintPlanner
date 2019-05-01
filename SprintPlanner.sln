@@ -1,17 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28803.202
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.572
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SprintPlanner", "SprintPlanner\SprintPlanner.csproj", "{EE134FBB-4A36-4654-B64C-A189AF0C86AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SprintPlanner.ConsoleExample", "SprintPlanner.ConsoleExample\SprintPlanner.ConsoleExample.csproj", "{EE134FBB-4A36-4654-B64C-A189AF0C86AD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SprintPlanner.Core", "SprintPlanner.Core\SprintPlanner.Core.csproj", "{61C683CE-8D63-4B03-9987-9C727F0502AC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprintPlanner.WpfApp", "SprintPlanner.WpfApp\SprintPlanner.WpfApp.csproj", "{5501631D-BCAF-4E74-966B-98FE79064A0D}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprintPlanner.CoreFramework", "SprintPlanner.WpfCore\SprintPlanner.CoreFramework.csproj", "{3E8A8696-AB53-40C7-8328-3CEE86EAFAE4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprintPlanner.ConsoleFramework", "SprintPlanner.ConsoleFramework\SprintPlanner.ConsoleFramework.csproj", "{ADFC6F32-2C40-4A44-8642-F85255CEE7C8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,14 +27,6 @@ Global
 		{5501631D-BCAF-4E74-966B-98FE79064A0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5501631D-BCAF-4E74-966B-98FE79064A0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5501631D-BCAF-4E74-966B-98FE79064A0D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3E8A8696-AB53-40C7-8328-3CEE86EAFAE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3E8A8696-AB53-40C7-8328-3CEE86EAFAE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3E8A8696-AB53-40C7-8328-3CEE86EAFAE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3E8A8696-AB53-40C7-8328-3CEE86EAFAE4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{ADFC6F32-2C40-4A44-8642-F85255CEE7C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ADFC6F32-2C40-4A44-8642-F85255CEE7C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ADFC6F32-2C40-4A44-8642-F85255CEE7C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ADFC6F32-2C40-4A44-8642-F85255CEE7C8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

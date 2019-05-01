@@ -1,27 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using Newtonsoft.Json;
-using SprintPlanner.Core;
+﻿using SprintPlanner.Core;
+using System;
 
 namespace SprintPlanner
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            JiraHelper jh = new JiraHelper();
+            var jh = new JiraWrapper(new SimpleHttpRequester());
+            jh.Url = "https://jira.sdl.com";
+            //jh.Url = "https://issues.apache.org/jira";
             bool isLoggedIn = false;
             while (!isLoggedIn)
             {
                 Console.Write("Please enter username: ");
-                var username = Console.ReadLine();
+                string username = Console.ReadLine();
 
                 Console.Write("Please enter password: ");
-                var password = Console.ReadLine();
+                string password = Console.ReadLine();
 
                 isLoggedIn = jh.Login(username, password);
                 Console.WriteLine("--------------------");
@@ -37,7 +33,7 @@ namespace SprintPlanner
             var sprints = jh.GetOpenSprints(1137);
             foreach (var sprint in sprints)
             {
-                Console.WriteLine("Sprint: " + sprint.Value);
+                Console.WriteLine("Sprint: " + sprint.Item2);
             }
             Console.WriteLine("--------------------");
 

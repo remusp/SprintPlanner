@@ -3,7 +3,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 
-namespace SprintPlanner.CoreFramework
+namespace SprintPlanner.Core
 {
     public class SimpleHttpRequester : IHttpRequester
     {

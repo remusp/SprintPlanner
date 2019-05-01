@@ -1,20 +1,18 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 
-namespace SprintPlanner.CoreFramework
+namespace SprintPlanner.Core
 {
-    public class JiraHelper
+    public class JiraWrapper
     {
         private string _username;
         private string _password;
         private IHttpRequester _webRequester;
 
-        public JiraHelper(IHttpRequester webRequester)
+        public JiraWrapper(IHttpRequester webRequester)
         {
             _webRequester = webRequester;
         }
@@ -31,7 +29,7 @@ namespace SprintPlanner.CoreFramework
 
         public List<string> GetAllAssigneesInSprint(int boardId, int sprintId)
         {
-            var issues = GetAllIssuesBySprint(boardId, sprintId);
+            List<Issue> issues = GetAllIssuesBySprint(boardId, sprintId);
             var persons = issues.Where(l => l.fields.assignee != null).Select(j => j.fields.assignee.name).Distinct().ToList();
 
             return persons;
@@ -39,10 +37,10 @@ namespace SprintPlanner.CoreFramework
 
         public List<Tuple<string, decimal>> GetAllAssigneesAndWorkInSprint(int boardId, int sprintId)
         {
-            var issues = GetAllIssuesBySprint(boardId, sprintId);
+            List<Issue> issues = GetAllIssuesBySprint(boardId, sprintId);
 
             IEnumerable<IGrouping<string, Issue>> issuesPerAssignee = issues.Where(l => l.fields.assignee != null).GroupBy(i => i.fields.assignee.name);
-            List<Tuple<string, decimal>> result = new List<Tuple<string, decimal>>();
+            var result = new List<Tuple<string, decimal>>();
 
             foreach (var issuePerAssignee in issuesPerAssignee)
             {
@@ -55,14 +53,14 @@ namespace SprintPlanner.CoreFramework
 
         public IEnumerable<IGrouping<string, Issue>> GetIssuesPerAssignee(int boardId, int sprintId)
         {
-            var issues = GetAllIssuesBySprint(boardId, sprintId);
+            List<Issue> issues = GetAllIssuesBySprint(boardId, sprintId);
             return issues.Where(l => l.fields.assignee != null && l.fields.subtasks.Count == 0).GroupBy(i => i.fields.assignee.name);
         }
 
         public List<Tuple<int, string>> GetOpenSprints(int boardId)
         {
-            var values = GetOpenSprintsbyBoardId(boardId);
-            List<Tuple<int, string>> result = new List<Tuple<int, string>>();
+            List<Value> values = GetOpenSprintsbyBoardId(boardId);
+            var result = new List<Tuple<int, string>>();
 
             foreach (var value in values)
             {
@@ -75,7 +73,7 @@ namespace SprintPlanner.CoreFramework
         public Dictionary<int, string> GetBoards()
         {
             List<Value> values = GetAllBoards();
-            Dictionary<int, string> result = new Dictionary<int, string>();
+            var result = new Dictionary<int, string>();
 
             foreach (var value in values)
             {
@@ -89,7 +87,7 @@ namespace SprintPlanner.CoreFramework
         {
             string uri = new Uri(Url).Append($"/rest/api/2/user?username={uid}").AbsoluteUri;
             string x = _webRequester.HttpGetByWebRequest(uri, _username, _password);
-            var asignee = JsonConvert.DeserializeObject<Assignee>(x);
+            Assignee asignee = JsonConvert.DeserializeObject<Assignee>(x);
             return asignee.displayName;
         }
 
@@ -98,26 +96,26 @@ namespace SprintPlanner.CoreFramework
         private string GetSprintIssuesPath(int retries, int boardId, int sprintId)
         {
             string uri = new Uri(Url).Append("/rest/agile/1.0/board", boardId.ToString(), "sprint", sprintId.ToString(), "issue").AbsoluteUri;
-            return uri + "?startAt=" + retries * 50 + "&maxResults=" + (retries + 1) * 50;
+            return uri + "?startAt=" + (retries * 50) + "&maxResults=" + ((retries + 1) * 50);
         }
 
         private string GetBoardSprintPath(int retries, int boardId)
         {
             string uri = new Uri(Url).Append("/rest/agile/1.0/board", boardId.ToString(), "sprint").AbsoluteUri;
-            return uri + "?startAt=" + retries * 50 + "&maxResults=" + (retries + 1) * 50;
+            return uri + "?startAt=" + (retries * 50) + "&maxResults=" + ((retries + 1) * 50);
         }
 
         private string GetBoards(int retries)
         {
             string uri = new Uri(Url).Append("/rest/agile/1.0/board").AbsoluteUri;
-            return uri + "?startAt=" + retries * 50 + "&maxResults=" + (retries + 1) * 50;
+            return uri + "?startAt=" + (retries * 50) + "&maxResults=" + ((retries + 1) * 50);
         }
 
 
 
         private List<Issue> GetAllIssuesBySprint(int boardId, int sprintId)
         {
-            List<Issue> issues = new List<Issue>();
+            var issues = new List<Issue>();
             int? issueCount = null;
             int retries = 0;
 
@@ -135,7 +133,7 @@ namespace SprintPlanner.CoreFramework
 
         private List<Value> GetOpenSprintsbyBoardId(int boardId)
         {
-            List<Value> issues = new List<Value>();
+            var issues = new List<Value>();
             int? issueCount = null;
             int retries = 0;
 
@@ -153,7 +151,7 @@ namespace SprintPlanner.CoreFramework
 
         private List<Value> GetAllBoards()
         {
-            List<Value> boards = new List<Value>();
+            var boards = new List<Value>();
             int? boardCount = null;
             int retries = 0;
 
@@ -178,7 +176,7 @@ namespace SprintPlanner.CoreFramework
                 _webRequester.HttpGetByWebRequest(uri, _username, _password);
                 return true;
             }
-            catch (System.Net.WebException e)
+            catch (WebException)
             {
                 return false;
             }

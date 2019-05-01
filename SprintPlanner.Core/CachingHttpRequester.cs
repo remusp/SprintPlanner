@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SprintPlanner.CoreFramework
+namespace SprintPlanner.Core
 {
     public class CachingHttpRequester : SimpleHttpRequester
     {
-        private string _cacheFile;
+        private readonly string _cacheFile;
 
         private Dictionary<string, WebCacheEntry> _webCache;
 

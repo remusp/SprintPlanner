@@ -1,4 +1,4 @@
-﻿namespace SprintPlanner.CoreFramework
+﻿namespace SprintPlanner.Core
 {
     public class WebCacheEntry
     {

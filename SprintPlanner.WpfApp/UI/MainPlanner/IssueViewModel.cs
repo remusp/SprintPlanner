@@ -45,6 +45,15 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             }
         }
 
+        private decimal _hours;
+
+        public decimal Hours
+        {
+            get { return _hours; }
+            set { _hours = value; }
+        }
+
+
 
     }
 }

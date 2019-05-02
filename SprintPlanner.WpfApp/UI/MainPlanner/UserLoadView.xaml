@@ -42,7 +42,9 @@
                                     Binding="{Binding ParentName}" />
                 <DataGridTextColumn Header="Name"
                                     Binding="{Binding Name}" />
-            </DataGrid.Columns>
+        <DataGridTextColumn Header="Hours"
+                            Binding="{Binding Hours}" />
+      </DataGrid.Columns>
         </DataGrid>
     </Grid>
 </UserControl>

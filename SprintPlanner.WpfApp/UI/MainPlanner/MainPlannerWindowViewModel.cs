@@ -177,7 +177,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
                     Sprints = new ObservableCollection<Tuple<int, string>>(Business.Jira.GetOpenSprints(SelectedBoards.First().Item1));
                     SelectedSprint = Sprints.FirstOrDefault();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                 }
             }
@@ -185,27 +185,36 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
         private void SyncLoadComandExecute()
         {
-            // TODO: duplicate code: capacity load
-            string fileName = "CapacityData.json";
-            if (File.Exists(fileName))
+            try
             {
-                var cm = JsonConvert.DeserializeObject<CapacityModel>(File.ReadAllText(fileName));
-                var loads = Business.Jira.GetIssuesPerAssignee(SelectedBoards.First().Item1, SelectedSprint.Item1);
-                var capacities = from u in cm.Users
-                                 select new UserLoadViewModel
-                                 {
-                                     Name = u.UserName,
-                                     Capacity = u.Capacity,
-                                     Load = loads.FirstOrDefault(l => l.Key.Equals(u.Uid)).Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m,
-                                     Issues = new ObservableCollection<IssueViewModel>(loads.FirstOrDefault(l => l.Key.Equals(u.Uid)).Select(i => new IssueViewModel
+                // TODO: duplicate code: capacity load
+                string fileName = "CapacityData.json";
+                if (File.Exists(fileName))
+                {
+                    var cm = JsonConvert.DeserializeObject<CapacityModel>(File.ReadAllText(fileName));
+                    var loads = Business.Jira.GetIssuesPerAssignee(SelectedBoards.First().Item1, SelectedSprint.Item1);
+                    var capacities = from u in cm.Users
+                                     select new UserLoadViewModel
                                      {
-                                         Key = i.key,
-                                         ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : string.Empty,
-                                         Name = i.fields.summary
-                                     }))
-                                 };
-                UserLoads = new ObservableCollection<UserLoadViewModel>(capacities);
+                                         Name = u.UserName,
+                                         Capacity = u.Capacity,
+                                         Load = loads.FirstOrDefault(l => l.Key.Equals(u.Uid)).Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m,
+                                         Issues = new ObservableCollection<IssueViewModel>(loads.FirstOrDefault(l => l.Key.Equals(u.Uid)).Select(i => new IssueViewModel
+                                         {
+                                             Key = i.key,
+                                             ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : string.Empty,
+                                             Name = i.fields.summary,
+                                             Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
+                                         }))
+                                     };
+                    UserLoads = new ObservableCollection<UserLoadViewModel>(capacities);
+                }
             }
+            catch (Exception)
+            {
+                MessageBox.Show("Error encountered while executing command.");// TODO: proper messagebox
+            }
+
         }
 
         private void ReloadComandExecute()
@@ -235,7 +244,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             string fileName = "SprintData.json";
             if (File.Exists(fileName))
             {
-                _initializing = true; 
+                _initializing = true;
                 var sm = JsonConvert.DeserializeObject<SprintModel>(File.ReadAllText(fileName));
                 Boards = sm.Boards;
                 Sprints = sm.Sprints;
@@ -247,6 +256,6 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             }
         }
 
-        
+
     }
 }

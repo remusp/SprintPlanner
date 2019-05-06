@@ -1,5 +1,9 @@
 # SprintPlanner
 ## TODOs:
+* Color coding
+* Fix negative capacity bug
+* Story key/link
+* Story points
 * Team Configuration window 
 * Encrypt saved password
 * Use secure string when working with password (login + api)

@@ -1,5 +1,8 @@
 # SprintPlanner
 ## TODOs:
+* Negative capacity
+* Story key/link
+* Story points
 * Team Configuration window 
 * Encrypt saved password
 * Use secure string when working with password (login + api)

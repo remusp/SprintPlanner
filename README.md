@@ -1,7 +1,7 @@
 # SprintPlanner
 ## TODOs:
 * Color coding
-* Negative capacity
+* Fix negative capacity bug
 * Story key/link
 * Story points
 * Team Configuration window 

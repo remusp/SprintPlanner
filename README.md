@@ -1,5 +1,6 @@
 # SprintPlanner
 ## TODOs:
+* Color coding
 * Negative capacity
 * Story key/link
 * Story points

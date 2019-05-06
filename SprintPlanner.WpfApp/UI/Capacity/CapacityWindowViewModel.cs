@@ -14,7 +14,7 @@ namespace SprintPlanner.WpfApp.UI.Capacity
         public CapacityWindowViewModel()
         {
             Users = new ObservableCollection<UserDetails>();
-
+            CapacityFactor = 1;
             PropertyChanged += CapacityWindowViewModel_PropertyChanged;
         }
 
@@ -27,6 +27,7 @@ namespace SprintPlanner.WpfApp.UI.Capacity
                 var cm = JsonConvert.DeserializeObject<CapacityModel>(File.ReadAllText(fileName));
                 DaysInSprint = cm.DaysInSprint;
                 Users = cm.Users;
+                CapacityFactor = cm.CapacityFactor;
             }
         }
 
@@ -41,6 +42,14 @@ namespace SprintPlanner.WpfApp.UI.Capacity
                     }
 
                     break;
+
+                case nameof(CapacityFactor):
+                    foreach (var u in Users)
+                    {
+                        u.CapacityFactor = CapacityFactor;
+                    }
+
+                    break;
             }
         }
 
@@ -51,6 +60,7 @@ namespace SprintPlanner.WpfApp.UI.Capacity
                 var cm = new CapacityModel()
                 {
                     DaysInSprint = DaysInSprint,
+                    CapacityFactor = CapacityFactor,
                     Users = Users
                 };
 
@@ -58,6 +68,19 @@ namespace SprintPlanner.WpfApp.UI.Capacity
                 File.WriteAllText("CapacityData.json", data);
             }
         }
+
+        private decimal _capacityFactor;
+
+        public decimal CapacityFactor
+        {
+            get { return _capacityFactor; }
+            set
+            {
+                _capacityFactor = value;
+                RaisePropertyChanged();
+            }
+        }
+
 
         private int _daysInSprint;
 
@@ -123,8 +146,8 @@ namespace SprintPlanner.WpfApp.UI.Capacity
             }
         }
 
-        public int SprintId { get;  set; }
-        public int BoardId { get;  set; }
+        public int SprintId { get; set; }
+        public int BoardId { get; set; }
 
         private void RefreshCommandExecute()
         {

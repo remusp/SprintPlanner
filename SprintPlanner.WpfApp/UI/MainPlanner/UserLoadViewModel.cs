@@ -5,6 +5,18 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 {
     public class UserLoadViewModel : ViewModelBase
     {
+        private string _uid;
+
+        public string Uid
+        {
+            get { return _uid; }
+            set
+            {
+                _uid = value;
+                RaisePropertyChanged();
+            }
+        }
+
         private string _name;
 
         public string Name
@@ -18,9 +30,9 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         }
 
 
-        private int _capacity;
+        private decimal _capacity;
 
-        public int Capacity
+        public decimal Capacity
         {
             get { return _capacity; }
             set
@@ -39,7 +51,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             set
             {
                 _load = value;
-                RaisePropertyChanged();
+                RaisePropertyChanged(nameof(_load));
             }
         }
 

@@ -22,6 +22,8 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             _window = w;
             _selectedBoards = new ObservableCollection<Tuple<int, string>>();
             UserLoads = new ObservableCollection<UserLoadViewModel>();
+            ExternalLoads = new ObservableCollection<ExternalLoadViewModel>();
+
         }
 
         private Window _window;
@@ -75,6 +77,18 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             set
             {
                 _userLoads = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        private ObservableCollection<ExternalLoadViewModel> _externalLoads;
+
+        public ObservableCollection<ExternalLoadViewModel> ExternalLoads
+        {
+            get { return _externalLoads; }
+            set
+            {
+                _externalLoads = value;
                 RaisePropertyChanged();
             }
         }
@@ -193,24 +207,56 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
                 {
                     var cm = JsonConvert.DeserializeObject<CapacityModel>(File.ReadAllText(fileName));
                     var loads = Business.Jira.GetIssuesPerAssignee(SelectedBoards.First().Item1, SelectedSprint.Item1);
-                    var capacities = from u in cm.Users
-                                     select new UserLoadViewModel
-                                     {
-                                         Name = u.UserName,
-                                         Capacity = u.Capacity,
-                                         Load = loads.FirstOrDefault(l => l.Key.Equals(u.Uid)).Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m,
-                                         Issues = new ObservableCollection<IssueViewModel>(loads.FirstOrDefault(l => l.Key.Equals(u.Uid)).Select(i => new IssueViewModel
-                                         {
-                                             Key = i.key,
-                                             ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : string.Empty,
-                                             Name = i.fields.summary,
-                                             Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
-                                         }))
-                                     };
+                    var capacities = (from u in cm.Users
+                                      select new UserLoadViewModel
+                                      {
+                                          Name = u.UserName,
+                                          Uid = u.Uid,
+                                          Capacity = u.ScaledCapacity,
+                                      }).ToList();
+
+                    foreach (var u in capacities)
+                    {
+                        var load = loads.FirstOrDefault(l => l.Key.Equals(u.Uid));
+                        if (load != null)
+                        {
+                            u.Load = load.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m;
+                            u.Issues = new ObservableCollection<IssueViewModel>(load.Select(i => new IssueViewModel
+                            {
+                                Key = i.key,
+                                ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : string.Empty,
+                                Name = i.fields.summary,
+                                Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
+                            }));
+
+                        }
+                    }
                     UserLoads = new ObservableCollection<UserLoadViewModel>(capacities);
+
+                    var team = cm.Users.Select(u => u.Uid).ToList();
+                    var externalLoads = loads.Where(l => !team.Contains(l.Key));
+
+                    ExternalLoads.Clear();
+
+                    foreach (var load in externalLoads)
+                    {
+                        string userName = Business.Jira.GetUserDisplayName(load.Key);
+                        foreach (var item in load)
+                        {
+                            ExternalLoads.Add(new ExternalLoadViewModel
+                            {
+                                UserName = userName,
+                                IssueKey = item.key,
+                                Name = item.fields.summary,
+                                ParentKey = item.fields.issuetype.subtask ? item.fields.parent.key : string.Empty,
+                                ParentName = item.fields.issuetype.subtask ? item.fields.parent.fields.summary : string.Empty,
+                                Hours = item.fields.timetracking.remainingEstimateSeconds / 3600m
+                            });
+                        }
+                    }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 MessageBox.Show("Error encountered while executing command.");// TODO: proper messagebox
             }
@@ -219,7 +265,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
         private void ReloadComandExecute()
         {
-            Boards = new ObservableCollection<Tuple<int, string>>(Business.Jira.GetBoards().Select(b => new Tuple<int, string>(b.Key, b.Value)));
+            Boards = new ObservableCollection<Tuple<int, string>>(Business.Jira.GetBoards().Select(b => new Tuple<int, string>(b.Key, b.Value)).ToList());
         }
 
         public void Persist()

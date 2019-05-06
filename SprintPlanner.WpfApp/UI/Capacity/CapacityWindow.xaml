@@ -13,8 +13,7 @@
                 MinHeight="200"
                 Width="300"
                 Loaded="Window_Loaded"
-                Closing="MetroWindow_Closing"
-                >
+                Closing="MetroWindow_Closing">
   <Window.InputBindings>
     <KeyBinding Key="F5"
                 Command="{Binding RefreshCommand}" />
@@ -23,6 +22,7 @@
                       BusyContent="{Binding BusyReason}">
     <Grid Style="{StaticResource LayoutGrid}">
       <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
         <RowDefinition Height="Auto" />
         <RowDefinition />
       </Grid.RowDefinitions>
@@ -42,9 +42,17 @@
               Command="{Binding RefreshCommand}"
               Grid.Row="0"
               Grid.Column="2" />
+      <TextBlock Text="Capacity factor"
+                 Style="{StaticResource TextBlockStyle}"
+                 Grid.Row="1" />
+      <xctk:DecimalUpDown Value="{Binding CapacityFactor}"
+                          Style="{StaticResource DecimalUpDownStyle}"
+                          Increment="0.1"
+                          Grid.Row="1"
+                          Grid.Column="1" />
       <DataGrid AutoGenerateColumns="False"
                 ItemsSource="{Binding Users}"
-                Grid.Row="1"
+                Grid.Row="2"
                 Grid.Column="0"
                 Grid.ColumnSpan="3">
         <DataGrid.Columns>
@@ -53,7 +61,8 @@
           <DataGridTemplateColumn Header="Hours/Day">
             <DataGridTemplateColumn.CellTemplate>
               <DataTemplate>
-                <xctk:IntegerUpDown Value="{Binding HoursPerDay, UpdateSourceTrigger=PropertyChanged}" />
+                <xctk:DecimalUpDown Value="{Binding HoursPerDay, UpdateSourceTrigger=PropertyChanged}"
+                                    Increment="0.1" />
               </DataTemplate>
             </DataGridTemplateColumn.CellTemplate>
           </DataGridTemplateColumn>
@@ -66,6 +75,8 @@
           </DataGridTemplateColumn>
           <DataGridTextColumn Header="Capacity (h)"
                               Binding="{Binding Capacity, Mode=OneWay}" />
+          <DataGridTextColumn Header="Scaled Capacity (h)"
+                              Binding="{Binding ScaledCapacity, Mode=OneWay}" />
         </DataGrid.Columns>
       </DataGrid>
     </Grid>

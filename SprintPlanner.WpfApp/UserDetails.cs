@@ -28,9 +28,9 @@ namespace SprintPlanner.WpfApp
             }
         }
 
-        private int _hoursPerDay;
+        private decimal _hoursPerDay;
 
-        public int HoursPerDay
+        public decimal HoursPerDay
         {
             get { return _hoursPerDay; }
             set
@@ -38,6 +38,7 @@ namespace SprintPlanner.WpfApp
                 _hoursPerDay = value;
                 RaisePropertyChanged();
                 RaisePropertyChanged(nameof(Capacity));
+                RaisePropertyChanged(nameof(ScaledCapacity));
             }
         }
 
@@ -51,6 +52,7 @@ namespace SprintPlanner.WpfApp
                 _daysOff = value;
                 RaisePropertyChanged();
                 RaisePropertyChanged(nameof(Capacity));
+                RaisePropertyChanged(nameof(ScaledCapacity));
             }
         }
 
@@ -64,13 +66,32 @@ namespace SprintPlanner.WpfApp
                 _daysInSprint = value;
                 RaisePropertyChanged();
                 RaisePropertyChanged(nameof(Capacity));
+                RaisePropertyChanged(nameof(ScaledCapacity));
             }
         }
 
-        public int Capacity
+        private decimal _capacityFactor;
+
+        public decimal CapacityFactor
+        {
+            get { return _capacityFactor; }
+            set
+            {
+                _capacityFactor = value;
+                RaisePropertyChanged();
+                RaisePropertyChanged(nameof(ScaledCapacity));
+            }
+        }
+
+        public decimal Capacity
         {
             get { return (DaysInSprint - DaysOff) * HoursPerDay; }
 
+        }
+
+        public decimal ScaledCapacity
+        {
+            get { return Capacity * CapacityFactor; }
         }
     }
 }

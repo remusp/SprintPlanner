@@ -31,6 +31,12 @@
             Value="5" />
   </Style>
 
+  <Style TargetType="xctk:DecimalUpDown"
+         x:Key="DecimalUpDownStyle">
+    <Setter Property="Margin"
+            Value="5" />
+  </Style>
+
   <Style TargetType="ComboBox"
          x:Key="ComboStyle">
     <Setter Property="Margin"

@@ -7,5 +7,7 @@ namespace SprintPlanner.WpfApp.UI.Capacity
         public int DaysInSprint { get; set; }
 
         public ObservableCollection<UserDetails> Users { get; set; }
+        
+        public decimal CapacityFactor { get; set; }
     }
 }

@@ -63,6 +63,7 @@
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Login\LoginWindowViewModel.cs" />
+    <Compile Include="UI\MainPlanner\ExternalLoadViewModel.cs" />
     <Compile Include="UI\MainPlanner\IssueView.xaml.cs">
       <DependentUpon>IssueView.xaml</DependentUpon>
     </Compile>

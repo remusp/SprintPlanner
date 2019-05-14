@@ -254,6 +254,20 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
                             });
                         }
                     }
+
+                    var unassignedIssues = Business.Jira.GetUnassignedIssues(SelectedBoards.First().Item1, SelectedSprint.Item1);
+                    foreach (var ui in unassignedIssues)
+                    {
+                        ExternalLoads.Add(new ExternalLoadViewModel
+                        {
+                            UserName = "Unassigned",
+                            IssueKey = ui.key,
+                            Name = ui.fields.summary,
+                            ParentKey = ui.fields.issuetype.subtask ? ui.fields.parent.key : string.Empty,
+                            ParentName = ui.fields.issuetype.subtask ? ui.fields.parent.fields.summary : string.Empty,
+                            Hours = ui.fields.timetracking.remainingEstimateSeconds / 3600m
+                        });
+                    }
                 }
             }
             catch (Exception ex)

@@ -51,11 +51,19 @@ namespace SprintPlanner.Core
             return result;
         }
 
+
         public IEnumerable<IGrouping<string, Issue>> GetIssuesPerAssignee(int boardId, int sprintId)
         {
-            List<Issue> issues = GetAllIssuesBySprint(boardId, sprintId); 
+            List<Issue> issues = GetAllIssuesBySprint(boardId, sprintId);
             // Status "6" = Done
-            return issues.Where(l => l.fields.subtasks.Count == 0 && l.fields.status.id != "6").GroupBy(i => i.fields.assignee.name);
+            return issues.Where(l => l.fields.subtasks.Count == 0 && l.fields.status.id != "6" && l.fields.assignee != null).GroupBy(i => i.fields.assignee.name);
+        }
+
+        public IEnumerable<Issue> GetUnassignedIssues(int boardId, int sprintId)
+        {
+            List<Issue> issues = GetAllIssuesBySprint(boardId, sprintId);
+            // Status "6" = Done
+            return issues.Where(l => l.fields.subtasks.Count == 0 && l.fields.status.id != "6" && l.fields.assignee == null);
         }
 
         public List<Tuple<int, string>> GetOpenSprints(int boardId)

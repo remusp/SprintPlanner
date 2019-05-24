@@ -13,6 +13,7 @@
 * Multiselect combo for sprint list (just for search feature)
 * Navigation instead of windows ?
 * Installer
+* Logging support: nlog vs log4net
 * Encrypt saved password
 * Use secure string when working with password (login + api)
 * Remove the need for backing fields in VMs AND run CodeMaid \\:D/

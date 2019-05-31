@@ -67,5 +67,25 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             }
         }
 
+
+        #region PictureData Property
+
+        private byte[] _pictureData;
+        public byte[] PictureData
+        {
+            get
+            {
+                return _pictureData;
+            }
+
+            set
+            {
+                _pictureData = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        #endregion PictureData Property
+
     }
 }

@@ -174,6 +174,12 @@ namespace SprintPlanner.Core
             return boards;
         }
 
+        public byte[] GetPicture(string uid)
+        {
+            string uri = new Uri(Url).Append($"/secure/useravatar?ownerId={uid}").AbsoluteUri;
+            return _webRequester.HttpGetBinaryByWebRequest(uri, _username, _password);
+        }
+
         private bool CheckValidLogin(string username, string password)
         {
             try

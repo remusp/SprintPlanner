@@ -15,7 +15,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 {
     public class MainPlannerWindowViewModel : ViewModelBase
     {
-        bool _initializing;
+        private bool _initializing;
 
         public MainPlannerWindowViewModel(Window w)
         {
@@ -215,8 +215,10 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
                                           Capacity = u.ScaledCapacity,
                                       }).ToList();
 
-                    foreach (var u in capacities)
+
+                    foreach (UserLoadViewModel u in capacities)
                     {
+                        u.PictureData = Business.Jira.GetPicture(u.Uid);
                         var load = loads.FirstOrDefault(l => l.Key.Equals(u.Uid));
                         if (load != null)
                         {

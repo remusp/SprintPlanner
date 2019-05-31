@@ -17,11 +17,11 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         public MainPlannerWindow()
         {
             InitializeComponent();
-            //_webRequester = new CachingHttpRequester("requestCache.txt");
-            _webRequester = new SimpleHttpRequester();
+            _webRequester = new CachingHttpRequester("requestCache.txt");
+            //_webRequester = new SimpleHttpRequester();
         }
 
-        private void MetroWindow_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        private void MetroWindow_Loaded(object sender, RoutedEventArgs e)
         {
             if (_webRequester is CachingHttpRequester cr)
             {

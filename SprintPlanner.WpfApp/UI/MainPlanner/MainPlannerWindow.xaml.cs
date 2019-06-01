@@ -17,7 +17,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         public MainPlannerWindow()
         {
             InitializeComponent();
-            _webRequester = new CachingHttpRequester("requestCache.txt");
+            _webRequester = new CachingHttpRequester("requestCache.json");
             //_webRequester = new SimpleHttpRequester();
         }
 
@@ -69,11 +69,11 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             {
                 if (e.Delta < 0)
                 {
-                    scrollViwer.ScrollToVerticalOffset(scrollViwer.VerticalOffset + 3);
+                    scrollViwer.ScrollToVerticalOffset(scrollViwer.VerticalOffset + 80);//TODO: scrollspeed setting
                 }
                 else if (e.Delta > 0)
                 {
-                    scrollViwer.ScrollToVerticalOffset(scrollViwer.VerticalOffset - 3);
+                    scrollViwer.ScrollToVerticalOffset(scrollViwer.VerticalOffset - 80);
                 }
             }
         }

@@ -42,6 +42,19 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             }
         }
 
+        private decimal _scaledCapacity;
+
+        public decimal ScaledCapacity
+        {
+            get { return _scaledCapacity; }
+            set
+            {
+                _scaledCapacity = value;
+                RaisePropertyChanged();
+            }
+        }
+
+
 
         private decimal _load;
 
@@ -68,6 +81,9 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         }
 
 
+
+
+
         #region PictureData Property
 
         private byte[] _pictureData;
@@ -86,6 +102,19 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         }
 
         #endregion PictureData Property
+
+        private UserStatus _status;
+
+        public UserStatus Status
+        {
+            get { return _status; }
+            set
+            {
+                _status = value;
+                RaisePropertyChanged();
+            }
+        }
+
 
     }
 }

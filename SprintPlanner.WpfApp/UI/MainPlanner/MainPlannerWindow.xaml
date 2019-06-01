@@ -3,7 +3,7 @@
                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                xmlns:mh="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                xmlns:mh="http://metro.mahapps.com/winfx/xaml/controls"
                 xmlns:ip="http://metro.mahapps.com/winfx/xaml/iconpacks"
                 xmlns:l="clr-namespace:SprintPlanner.WpfApp.UI.MainPlanner"
                 xmlns:sdl="http://schemas.sdl.com/xaml"
@@ -13,195 +13,138 @@
                 Closed="MetroWindow_Closed"
                 d:DesignHeight="450"
                 d:DesignWidth="800">
-  <!--<Grid>
-    <Grid.RowDefinitions>
-      <RowDefinition Height="Auto" />
-      <RowDefinition />
-    </Grid.RowDefinitions>
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="Auto" />
-      <ColumnDefinition />
-      <ColumnDefinition Width="Auto" />
-      <ColumnDefinition />
-      <ColumnDefinition Width="Auto" />
-    </Grid.ColumnDefinitions>
-    <TextBlock Text="Board"
-               VerticalAlignment="Center"
-               Style="{StaticResource TextBlockStyle}" />
-    <sdl:MultiSelectComboBox ItemsSource="{Binding Boards}"
-                             SelectedItems="{Binding SelectedBoards}"
-                             sdl:SelectedItemsChangedBehaviour.SelectedItemsChanged="{Binding SelectedBoardChangedCommand}"
-                             ClearFilterOnDropdownClosing="True"
-                             SelectionMode="Single"
-                             IsEditable="True"
-                             MinHeight="38"
-                             Margin="5"
-                             Grid.Column="1">
-      <sdl:MultiSelectComboBox.SelectedItemTemplate>
-        <DataTemplate>
-          <TextBlock Text="{Binding Item2}"
-                     VerticalAlignment="Center" />
-        </DataTemplate>
-      </sdl:MultiSelectComboBox.SelectedItemTemplate>
-      <sdl:MultiSelectComboBox.DropdownItemTemplate>
-        <DataTemplate>
-          <TextBlock Text="{Binding Item2}"
-                     VerticalAlignment="Center" />
-        </DataTemplate>
-      </sdl:MultiSelectComboBox.DropdownItemTemplate>
-    </sdl:MultiSelectComboBox>
-    <TextBlock Text="Sprint"
-               VerticalAlignment="Center"
-               Style="{StaticResource TextBlockStyle}"
-               Grid.Column="2" />
-    <ComboBox ItemsSource="{Binding Sprints}"
-              SelectedItem="{Binding SelectedSprint}"
-              DisplayMemberPath="Item2"
-              Style="{StaticResource ComboStyle}"
-              Grid.Column="3"
-              VerticalAlignment="Center" />
-    <ListBox Grid.Row="1"
-             Grid.ColumnSpan="4"
-             ItemsSource="{Binding UserLoads}"
-             PreviewMouseWheel="ListBox_PreviewMouseWheel"
-             Grid.IsSharedSizeScope="True">
-      <ListBox.ItemTemplate>
-        <DataTemplate>
-          <l:UserLoadView MinWidth="150"
-                          HorizontalAlignment="Left" />
-        </DataTemplate>
-      </ListBox.ItemTemplate>
-    </ListBox>
-    <StackPanel Orientation="Vertical"
-                HorizontalAlignment="Right"
-                Grid.Column="4"
-                Grid.RowSpan="2">
-      <Button ToolTip="Reload"
-              Style="{StaticResource ButtonStyle}"
-              Command="{Binding ReloadCommand}"
-              Content="{ip:FontAwesome {x:Static ip:PackIconFontAwesomeKind.SyncAltSolid}, Width=48, Height=48}">
-      </Button>
-      <Button ToolTip="Settings"
-              Style="{StaticResource ButtonStyle}"
-              Content="{ip:PackIcon {x:Static ip:PackIconMaterialKind.Settings}, Width=48, Height=48}">
-      </Button>
-      <Button ToolTip="Team"
-              Style="{StaticResource ButtonStyle}"
-              Content="{ip:FontAwesome UsersSolid, Width=48, Height=48}" />
-      <Button ToolTip="Team Capacity"
-              Style="{StaticResource ButtonStyle}"
-              Command="{Binding OpenCapacityWindowCommand}"
-              Content="{ip:PackIcon {x:Static ip:PackIconModernKind.ScaleUnbalanced}, Width=48, Height=48}" />
-      <Button ToolTip="Sync load"
-              Style="{StaticResource ButtonStyle}"
-              Command="{Binding SyncLoadCommand}"
-              Content="{ip:FontAwesome SpinnerSolid, Width=48, Height=48}" />
-    </StackPanel>
-  </Grid>-->
-  <DockPanel>
-    <StackPanel Orientation="Vertical"
-                HorizontalAlignment="Right"
-                DockPanel.Dock="Right"
-                Grid.Column="4"
-                Grid.RowSpan="2">
-      <Button ToolTip="Reload"
-              Style="{StaticResource ButtonStyle}"
-              Command="{Binding ReloadCommand}"
-              Content="{ip:FontAwesome {x:Static ip:PackIconFontAwesomeKind.SyncAltSolid}, Width=48, Height=48}">
-      </Button>
-      <Button ToolTip="Settings"
-              Style="{StaticResource ButtonStyle}"
-              Content="{ip:PackIcon {x:Static ip:PackIconMaterialKind.Settings}, Width=48, Height=48}">
-      </Button>
-      <Button ToolTip="Team"
-              Style="{StaticResource ButtonStyle}"
-              Content="{ip:FontAwesome UsersSolid, Width=48, Height=48}" />
-      <Button ToolTip="Team Capacity"
-              Style="{StaticResource ButtonStyle}"
-              Command="{Binding OpenCapacityWindowCommand}"
-              Content="{ip:PackIcon {x:Static ip:PackIconModernKind.ScaleUnbalanced}, Width=48, Height=48}" />
-      <Button ToolTip="Sync load"
-              Style="{StaticResource ButtonStyle}"
-              Command="{Binding SyncLoadCommand}"
-              Content="{ip:FontAwesome SpinnerSolid, Width=48, Height=48}" />
-    </StackPanel>
-    <Grid DockPanel.Dock="Top"
-          VerticalAlignment="Top">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition />
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition />
-      </Grid.ColumnDefinitions>
-      <TextBlock Text="Board"
-                 VerticalAlignment="Center"
-                 Style="{StaticResource TextBlockStyle}" />
-      <sdl:MultiSelectComboBox ItemsSource="{Binding Boards}"
-                               SelectedItems="{Binding SelectedBoards}"
-                               sdl:SelectedItemsChangedBehaviour.SelectedItemsChanged="{Binding SelectedBoardChangedCommand}"
-                               ClearFilterOnDropdownClosing="True"
-                               SelectionMode="Single"
-                               IsEditable="True"
-                               MinHeight="38"
-                               Margin="5"
-                               Grid.Column="1">
-        <sdl:MultiSelectComboBox.SelectedItemTemplate>
-          <DataTemplate>
-            <TextBlock Text="{Binding Item2}"
-                       VerticalAlignment="Center" />
-          </DataTemplate>
-        </sdl:MultiSelectComboBox.SelectedItemTemplate>
-        <sdl:MultiSelectComboBox.DropdownItemTemplate>
-          <DataTemplate>
-            <TextBlock Text="{Binding Item2}"
-                       VerticalAlignment="Center" />
-          </DataTemplate>
-        </sdl:MultiSelectComboBox.DropdownItemTemplate>
-      </sdl:MultiSelectComboBox>
-      <TextBlock Text="Sprint"
-                 VerticalAlignment="Center"
-                 Style="{StaticResource TextBlockStyle}"
-                 Grid.Column="2" />
-      <ComboBox ItemsSource="{Binding Sprints}"
-                SelectedItem="{Binding SelectedSprint}"
-                DisplayMemberPath="Item2"
-                Style="{StaticResource ComboStyle}"
-                Grid.Column="3"
-                VerticalAlignment="Center" />
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <DockPanel
+                    HorizontalAlignment="Stretch"
+                    >
+            <Grid VerticalAlignment="Top"
+                  DockPanel.Dock="Top"
+                  HorizontalAlignment="Stretch">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Board"
+                           VerticalAlignment="Center"
+                           Style="{StaticResource TextBlockStyle}" />
+                <sdl:MultiSelectComboBox ItemsSource="{Binding Boards}"
+                                         SelectedItems="{Binding SelectedBoards}"
+                                         sdl:SelectedItemsChangedBehaviour.SelectedItemsChanged="{Binding SelectedBoardChangedCommand}"
+                                         ClearFilterOnDropdownClosing="True"
+                                         SelectionMode="Single"
+                                         IsEditable="True"
+                                         MinHeight="38"
+                                         Margin="5"
+                                         Grid.Column="1">
+                    <sdl:MultiSelectComboBox.SelectedItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Item2}"
+                                       VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </sdl:MultiSelectComboBox.SelectedItemTemplate>
+                    <sdl:MultiSelectComboBox.DropdownItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Item2}"
+                                       VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </sdl:MultiSelectComboBox.DropdownItemTemplate>
+                </sdl:MultiSelectComboBox>
+                <TextBlock Text="Sprint"
+                           VerticalAlignment="Center"
+                           Style="{StaticResource TextBlockStyle}"
+                           Grid.Column="2" />
+                <ComboBox ItemsSource="{Binding Sprints}"
+                          SelectedItem="{Binding SelectedSprint}"
+                          DisplayMemberPath="Item2"
+                          VerticalAlignment="Stretch"
+                          Grid.Column="3"
+                          Style="{StaticResource ComboStyle}"
+                           />
+            </Grid>
+            <ScrollViewer 
+                          PreviewMouseWheel="ListBox_PreviewMouseWheel" Margin="0, 0, 5, 0">
+                <ItemsControl Grid.Row="1"
+                              Grid.ColumnSpan="4"
+                              ItemsSource="{Binding UserLoads}"
+                              
+                              Grid.IsSharedSizeScope="True"
+                              DockPanel.Dock="Left"
+                              HorizontalAlignment="Left">
+                    
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <l:UserLoadView MinWidth="150"
+                                            HorizontalAlignment="Stretch" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </DockPanel>
+        <mh:HamburgerMenu 
+            DisplayMode="CompactOverlay"
+                          HamburgerWidth="64"
+                          CompactPaneLength="64"
+                          PanePlacement="Right"
+                          PaneBackground="{StaticResource WhiteBrush}"
+                          PaneForeground="{StaticResource TextBrush}"
+                          Grid.Column="1"
+                          >
+            <mh:HamburgerMenu.Style>
+                <Style TargetType="{x:Type mh:HamburgerMenu}">
+                    <Setter Property="OpenPaneLength"
+                            Value="200" />
+                    <Style.Triggers>
+                        <Trigger Property="IsPaneOpen" Value="False">
+                            <Setter Property="OpenPaneLength"
+                                    Value="64" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </mh:HamburgerMenu.Style>
+            <mh:HamburgerMenu.ItemsSource>
+                <mh:HamburgerMenuItemCollection>
+                    <mh:HamburgerMenuIconItem Icon="{ip:FontAwesome {x:Static ip:PackIconFontAwesomeKind.SyncAltSolid}, Width=48, Height=48}"
+                                              Command="{Binding ReloadCommand}"
+                                              Label="Reload" />
+                    <mh:HamburgerMenuIconItem Icon="{ip:PackIcon {x:Static ip:PackIconMaterialKind.Settings}, Width=48, Height=48}"
+                                              Label="Settings" />
+                    <mh:HamburgerMenuIconItem Icon="{ip:FontAwesome UsersSolid, Width=48, Height=48}"
+                                              Label="Team" />
+                    <mh:HamburgerMenuIconItem Icon="{ip:PackIcon {x:Static ip:PackIconModernKind.ScaleUnbalanced}, Width=48, Height=48}"
+                                              Command="{Binding OpenCapacityWindowCommand}"
+                                              Label="Team Capacity" />
+                    <mh:HamburgerMenuIconItem Icon="{ip:FontAwesome SpinnerSolid, Width=48, Height=48}"
+                                              Command="{Binding SyncLoadCommand}"
+                                              Label="Get team data" />
+                </mh:HamburgerMenuItemCollection>
+
+            </mh:HamburgerMenu.ItemsSource>
+            <mh:HamburgerMenu.ItemTemplate>
+                <DataTemplate>
+                    <DockPanel Height="64"
+                               LastChildFill="True">
+                        <Grid Width="64"
+                              DockPanel.Dock="Right">
+                            <ContentControl Grid.Column="0"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Content="{Binding Icon}"
+                                            Focusable="False"
+                                            IsTabStop="False" />
+                        </Grid>
+                        <TextBlock VerticalAlignment="Center"
+                                   FontSize="16"
+                                   HorizontalAlignment="Right"
+                                   Text="{Binding Label}" />
+                    </DockPanel>
+                </DataTemplate>
+            </mh:HamburgerMenu.ItemTemplate>
+        </mh:HamburgerMenu>
     </Grid>
-    <ListBox Grid.Row="1"
-             Grid.ColumnSpan="4"
-             ItemsSource="{Binding UserLoads}"
-             PreviewMouseWheel="ListBox_PreviewMouseWheel"
-             Grid.IsSharedSizeScope="True"
-             DockPanel.Dock="Left"
-             HorizontalAlignment="Left">
-      <ListBox.ItemTemplate>
-        <DataTemplate>
-          <l:UserLoadView MinWidth="150"
-                          HorizontalAlignment="Left" />
-        </DataTemplate>
-      </ListBox.ItemTemplate>
-    </ListBox>
-    <DataGrid Grid.Row="1"
-              Grid.ColumnSpan="4"
-              ItemsSource="{Binding ExternalLoads}"
-              AutoGenerateColumns="False"
-              CanUserAddRows="False">
-      <DataGrid.Columns>
-        <DataGridTextColumn Header="Asignee"
-                            Binding="{Binding UserName}" />
-        <DataGridTextColumn Header="Story Key"
-                            Binding="{Binding ParentKey}" />
-        <DataGridTextColumn Header="Story"
-                            Binding="{Binding ParentName}" />
-        <DataGridTextColumn Header="Issue Key"
-                            Binding="{Binding IssueKey}" />
-        <DataGridTextColumn Header="Issue"
-                            Binding="{Binding Name}" />
-        <DataGridTextColumn Header="Hours"
-                            Binding="{Binding Hours}" />
-      </DataGrid.Columns>
-    </DataGrid>
-  </DockPanel>
 </mh:MetroWindow>

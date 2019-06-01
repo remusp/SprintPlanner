@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -19,17 +20,10 @@ namespace SprintPlanner.Core
 
         public void Load()
         {
-            string[] lines = File.ReadAllLines(_cacheFile);
-
-            for (int i = 0; i < lines.Length; i += 2)
+            using (StreamReader file = File.OpenText(_cacheFile))
             {
-                _webCache.Add(lines[i], new WebCacheEntry
-                {
-                    Request = lines[i],
-                    Response = lines[i + 1],
-                    BinaryResponse = lines[i + 2] != "NULL" ? Encoding.ASCII.GetBytes(lines[i + 2]) : null,
-                    IsNew = false
-                });
+                JsonSerializer serializer = new JsonSerializer();
+                _webCache = (Dictionary<string, WebCacheEntry>)serializer.Deserialize(file, typeof(Dictionary<string, WebCacheEntry>));
             }
         }
 
@@ -47,7 +41,6 @@ namespace SprintPlanner.Core
                 {
                     Request = uri,
                     Response = response,
-                    IsNew = true
                 });
             }
 
@@ -68,7 +61,6 @@ namespace SprintPlanner.Core
                 {
                     Request = uri,
                     BinaryResponse = response,
-                    IsNew = true
                 });
             }
 
@@ -77,16 +69,11 @@ namespace SprintPlanner.Core
 
         public void FlushCacheToDisk()
         {
-            var newEntries = _webCache.Values.Where(v => v.IsNew);
-            var lines = new List<string>();
-            foreach (WebCacheEntry e in newEntries)
+            using (StreamWriter file = File.CreateText(_cacheFile))
             {
-                lines.Add(e.Request);
-                lines.Add(e.Response);
-                lines.Add(Encoding.ASCII.GetString(e.BinaryResponse ?? Encoding.ASCII.GetBytes("NULL")));
+                JsonSerializer serializer = new JsonSerializer() { Formatting = Formatting.Indented };
+                serializer.Serialize(file, _webCache);
             }
-
-            File.AppendAllLines(_cacheFile, lines);
         }
     }
 }

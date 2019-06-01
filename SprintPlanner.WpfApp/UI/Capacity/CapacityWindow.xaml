@@ -11,74 +11,77 @@
                 d:DesignWidth="800"
                 MinWidth="200"
                 MinHeight="200"
-                Width="300"
+                Width="550"
                 Loaded="Window_Loaded"
                 Closing="MetroWindow_Closing">
-  <Window.InputBindings>
-    <KeyBinding Key="F5"
-                Command="{Binding RefreshCommand}" />
-  </Window.InputBindings>
-  <xctk:BusyIndicator IsBusy="{Binding IsBusy}"
-                      BusyContent="{Binding BusyReason}">
-    <Grid Style="{StaticResource LayoutGrid}">
-      <Grid.RowDefinitions>
-        <RowDefinition Height="Auto" />
-        <RowDefinition Height="Auto" />
-        <RowDefinition />
-      </Grid.RowDefinitions>
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition />
-        <ColumnDefinition />
-      </Grid.ColumnDefinitions>
-      <TextBlock Text="Days in sprint"
-                 Style="{StaticResource TextBlockStyle}" />
-      <xctk:IntegerUpDown Value="{Binding DaysInSprint}"
-                          Style="{StaticResource UpDownStyle}"
-                          Grid.Row="0"
-                          Grid.Column="1" />
-      <Button Content="Refresh (F5)"
-              Style="{StaticResource ButtonStyle}"
-              Command="{Binding RefreshCommand}"
-              Grid.Row="0"
-              Grid.Column="2" />
-      <TextBlock Text="Capacity factor"
-                 Style="{StaticResource TextBlockStyle}"
-                 Grid.Row="1" />
-      <xctk:DecimalUpDown Value="{Binding CapacityFactor}"
-                          Style="{StaticResource DecimalUpDownStyle}"
-                          Increment="0.1"
-                          Grid.Row="1"
-                          Grid.Column="1" />
-      <DataGrid AutoGenerateColumns="False"
-                ItemsSource="{Binding Users}"
-                Grid.Row="2"
-                Grid.Column="0"
-                Grid.ColumnSpan="3">
-        <DataGrid.Columns>
-          <DataGridTextColumn Header="Name"
-                              Binding="{Binding UserName}" />
-          <DataGridTemplateColumn Header="Hours/Day">
-            <DataGridTemplateColumn.CellTemplate>
-              <DataTemplate>
-                <xctk:DecimalUpDown Value="{Binding HoursPerDay, UpdateSourceTrigger=PropertyChanged}"
-                                    Increment="0.1" />
-              </DataTemplate>
-            </DataGridTemplateColumn.CellTemplate>
-          </DataGridTemplateColumn>
-          <DataGridTemplateColumn Header="Days off">
-            <DataGridTemplateColumn.CellTemplate>
-              <DataTemplate>
-                <xctk:IntegerUpDown Value="{Binding DaysOff, UpdateSourceTrigger=PropertyChanged}" />
-              </DataTemplate>
-            </DataGridTemplateColumn.CellTemplate>
-          </DataGridTemplateColumn>
-          <DataGridTextColumn Header="Capacity (h)"
-                              Binding="{Binding Capacity, Mode=OneWay}" />
-          <DataGridTextColumn Header="Scaled Capacity (h)"
-                              Binding="{Binding ScaledCapacity, Mode=OneWay}" />
-        </DataGrid.Columns>
-      </DataGrid>
-    </Grid>
-  </xctk:BusyIndicator>
+    <Window.InputBindings>
+        <KeyBinding Key="F5"
+                    Command="{Binding RefreshCommand}" />
+    </Window.InputBindings>
+    <xctk:BusyIndicator IsBusy="{Binding IsBusy}"
+                        BusyContent="{Binding BusyReason}">
+        <Grid Style="{StaticResource LayoutGrid}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Days in sprint"
+                       VerticalAlignment="Center"
+                       Style="{StaticResource TextBlockStyle}" />
+            <mh:NumericUpDown Value="{Binding DaysInSprint}"
+                              Style="{StaticResource UpDownStyle}"
+                              Grid.Row="0"
+                              Grid.Column="1" />
+            <Button Content="Refresh (F5)"
+                    Style="{StaticResource ButtonStyle}"
+                    Command="{Binding RefreshCommand}"
+                    Grid.Row="0"
+                    Grid.Column="2" />
+            <TextBlock Text="Capacity factor"
+                       Style="{StaticResource TextBlockStyle}"
+                       VerticalAlignment="Center"
+                       Grid.Row="1" />
+            <mh:NumericUpDown Value="{Binding CapacityFactor}"
+                              Style="{StaticResource UpDownStyle}"
+                              Interval="0.1"
+                              Grid.Row="1"
+                              Grid.Column="1" />
+            <DataGrid AutoGenerateColumns="False"
+                      ItemsSource="{Binding Users}"
+                      CanUserAddRows="False"
+                      Grid.Row="2"
+                      Grid.Column="0"
+                      Grid.ColumnSpan="3">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Name"
+                                        Binding="{Binding UserName}" />
+                    <DataGridTemplateColumn Header="Hours/Day">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <mh:NumericUpDown Value="{Binding HoursPerDay, UpdateSourceTrigger=PropertyChanged}"
+                                                  Interval="0.1" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Days off">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <mh:NumericUpDown Value="{Binding DaysOff, UpdateSourceTrigger=PropertyChanged}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Capacity (h)"
+                                        Binding="{Binding Capacity, Mode=OneWay}" />
+                    <DataGridTextColumn Header="Scaled Capacity (h)"
+                                        Binding="{Binding ScaledCapacity, Mode=OneWay}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </xctk:BusyIndicator>
 </mh:MetroWindow>

@@ -9,14 +9,14 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 {
     public class IssueViewModel : ViewModelBase
     {
-        private string _key;
+        private string _storyId;
 
-        public string Key
+        public string StoryId
         {
-            get { return _key; }
+            get { return _storyId; }
             set
             {
-                _key = value;
+                _storyId = value;
                 RaisePropertyChanged();
             }
         }
@@ -50,10 +50,49 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         public decimal Hours
         {
             get { return _hours; }
-            set { _hours = value; }
+            set
+            {
+                _hours = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        private string _taskId;
+
+        public string TaskId
+        {
+            get { return _taskId; }
+            set
+            {
+                _taskId = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        private string _taskLink;
+
+        public string TaskLink
+        {
+            get { return _taskLink; }
+            set
+            {
+                _taskLink = value;
+                RaisePropertyChanged();
+            }
         }
 
 
+        private string _storyLink;
+
+        public string StoryLink
+        {
+            get { return _storyLink; }
+            set
+            {
+                _storyLink = value;
+                RaisePropertyChanged();
+            }
+        }
 
     }
 }

@@ -10,6 +10,8 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using MahApps.Metro.Controls.Dialogs;
+using MahApps.Metro.Controls;
 
 namespace SprintPlanner.WpfApp.UI.MainPlanner
 {
@@ -22,7 +24,6 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             _window = w;
             _selectedBoards = new ObservableCollection<Tuple<int, string>>();
             UserLoads = new ObservableCollection<UserLoadViewModel>();
-            ExternalLoads = new ObservableCollection<ExternalLoadViewModel>();
 
         }
 
@@ -80,19 +81,6 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
                 RaisePropertyChanged();
             }
         }
-
-        private ObservableCollection<ExternalLoadViewModel> _externalLoads;
-
-        public ObservableCollection<ExternalLoadViewModel> ExternalLoads
-        {
-            get { return _externalLoads; }
-            set
-            {
-                _externalLoads = value;
-                RaisePropertyChanged();
-            }
-        }
-
 
         private ObservableCollection<Tuple<int, string>> _selectedBoards;
 
@@ -212,7 +200,9 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
                                       {
                                           Name = u.UserName,
                                           Uid = u.Uid,
-                                          Capacity = u.ScaledCapacity,
+                                          Capacity = u.Capacity,
+                                          ScaledCapacity = u.ScaledCapacity,
+                                          Status = UserStatus.Normal
                                       }).ToList();
 
 
@@ -223,9 +213,13 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
                         if (load != null)
                         {
                             u.Load = load.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m;
+                            u.Status = GetStatusAccordingToLoad(u);
                             u.Issues = new ObservableCollection<IssueViewModel>(load.Select(i => new IssueViewModel
                             {
-                                Key = i.key,
+                                TaskId = i.key,
+                                TaskLink = "https://www.google.com",
+                                StoryLink = "https://www.youtube.com/",
+                                StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : string.Empty,
                                 ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : string.Empty,
                                 Name = i.fields.summary,
                                 Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
@@ -233,50 +227,77 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
                         }
                     }
-                    UserLoads = new ObservableCollection<UserLoadViewModel>(capacities);
 
                     var team = cm.Users.Select(u => u.Uid).ToList();
-                    var externalLoads = loads.Where(l => !team.Contains(l.Key));
-
-                    ExternalLoads.Clear();
-
-                    foreach (var load in externalLoads)
+                    foreach (var load in loads.Where(l => !team.Contains(l.Key)))
                     {
-                        string userName = Business.Jira.GetUserDisplayName(load.Key);
-                        foreach (var item in load)
+                        capacities.Add(new UserLoadViewModel
                         {
-                            ExternalLoads.Add(new ExternalLoadViewModel
+                            Name = Business.Jira.GetUserDisplayName(load.Key),
+                            Status = UserStatus.External,
+                            Uid = load.Key,
+                            Capacity = 0,
+                            PictureData = Business.Jira.GetPicture(load.Key),
+                            Load = load.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m,
+                            Issues = new ObservableCollection<IssueViewModel>(load.Select(i => new IssueViewModel
                             {
-                                UserName = userName,
-                                IssueKey = item.key,
-                                Name = item.fields.summary,
-                                ParentKey = item.fields.issuetype.subtask ? item.fields.parent.key : string.Empty,
-                                ParentName = item.fields.issuetype.subtask ? item.fields.parent.fields.summary : string.Empty,
-                                Hours = item.fields.timetracking.remainingEstimateSeconds / 3600m
-                            });
-                        }
+                                TaskId = i.key,
+                                StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : string.Empty,
+                                TaskLink = "https://www.google.com",
+                                StoryLink = "https://www.youtube.com/",
+                                ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : string.Empty,
+                                Name = i.fields.summary,
+                                Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
+                            }))
+                        });
                     }
 
                     var unassignedIssues = Business.Jira.GetUnassignedIssues(SelectedBoards.First().Item1, SelectedSprint.Item1);
-                    foreach (var ui in unassignedIssues)
+                    if (unassignedIssues.Any())
                     {
-                        ExternalLoads.Add(new ExternalLoadViewModel
+                        capacities.Add(new UserLoadViewModel
                         {
-                            UserName = "Unassigned",
-                            IssueKey = ui.key,
-                            Name = ui.fields.summary,
-                            ParentKey = ui.fields.issuetype.subtask ? ui.fields.parent.key : string.Empty,
-                            ParentName = ui.fields.issuetype.subtask ? ui.fields.parent.fields.summary : string.Empty,
-                            Hours = ui.fields.timetracking.remainingEstimateSeconds / 3600m
+                            Name = "Unassigned",
+                            Status = UserStatus.External,
+                            Capacity = 0,
+                            PictureData = File.ReadAllBytes(@"Data\Unassigned.png"),
+                            Load = unassignedIssues.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m,
+                            Issues = new ObservableCollection<IssueViewModel>(unassignedIssues.Select(i => new IssueViewModel
+                            {
+                                TaskId = i.key,
+                                StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : string.Empty,
+                                TaskLink = "https://www.google.com",
+                                StoryLink = "https://www.youtube.com/",
+                                ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : string.Empty,
+                                Name = i.fields.summary,
+                                Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
+                            }))
                         });
                     }
+
+                    UserLoads = new ObservableCollection<UserLoadViewModel>(capacities);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error encountered while executing command.");// TODO: proper messagebox
+                ((MetroWindow)_window).ShowMessageAsync("Error getting team tasks", ex.Message + Environment.NewLine + ex.StackTrace);
             }
 
+        }
+
+        private UserStatus GetStatusAccordingToLoad(UserLoadViewModel u)
+        {
+            if (u.Load >= u.Capacity * 0.875m)
+            {
+                return UserStatus.Danger;
+            }
+
+            if ((u.Load >= u.ScaledCapacity * 0.875m) || (u.Load < u.ScaledCapacity * 0.625m))
+            {
+                return UserStatus.Warning;
+            }
+
+            return UserStatus.Normal;
         }
 
         private void ReloadComandExecute()

@@ -34,6 +34,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>
+    </ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -77,6 +81,7 @@
       <DependentUpon>UserLoadView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\MainPlanner\UserLoadViewModel.cs" />
+    <Compile Include="UI\MainPlanner\UserStatus.cs" />
     <Compile Include="UserDetails.cs" />
     <Page Include="Styles.xaml">
       <SubType>Designer</SubType>
@@ -150,6 +155,14 @@
       <Project>{61c683ce-8d63-4b03-9987-9c727f0502ac}</Project>
       <Name>SprintPlanner.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="construction_project_plan_building_architect_design_develop-62_icon-icons.com_60212.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Data\Unassigned.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

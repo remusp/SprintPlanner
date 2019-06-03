@@ -1,5 +1,7 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
 using SprintPlanner.WpfApp.Properties;
 using System;
 using System.Windows;
@@ -9,8 +11,8 @@ namespace SprintPlanner.WpfApp.UI.Login
 {
     public class LoginWindowViewModel : ViewModelBase
     {
-        private Window _window;
-        public LoginWindowViewModel(Window w)
+        private MetroWindow _window;
+        public LoginWindowViewModel(MetroWindow w)
         {
             _window = w;
         }
@@ -66,24 +68,46 @@ namespace SprintPlanner.WpfApp.UI.Login
             }
         }
 
+
+        #region IsLoggedIn Property
+
+        private bool _isLoggedIn;
+        public bool IsLoggedIn
+        {
+            get
+            {
+                return _isLoggedIn;
+            }
+
+            set
+            {
+                _isLoggedIn = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        #endregion IsLoggedIn Property
+
+
         private void LoginCommandExecute()
         {
             Settings.Default.StoreCredentials = StoreCredentials;
 
-            if (StoreCredentials)
+            IsLoggedIn = Business.Jira.Login(UserName, Password);
+            if (IsLoggedIn)
             {
+                // Always store credentials, as a workaround to transmit them to main window
                 Settings.Default.User = UserName;
                 Settings.Default.Pass = Password;
+                Settings.Default.Save();
+
+                _window.Close();
             }
             else
             {
-                Settings.Default.User = string.Empty;
-                Settings.Default.Pass = string.Empty;
+                _window.ShowMessageAsync("Sprint Organizer", "Username or password is wrong.");
             }
 
-            Settings.Default.Save();
-            Business.Jira.Login(UserName, Password);
-            _window.Close();
         }
     }
 }

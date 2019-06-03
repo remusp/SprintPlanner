@@ -13,138 +13,141 @@
                 Closed="MetroWindow_Closed"
                 d:DesignHeight="450"
                 d:DesignWidth="800">
-    <Grid>
+  <mh:MetroWindow.RightWindowCommands>
+    <mh:WindowCommands>
+      <Image Source="{Binding LoggedInUserPictureData}" />
+      <Button Content="Logout"
+              Visibility="{Binding LogoutVisibility}"
+              Command="{Binding LogoutCommand}" />
+    </mh:WindowCommands>
+  </mh:MetroWindow.RightWindowCommands>
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="*" />
+      <ColumnDefinition Width="Auto" />
+    </Grid.ColumnDefinitions>
+    <DockPanel HorizontalAlignment="Stretch">
+      <Grid VerticalAlignment="Top"
+            DockPanel.Dock="Top"
+            HorizontalAlignment="Stretch">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <DockPanel
-                    HorizontalAlignment="Stretch"
-                    >
-            <Grid VerticalAlignment="Top"
-                  DockPanel.Dock="Top"
-                  HorizontalAlignment="Stretch">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="Board"
-                           VerticalAlignment="Center"
-                           Style="{StaticResource TextBlockStyle}" />
-                <sdl:MultiSelectComboBox ItemsSource="{Binding Boards}"
-                                         SelectedItems="{Binding SelectedBoards}"
-                                         sdl:SelectedItemsChangedBehaviour.SelectedItemsChanged="{Binding SelectedBoardChangedCommand}"
-                                         ClearFilterOnDropdownClosing="True"
-                                         SelectionMode="Single"
-                                         IsEditable="True"
-                                         MinHeight="38"
-                                         Margin="5"
-                                         Grid.Column="1">
-                    <sdl:MultiSelectComboBox.SelectedItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Item2}"
-                                       VerticalAlignment="Center" />
-                        </DataTemplate>
-                    </sdl:MultiSelectComboBox.SelectedItemTemplate>
-                    <sdl:MultiSelectComboBox.DropdownItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Item2}"
-                                       VerticalAlignment="Center" />
-                        </DataTemplate>
-                    </sdl:MultiSelectComboBox.DropdownItemTemplate>
-                </sdl:MultiSelectComboBox>
-                <TextBlock Text="Sprint"
-                           VerticalAlignment="Center"
-                           Style="{StaticResource TextBlockStyle}"
-                           Grid.Column="2" />
-                <ComboBox ItemsSource="{Binding Sprints}"
-                          SelectedItem="{Binding SelectedSprint}"
-                          DisplayMemberPath="Item2"
-                          VerticalAlignment="Stretch"
-                          Grid.Column="3"
-                          Style="{StaticResource ComboStyle}"
-                           />
-            </Grid>
-            <ScrollViewer 
-                          PreviewMouseWheel="ListBox_PreviewMouseWheel" Margin="0, 0, 5, 0">
-                <ItemsControl Grid.Row="1"
-                              Grid.ColumnSpan="4"
-                              ItemsSource="{Binding UserLoads}"
-                              
-                              Grid.IsSharedSizeScope="True"
-                              DockPanel.Dock="Left"
-                              HorizontalAlignment="Left">
-                    
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <l:UserLoadView MinWidth="150"
-                                            HorizontalAlignment="Stretch" />
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
-        </DockPanel>
-        <mh:HamburgerMenu 
-            DisplayMode="CompactOverlay"
-                          HamburgerWidth="64"
-                          CompactPaneLength="64"
-                          PanePlacement="Right"
-                          PaneBackground="{StaticResource WhiteBrush}"
-                          PaneForeground="{StaticResource TextBrush}"
-                          Grid.Column="1"
-                          >
-            <mh:HamburgerMenu.Style>
-                <Style TargetType="{x:Type mh:HamburgerMenu}">
-                    <Setter Property="OpenPaneLength"
-                            Value="200" />
-                    <Style.Triggers>
-                        <Trigger Property="IsPaneOpen" Value="False">
-                            <Setter Property="OpenPaneLength"
-                                    Value="64" />
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </mh:HamburgerMenu.Style>
-            <mh:HamburgerMenu.ItemsSource>
-                <mh:HamburgerMenuItemCollection>
-                    <mh:HamburgerMenuIconItem Icon="{ip:FontAwesome {x:Static ip:PackIconFontAwesomeKind.SyncAltSolid}, Width=48, Height=48}"
-                                              Command="{Binding ReloadCommand}"
-                                              Label="Reload" />
-                    <mh:HamburgerMenuIconItem Icon="{ip:PackIcon {x:Static ip:PackIconMaterialKind.Settings}, Width=48, Height=48}"
-                                              Label="Settings" />
-                    <mh:HamburgerMenuIconItem Icon="{ip:FontAwesome UsersSolid, Width=48, Height=48}"
-                                              Label="Team" />
-                    <mh:HamburgerMenuIconItem Icon="{ip:PackIcon {x:Static ip:PackIconModernKind.ScaleUnbalanced}, Width=48, Height=48}"
-                                              Command="{Binding OpenCapacityWindowCommand}"
-                                              Label="Team Capacity" />
-                    <mh:HamburgerMenuIconItem Icon="{ip:FontAwesome SpinnerSolid, Width=48, Height=48}"
-                                              Command="{Binding SyncLoadCommand}"
-                                              Label="Get team data" />
-                </mh:HamburgerMenuItemCollection>
+        <TextBlock Text="Board"
+                   VerticalAlignment="Center"
+                   Style="{StaticResource TextBlockStyle}" />
+        <sdl:MultiSelectComboBox ItemsSource="{Binding Boards}"
+                                 SelectedItems="{Binding SelectedBoards}"
+                                 sdl:SelectedItemsChangedBehaviour.SelectedItemsChanged="{Binding SelectedBoardChangedCommand}"
+                                 ClearFilterOnDropdownClosing="True"
+                                 SelectionMode="Single"
+                                 IsEditable="True"
+                                 MinHeight="38"
+                                 Margin="5"
+                                 Grid.Column="1">
+          <sdl:MultiSelectComboBox.SelectedItemTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding Item2}"
+                         VerticalAlignment="Center" />
+            </DataTemplate>
+          </sdl:MultiSelectComboBox.SelectedItemTemplate>
+          <sdl:MultiSelectComboBox.DropdownItemTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding Item2}"
+                         VerticalAlignment="Center" />
+            </DataTemplate>
+          </sdl:MultiSelectComboBox.DropdownItemTemplate>
+        </sdl:MultiSelectComboBox>
+        <TextBlock Text="Sprint"
+                   VerticalAlignment="Center"
+                   Style="{StaticResource TextBlockStyle}"
+                   Grid.Column="2" />
+        <ComboBox ItemsSource="{Binding Sprints}"
+                  SelectedItem="{Binding SelectedSprint}"
+                  DisplayMemberPath="Item2"
+                  VerticalAlignment="Stretch"
+                  Grid.Column="3"
+                  Style="{StaticResource ComboStyle}" />
+      </Grid>
+      <ScrollViewer PreviewMouseWheel="ListBox_PreviewMouseWheel"
+                    Margin="0, 0, 5, 0">
+        <ItemsControl Grid.Row="1"
+                      Grid.ColumnSpan="4"
+                      ItemsSource="{Binding UserLoads}"
+                      Grid.IsSharedSizeScope="True"
+                      DockPanel.Dock="Left"
+                      HorizontalAlignment="Left">
 
-            </mh:HamburgerMenu.ItemsSource>
-            <mh:HamburgerMenu.ItemTemplate>
-                <DataTemplate>
-                    <DockPanel Height="64"
-                               LastChildFill="True">
-                        <Grid Width="64"
-                              DockPanel.Dock="Right">
-                            <ContentControl Grid.Column="0"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Content="{Binding Icon}"
-                                            Focusable="False"
-                                            IsTabStop="False" />
-                        </Grid>
-                        <TextBlock VerticalAlignment="Center"
-                                   FontSize="16"
-                                   HorizontalAlignment="Right"
-                                   Text="{Binding Label}" />
-                    </DockPanel>
-                </DataTemplate>
-            </mh:HamburgerMenu.ItemTemplate>
-        </mh:HamburgerMenu>
-    </Grid>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <l:UserLoadView MinWidth="150"
+                              HorizontalAlignment="Stretch" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </DockPanel>
+    <mh:HamburgerMenu DisplayMode="CompactOverlay"
+                      HamburgerWidth="64"
+                      CompactPaneLength="64"
+                      PanePlacement="Right"
+                      PaneBackground="{StaticResource WhiteBrush}"
+                      PaneForeground="{StaticResource TextBrush}"
+                      Grid.Column="1">
+      <mh:HamburgerMenu.Style>
+        <Style TargetType="{x:Type mh:HamburgerMenu}">
+          <Setter Property="OpenPaneLength"
+                  Value="200" />
+          <Style.Triggers>
+            <Trigger Property="IsPaneOpen"
+                     Value="False">
+              <Setter Property="OpenPaneLength"
+                      Value="64" />
+            </Trigger>
+          </Style.Triggers>
+        </Style>
+      </mh:HamburgerMenu.Style>
+      <mh:HamburgerMenu.ItemsSource>
+        <mh:HamburgerMenuItemCollection>
+          <mh:HamburgerMenuIconItem Icon="{ip:FontAwesome {x:Static ip:PackIconFontAwesomeKind.SyncAltSolid}, Width=48, Height=48}"
+                                    Command="{Binding ReloadCommand}"
+                                    Label="Reload" />
+          <mh:HamburgerMenuIconItem Icon="{ip:PackIcon {x:Static ip:PackIconMaterialKind.Settings}, Width=48, Height=48}"
+                                    Label="Settings" />
+          <mh:HamburgerMenuIconItem Icon="{ip:FontAwesome UsersSolid, Width=48, Height=48}"
+                                    Label="Team" />
+          <mh:HamburgerMenuIconItem Icon="{ip:PackIcon {x:Static ip:PackIconModernKind.ScaleUnbalanced}, Width=48, Height=48}"
+                                    Command="{Binding OpenCapacityWindowCommand}"
+                                    Label="Team Capacity" />
+          <mh:HamburgerMenuIconItem Icon="{ip:FontAwesome SpinnerSolid, Width=48, Height=48}"
+                                    Command="{Binding SyncLoadCommand}"
+                                    Label="Get team data" />
+        </mh:HamburgerMenuItemCollection>
+
+      </mh:HamburgerMenu.ItemsSource>
+      <mh:HamburgerMenu.ItemTemplate>
+        <DataTemplate>
+          <DockPanel Height="64"
+                     LastChildFill="True">
+            <Grid Width="64"
+                  DockPanel.Dock="Right">
+              <ContentControl Grid.Column="0"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              Content="{Binding Icon}"
+                              Focusable="False"
+                              IsTabStop="False" />
+            </Grid>
+            <TextBlock VerticalAlignment="Center"
+                       FontSize="16"
+                       HorizontalAlignment="Right"
+                       Text="{Binding Label}" />
+          </DockPanel>
+        </DataTemplate>
+      </mh:HamburgerMenu.ItemTemplate>
+    </mh:HamburgerMenu>
+  </Grid>
 </mh:MetroWindow>

@@ -1,4 +1,9 @@
-### Version 0.0.3 (2019-xx-xx)
+### Version 0.0.4 (2019-xx-xx)
+ * Logged in user displayed in title bar
+ * Logout button in title bar
+ * Fixed bug causing user data to not be loaded when there is no team configured
+ 
+### Version 0.0.3 (2019-06-03)
  * Added user pictures
  * Replaced buttons in sprint planning main view with a hamburger menu
  * Switched to Mahapps look for combos, numeric-up-downs, buttons, grids

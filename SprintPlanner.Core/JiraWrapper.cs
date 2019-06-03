@@ -156,6 +156,12 @@ namespace SprintPlanner.Core
             return issues;
         }
 
+        public void Logout()
+        {
+            _username = string.Empty;
+            _password = string.Empty;
+        }
+
         private List<Value> GetAllBoards()
         {
             var boards = new List<Value>();

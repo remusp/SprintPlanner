@@ -17,8 +17,8 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         public MainPlannerWindow()
         {
             InitializeComponent();
-            _webRequester = new CachingHttpRequester("requestCache.json");
-            //_webRequester = new SimpleHttpRequester();
+            //_webRequester = new CachingHttpRequester("requestCache.json");
+            _webRequester = new SimpleHttpRequester();
         }
 
         private void MetroWindow_Loaded(object sender, RoutedEventArgs e)
@@ -55,6 +55,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             {
                 Settings.Default.User = string.Empty;
                 Settings.Default.Pass = string.Empty;
+                Settings.Default.Save();
             }
 
             if (DataContext is MainPlannerWindowViewModel vm)

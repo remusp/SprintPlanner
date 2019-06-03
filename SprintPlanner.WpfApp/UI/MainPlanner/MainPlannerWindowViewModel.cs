@@ -12,6 +12,8 @@ using System.Windows;
 using System.Windows.Input;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.Controls;
+using System.Collections.Generic;
+using SprintPlanner.Core;
 
 namespace SprintPlanner.WpfApp.UI.MainPlanner
 {
@@ -19,15 +21,15 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
     {
         private bool _initializing;
 
-        public MainPlannerWindowViewModel(Window w)
+        public MainPlannerWindowViewModel(MetroWindow w)
         {
             _window = w;
             _selectedBoards = new ObservableCollection<Tuple<int, string>>();
             UserLoads = new ObservableCollection<UserLoadViewModel>();
-
+            LogoutVisibility = Visibility.Collapsed;
         }
 
-        private Window _window;
+        private MetroWindow _window;
 
         private ICommand _openCapacityWindowCommand;
 
@@ -106,15 +108,49 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             }
         }
 
+
+        #region LoggedInUserPictureData Property
+
+        private byte[] _loggedInUserPictureData;
+        public byte[] LoggedInUserPictureData
+        {
+            get
+            {
+                return _loggedInUserPictureData;
+            }
+
+            set
+            {
+                _loggedInUserPictureData = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        #endregion LoggedInUserPictureData Property
+
+
         public void EnsureLoggedIn()
         {
             if (string.IsNullOrWhiteSpace(Settings.Default.User) || string.IsNullOrWhiteSpace(Settings.Default.Pass))
             {
-                new LoginWindow() { Owner = _window }.Show();
+                var loginWindow = new LoginWindow() { Owner = _window };
+                loginWindow.ShowDialog();
+                bool isLoggedIn = (loginWindow.DataContext as LoginWindowViewModel).IsLoggedIn;
+                if (isLoggedIn)
+                {
+                    LoggedInUserPictureData = Business.Jira.GetPicture(Settings.Default.User);
+                    LogoutVisibility = Visibility.Visible;
+                }
             }
             else
             {
-                Business.Jira.Login(Settings.Default.User, Settings.Default.Pass);
+                bool isLoggedIn = Business.Jira.Login(Settings.Default.User, Settings.Default.Pass);
+                if (isLoggedIn)
+                {
+                    LoggedInUserPictureData = Business.Jira.GetPicture(Settings.Default.User);
+                    LogoutVisibility = Visibility.Visible;
+                }
+
             }
         }
 
@@ -170,6 +206,54 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             }
         }
 
+        private ICommand _logoutCommand;
+
+        public ICommand LogoutCommand
+        {
+            get
+            {
+                if (_logoutCommand == null)
+                {
+                    _logoutCommand = new RelayCommand(LogoutExecute);
+                }
+
+                return _logoutCommand;
+            }
+        }
+
+
+        #region IsLogoutVisible Property
+
+        private Visibility _logoutVisibility;
+        public Visibility LogoutVisibility
+        {
+            get
+            {
+                return _logoutVisibility;
+            }
+
+            set
+            {
+                _logoutVisibility = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        #endregion IsLogoutVisible Property
+
+
+        private void LogoutExecute()
+        {
+            Settings.Default.User = string.Empty;
+            Settings.Default.Pass = string.Empty;
+            Settings.Default.StoreCredentials = false;
+            Settings.Default.Save();
+
+            LoggedInUserPictureData = null;
+            Business.Jira.Logout();
+            LogoutVisibility = Visibility.Collapsed;
+        }
+
         private void SelectedBoardChangedComandExecute()
         {
             if (!_initializing && !SelectedBoards.Equals(default(Tuple<int, string>)))
@@ -181,29 +265,35 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
                 }
                 catch (Exception ex)
                 {
+                    _window.ShowMessageAsync("Error fetching open sprints", ex.Message + Environment.NewLine + ex.StackTrace);
                 }
             }
+
+            _initializing = false;
         }
 
         private void SyncLoadComandExecute()
         {
             try
             {
+                var capacities = new List<UserLoadViewModel>();
+                var team = new List<string>();
+                var loads = Business.Jira.GetIssuesPerAssignee(SelectedBoards.First().Item1, SelectedSprint.Item1);
+
                 // TODO: duplicate code: capacity load
                 string fileName = "CapacityData.json";
                 if (File.Exists(fileName))
                 {
                     var cm = JsonConvert.DeserializeObject<CapacityModel>(File.ReadAllText(fileName));
-                    var loads = Business.Jira.GetIssuesPerAssignee(SelectedBoards.First().Item1, SelectedSprint.Item1);
-                    var capacities = (from u in cm.Users
-                                      select new UserLoadViewModel
-                                      {
-                                          Name = u.UserName,
-                                          Uid = u.Uid,
-                                          Capacity = u.Capacity,
-                                          ScaledCapacity = u.ScaledCapacity,
-                                          Status = UserStatus.Normal
-                                      }).ToList();
+                    capacities = (from u in cm.Users
+                                  select new UserLoadViewModel
+                                  {
+                                      Name = u.UserName,
+                                      Uid = u.Uid,
+                                      Capacity = u.Capacity,
+                                      ScaledCapacity = u.ScaledCapacity,
+                                      Status = UserStatus.Normal
+                                  }).ToList();
 
 
                     foreach (UserLoadViewModel u in capacities)
@@ -217,8 +307,8 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
                             u.Issues = new ObservableCollection<IssueViewModel>(load.Select(i => new IssueViewModel
                             {
                                 TaskId = i.key,
-                                TaskLink = "https://www.google.com",
-                                StoryLink = "https://www.youtube.com/",
+                                TaskLink = $"https://jira.sdl.com/browse/{i.key}",
+                                StoryLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.fields.parent.key : string.Empty)}",
                                 StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : string.Empty,
                                 ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : string.Empty,
                                 Name = i.fields.summary,
@@ -228,71 +318,73 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
                         }
                     }
 
-                    var team = cm.Users.Select(u => u.Uid).ToList();
-                    foreach (var load in loads.Where(l => !team.Contains(l.Key)))
-                    {
-                        capacities.Add(new UserLoadViewModel
-                        {
-                            Name = Business.Jira.GetUserDisplayName(load.Key),
-                            Status = UserStatus.External,
-                            Uid = load.Key,
-                            Capacity = 0,
-                            PictureData = Business.Jira.GetPicture(load.Key),
-                            Load = load.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m,
-                            Issues = new ObservableCollection<IssueViewModel>(load.Select(i => new IssueViewModel
-                            {
-                                TaskId = i.key,
-                                StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : string.Empty,
-                                TaskLink = "https://www.google.com",
-                                StoryLink = "https://www.youtube.com/",
-                                ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : string.Empty,
-                                Name = i.fields.summary,
-                                Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
-                            }))
-                        });
-                    }
-
-                    var unassignedIssues = Business.Jira.GetUnassignedIssues(SelectedBoards.First().Item1, SelectedSprint.Item1);
-                    if (unassignedIssues.Any())
-                    {
-                        capacities.Add(new UserLoadViewModel
-                        {
-                            Name = "Unassigned",
-                            Status = UserStatus.External,
-                            Capacity = 0,
-                            PictureData = File.ReadAllBytes(@"Data\Unassigned.png"),
-                            Load = unassignedIssues.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m,
-                            Issues = new ObservableCollection<IssueViewModel>(unassignedIssues.Select(i => new IssueViewModel
-                            {
-                                TaskId = i.key,
-                                StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : string.Empty,
-                                TaskLink = "https://www.google.com",
-                                StoryLink = "https://www.youtube.com/",
-                                ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : string.Empty,
-                                Name = i.fields.summary,
-                                Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
-                            }))
-                        });
-                    }
-
-                    UserLoads = new ObservableCollection<UserLoadViewModel>(capacities);
+                    team = cm.Users.Select(u => u.Uid).ToList();
                 }
+
+                foreach (var load in loads.Where(l => !team.Contains(l.Key)))
+                {
+                    capacities.Add(new UserLoadViewModel
+                    {
+                        Name = Business.Jira.GetUserDisplayName(load.Key),
+                        Status = UserStatus.External,
+                        Uid = load.Key,
+                        Capacity = 0,
+                        PictureData = Business.Jira.GetPicture(load.Key),
+                        Load = load.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m,
+                        Issues = new ObservableCollection<IssueViewModel>(load.Select(i => new IssueViewModel
+                        {
+                            TaskId = i.key,
+                            StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : string.Empty,
+                            TaskLink = $"https://jira.sdl.com/browse/{i.key}",
+                            StoryLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.fields.parent.key : string.Empty)}",
+                            ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : string.Empty,
+                            Name = i.fields.summary,
+                            Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
+                        }))
+                    });
+                }
+
+                IEnumerable<Issue> unassignedIssues = Business.Jira.GetUnassignedIssues(SelectedBoards.First().Item1, SelectedSprint.Item1);
+                if (unassignedIssues.Any())
+                {
+                    capacities.Add(new UserLoadViewModel
+                    {
+                        Name = "Unassigned",
+                        Status = UserStatus.External,
+                        Capacity = 0,
+                        PictureData = File.ReadAllBytes(@"Data\Unassigned.png"),
+                        Load = unassignedIssues.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m,
+                        Issues = new ObservableCollection<IssueViewModel>(unassignedIssues.Select(i => new IssueViewModel
+                        {
+                            TaskId = i.key,
+                            StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : string.Empty,
+                            TaskLink = $"https://jira.sdl.com/browse/{i.key}",
+                            StoryLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.fields.parent.key : string.Empty)}",
+                            ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : string.Empty,
+                            Name = i.fields.summary,
+                            Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
+                        }))
+                    });
+                }
+
+                UserLoads = new ObservableCollection<UserLoadViewModel>(capacities);
+
             }
             catch (Exception ex)
             {
-                ((MetroWindow)_window).ShowMessageAsync("Error getting team tasks", ex.Message + Environment.NewLine + ex.StackTrace);
+                _window.ShowMessageAsync("Error getting team tasks", ex.Message + Environment.NewLine + ex.StackTrace);
             }
 
         }
 
         private UserStatus GetStatusAccordingToLoad(UserLoadViewModel u)
         {
-            if (u.Load >= u.Capacity * 0.875m)
+            if (u.Load >= u.Capacity)
             {
                 return UserStatus.Danger;
             }
 
-            if ((u.Load >= u.ScaledCapacity * 0.875m) || (u.Load < u.ScaledCapacity * 0.625m))
+            if ((u.Load >= u.ScaledCapacity) || (u.Load < u.ScaledCapacity * 0.625m))
             {
                 return UserStatus.Warning;
             }
@@ -335,7 +427,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
                 SelectedBoards.Add(Boards.First(i => i.Item1 == sm.SelectedBoard));
                 RaisePropertyChanged(nameof(SelectedBoards));
                 SelectedSprint = Sprints.First(i => i.Item1 == sm.SelectedSprint);
-                _initializing = false;
+                
             }
         }
 

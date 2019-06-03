@@ -1,14 +1,13 @@
 # SprintPlanner
 ## TODOs:
-* Planning view: Tree display for issues 
-* Fix negative capacity bug
-* Display Logged-in user (in title bar?)
-* Logout
+* About box
 * Settings / Configurable server 
+* Commited field for stories / tasks
+* Fix negative capacity bug
 * Story points
 * Story points field in settings (needed bc technical reasons)
-* About box
 * Optimize JIRA calls
+* Progress spinner
 * Planning view: toggle expand/collapse btn
 * Team Configuration window 
   * Add users from current sprint

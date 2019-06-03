@@ -157,9 +157,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="construction_project_plan_building_architect_design_develop-62_icon-icons.com_60212.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Data\Unassigned.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

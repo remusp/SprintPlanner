@@ -17,8 +17,8 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         public MainPlannerWindow()
         {
             InitializeComponent();
-            //_webRequester = new CachingHttpRequester("requestCache.json");
-            _webRequester = new SimpleHttpRequester();
+            _webRequester = new CachingHttpRequester("requestCache.json");
+            //_webRequester = new SimpleHttpRequester();
         }
 
         private void MetroWindow_Loaded(object sender, RoutedEventArgs e)

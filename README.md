@@ -1,5 +1,6 @@
 # SprintPlanner
 ## TODOs:
+* Dev / QA capacity
 * Commited field for stories / tasks
 * Fix negative capacity bug
 * Story points

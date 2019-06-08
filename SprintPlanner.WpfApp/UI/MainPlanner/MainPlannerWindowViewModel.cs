@@ -1,113 +1,95 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using MahApps.Metro.Controls;
 using Newtonsoft.Json;
+using SprintPlanner.Core.Logic;
 using SprintPlanner.WpfApp.Properties;
+using SprintPlanner.WpfApp.UI.About;
 using SprintPlanner.WpfApp.UI.Capacity;
 using SprintPlanner.WpfApp.UI.Login;
-using System;
-using System.Collections.ObjectModel;
+using SprintPlanner.WpfApp.UI.Planning;
+using SprintPlanner.WpfApp.UI.SettingsUI;
 using System.IO;
-using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
-using MahApps.Metro.Controls.Dialogs;
-using MahApps.Metro.Controls;
-using System.Collections.Generic;
-using SprintPlanner.Core;
 
 namespace SprintPlanner.WpfApp.UI.MainPlanner
 {
     public class MainPlannerWindowViewModel : ViewModelBase
     {
-        private bool _initializing;
+
+        private readonly CapacityViewModel _capacityViewModel;
+
+        private readonly PlanningViewModel _planningViewModel;
+
+        private readonly LoginViewModel _loginViewModel;
+
+        private readonly AboutViewModel _aboutViewModel;
+
+        private readonly SettingsViewModel _settingsViewModel;
+
+        private readonly MetroWindow _window;
 
         public MainPlannerWindowViewModel(MetroWindow w)
         {
             _window = w;
-            _selectedBoards = new ObservableCollection<Tuple<int, string>>();
-            UserLoads = new ObservableCollection<UserLoadViewModel>();
+
             LogoutVisibility = Visibility.Collapsed;
+
+            _planningViewModel = new PlanningViewModel(w);
+            _capacityViewModel = new CapacityViewModel();
+            _settingsViewModel = new SettingsViewModel();
+            _loginViewModel = new LoginViewModel(w);
+            _loginViewModel.LoginSucceeded += LoginSucceededHandler;
+            var assembly = Assembly.GetExecutingAssembly();
+            _aboutViewModel = new AboutViewModel()
+            {
+                ProductName = ((AssemblyTitleAttribute)assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute))).Title,
+                ProductVersion = assembly.GetName().Version.ToString()
+            };
         }
 
-        private MetroWindow _window;
 
-        private ICommand _openCapacityWindowCommand;
 
-        public ICommand OpenCapacityWindowCommand
+        private ICommand _capacityViewCommand;
+
+        public ICommand CapacityViewCommand
         {
             get
             {
-                if (_openCapacityWindowCommand == null)
-                {
-                    _openCapacityWindowCommand = new RelayCommand(OpenCapacityWindowCommandExecute);
-                }
-
-                return _openCapacityWindowCommand;
+                return _capacityViewCommand ?? (_capacityViewCommand = new RelayCommand(CapacityViewCommandExecute));
             }
         }
 
+        private ICommand _aboutViewCommand;
 
-
-        private ObservableCollection<Tuple<int, string>> _boards;
-
-        public ObservableCollection<Tuple<int, string>> Boards
+        public ICommand AboutViewCommand
         {
-            get { return _boards; }
-            set
+            get
             {
-                _boards = value;
-                RaisePropertyChanged();
+                return _aboutViewCommand ?? (_aboutViewCommand = new RelayCommand(AboutViewCommandExecute));
             }
         }
 
-        private ObservableCollection<Tuple<int, string>> _sprints;
+        private ICommand _settingsViewCommand;
 
-        public ObservableCollection<Tuple<int, string>> Sprints
+        public ICommand SettingsViewCommand
         {
-            get { return _sprints; }
-            set
+            get
             {
-                _sprints = value;
-                RaisePropertyChanged();
+                return _settingsViewCommand ?? (_settingsViewCommand = new RelayCommand(SettingsViewCommandExecute));
             }
         }
 
-        private ObservableCollection<UserLoadViewModel> _userLoads;
-
-        public ObservableCollection<UserLoadViewModel> UserLoads
+        public void Load()
         {
-            get { return _userLoads; }
-            set
+            const string fileName = "StoredData.json";
+            if (File.Exists(fileName))
             {
-                _userLoads = value;
-                RaisePropertyChanged();
+                Business.Data = JsonConvert.DeserializeObject<DataStorageModel>(File.ReadAllText(fileName));
             }
         }
-
-        private ObservableCollection<Tuple<int, string>> _selectedBoards;
-
-        public ObservableCollection<Tuple<int, string>> SelectedBoards
-        {
-            get { return _selectedBoards; }
-            set
-            {
-                _selectedBoards = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        private Tuple<int, string> _selectedSprint;
-
-        public Tuple<int, string> SelectedSprint
-        {
-            get { return _selectedSprint; }
-            set
-            {
-                _selectedSprint = value;
-                RaisePropertyChanged();
-            }
-        }
-
 
         #region LoggedInUserPictureData Property
 
@@ -128,22 +110,35 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
         #endregion LoggedInUserPictureData Property
 
+        private ViewModelBase _mainViewModel;
+
+        public ViewModelBase MainViewModel
+        {
+            get { return _mainViewModel; }
+            set
+            {
+                _mainViewModel = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public void Persist()
+        {
+            string serialized = JsonConvert.SerializeObject(Business.Data, Formatting.Indented);
+            File.WriteAllText("StoredData.json", serialized);
+        }
+
+
 
         public void EnsureLoggedIn()
         {
             if (string.IsNullOrWhiteSpace(Settings.Default.User) || string.IsNullOrWhiteSpace(Settings.Default.Pass))
             {
-                var loginWindow = new LoginWindow() { Owner = _window };
-                loginWindow.ShowDialog();
-                bool isLoggedIn = (loginWindow.DataContext as LoginWindowViewModel).IsLoggedIn;
-                if (isLoggedIn)
-                {
-                    LoggedInUserPictureData = Business.Jira.GetPicture(Settings.Default.User);
-                    LogoutVisibility = Visibility.Visible;
-                }
+                SetView(_loginViewModel);
             }
             else
             {
+                // TODO: duplicate login
                 bool isLoggedIn = Business.Jira.Login(Settings.Default.User, Settings.Default.Pass);
                 if (isLoggedIn)
                 {
@@ -151,59 +146,37 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
                     LogoutVisibility = Visibility.Visible;
                 }
 
+                SetView(_planningViewModel);
+
             }
         }
 
-        private void OpenCapacityWindowCommandExecute()
+        private void LoginSucceededHandler()
         {
-            new CapacityWindow(SelectedBoards.First().Item1, SelectedSprint.Item1).Show();
-        }
-
-        private ICommand _reloadCommand;
-
-        public ICommand ReloadCommand
-        {
-            get
+            // TODO: duplicate login
+            bool isLoggedIn = _loginViewModel.IsLoggedIn;
+            if (isLoggedIn)
             {
-                if (_reloadCommand == null)
-                {
-                    _reloadCommand = new RelayCommand(ReloadComandExecute);
-                }
-
-                return _reloadCommand;
+                LoggedInUserPictureData = Business.Jira.GetPicture(Settings.Default.User);
+                LogoutVisibility = Visibility.Visible;
             }
+
+            SetView(_planningViewModel);
         }
 
-        //SyncLoadCommand
-
-        private ICommand _syncLoadCommand;
-
-        public ICommand SyncLoadCommand
+        private void CapacityViewCommandExecute()
         {
-            get
-            {
-                if (_syncLoadCommand == null)
-                {
-                    _syncLoadCommand = new RelayCommand(SyncLoadComandExecute);
-                }
-
-                return _syncLoadCommand;
-            }
+            SetView(_capacityViewModel);
         }
 
-        private ICommand _selectedBoardChangedCommand;
-
-        public ICommand SelectedBoardChangedCommand
+        private void AboutViewCommandExecute()
         {
-            get
-            {
-                if (_selectedBoardChangedCommand == null)
-                {
-                    _selectedBoardChangedCommand = new RelayCommand(SelectedBoardChangedComandExecute);
-                }
+            SetView(_aboutViewModel);
+        }
 
-                return _selectedBoardChangedCommand;
-            }
+        private void SettingsViewCommandExecute()
+        {
+            SetView(_settingsViewModel);
         }
 
         private ICommand _logoutCommand;
@@ -212,12 +185,27 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         {
             get
             {
-                if (_logoutCommand == null)
-                {
-                    _logoutCommand = new RelayCommand(LogoutExecute);
-                }
+                return _logoutCommand ?? (_logoutCommand = new RelayCommand(LogoutExecute));
+            }
+        }
 
-                return _logoutCommand;
+        private ICommand _planningViewCommand;
+
+        public ICommand PlanningViewCommand
+        {
+            get
+            {
+                return _planningViewCommand ?? (_planningViewCommand = new RelayCommand(PlanningViewCommandExecute));
+            }
+        }
+
+        private ICommand _loginViewCommand;
+
+        public ICommand LoginViewCommand
+        {
+            get
+            {
+                return _loginViewCommand ?? (_loginViewCommand = new RelayCommand(LoginViewCommandExecute));
             }
         }
 
@@ -225,6 +213,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         #region IsLogoutVisible Property
 
         private Visibility _logoutVisibility;
+
         public Visibility LogoutVisibility
         {
             get
@@ -252,185 +241,28 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             LoggedInUserPictureData = null;
             Business.Jira.Logout();
             LogoutVisibility = Visibility.Collapsed;
+            SetView(_loginViewModel);
         }
 
-        private void SelectedBoardChangedComandExecute()
+        private void PlanningViewCommandExecute()
         {
-            if (!_initializing && !SelectedBoards.Equals(default(Tuple<int, string>)))
-            {
-                try
-                {
-                    Sprints = new ObservableCollection<Tuple<int, string>>(Business.Jira.GetOpenSprints(SelectedBoards.First().Item1));
-                    SelectedSprint = Sprints.FirstOrDefault();
-                }
-                catch (Exception ex)
-                {
-                    _window.ShowMessageAsync("Error fetching open sprints", ex.Message + Environment.NewLine + ex.StackTrace);
-                }
-            }
-
-            _initializing = false;
+            SetView(_planningViewModel);
         }
 
-        private void SyncLoadComandExecute()
+        private void LoginViewCommandExecute()
         {
-            try
-            {
-                var capacities = new List<UserLoadViewModel>();
-                var team = new List<string>();
-                var loads = Business.Jira.GetIssuesPerAssignee(SelectedBoards.First().Item1, SelectedSprint.Item1);
-
-                // TODO: duplicate code: capacity load
-                string fileName = "CapacityData.json";
-                if (File.Exists(fileName))
-                {
-                    var cm = JsonConvert.DeserializeObject<CapacityModel>(File.ReadAllText(fileName));
-                    capacities = (from u in cm.Users
-                                  select new UserLoadViewModel
-                                  {
-                                      Name = u.UserName,
-                                      Uid = u.Uid,
-                                      Capacity = u.Capacity,
-                                      ScaledCapacity = u.ScaledCapacity,
-                                      Status = UserStatus.Normal
-                                  }).ToList();
-
-
-                    foreach (UserLoadViewModel u in capacities)
-                    {
-                        u.PictureData = Business.Jira.GetPicture(u.Uid);
-                        var load = loads.FirstOrDefault(l => l.Key.Equals(u.Uid));
-                        if (load != null)
-                        {
-                            u.Load = load.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m;
-                            u.Status = GetStatusAccordingToLoad(u);
-                            u.Issues = new ObservableCollection<IssueViewModel>(load.Select(i => new IssueViewModel
-                            {
-                                TaskId = i.key,
-                                TaskLink = $"https://jira.sdl.com/browse/{i.key}",
-                                StoryLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.fields.parent.key : string.Empty)}",
-                                StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : string.Empty,
-                                ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : string.Empty,
-                                Name = i.fields.summary,
-                                Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
-                            }));
-
-                        }
-                    }
-
-                    team = cm.Users.Select(u => u.Uid).ToList();
-                }
-
-                foreach (var load in loads.Where(l => !team.Contains(l.Key)))
-                {
-                    capacities.Add(new UserLoadViewModel
-                    {
-                        Name = Business.Jira.GetUserDisplayName(load.Key),
-                        Status = UserStatus.External,
-                        Uid = load.Key,
-                        Capacity = 0,
-                        PictureData = Business.Jira.GetPicture(load.Key),
-                        Load = load.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m,
-                        Issues = new ObservableCollection<IssueViewModel>(load.Select(i => new IssueViewModel
-                        {
-                            TaskId = i.key,
-                            StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : string.Empty,
-                            TaskLink = $"https://jira.sdl.com/browse/{i.key}",
-                            StoryLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.fields.parent.key : string.Empty)}",
-                            ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : string.Empty,
-                            Name = i.fields.summary,
-                            Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
-                        }))
-                    });
-                }
-
-                IEnumerable<Issue> unassignedIssues = Business.Jira.GetUnassignedIssues(SelectedBoards.First().Item1, SelectedSprint.Item1);
-                if (unassignedIssues.Any())
-                {
-                    capacities.Add(new UserLoadViewModel
-                    {
-                        Name = "Unassigned",
-                        Status = UserStatus.External,
-                        Capacity = 0,
-                        PictureData = File.ReadAllBytes(@"Data\Unassigned.png"),
-                        Load = unassignedIssues.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m,
-                        Issues = new ObservableCollection<IssueViewModel>(unassignedIssues.Select(i => new IssueViewModel
-                        {
-                            TaskId = i.key,
-                            StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : string.Empty,
-                            TaskLink = $"https://jira.sdl.com/browse/{i.key}",
-                            StoryLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.fields.parent.key : string.Empty)}",
-                            ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : string.Empty,
-                            Name = i.fields.summary,
-                            Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
-                        }))
-                    });
-                }
-
-                UserLoads = new ObservableCollection<UserLoadViewModel>(capacities);
-
-            }
-            catch (Exception ex)
-            {
-                _window.ShowMessageAsync("Error getting team tasks", ex.Message + Environment.NewLine + ex.StackTrace);
-            }
-
+            SetView(_loginViewModel);
         }
 
-        private UserStatus GetStatusAccordingToLoad(UserLoadViewModel u)
+        private void SetView(ViewModelBase vm)
         {
-            if (u.Load >= u.Capacity)
+            if (MainViewModel is IStorageManipulator m)
             {
-                return UserStatus.Danger;
+                m.Flush();
             }
 
-            if ((u.Load >= u.ScaledCapacity) || (u.Load < u.ScaledCapacity * 0.625m))
-            {
-                return UserStatus.Warning;
-            }
-
-            return UserStatus.Normal;
+            (vm as IStorageManipulator)?.Pull();
+            MainViewModel = vm;
         }
-
-        private void ReloadComandExecute()
-        {
-            Boards = new ObservableCollection<Tuple<int, string>>(Business.Jira.GetBoards().Select(b => new Tuple<int, string>(b.Key, b.Value)).ToList());
-        }
-
-        public void Persist()
-        {
-            if (Boards != null && Boards.Count > 0)
-            {
-                var data = new SprintModel
-                {
-                    Boards = Boards,
-                    SelectedBoard = SelectedBoards.First().Item1,
-                    Sprints = Sprints,
-                    SelectedSprint = SelectedSprint.Item1
-                };
-
-                string serialized = JsonConvert.SerializeObject(data, Formatting.Indented);
-                File.WriteAllText("SprintData.json", serialized);
-            }
-        }
-
-        public void Load()
-        {
-            string fileName = "SprintData.json";
-            if (File.Exists(fileName))
-            {
-                _initializing = true;
-                var sm = JsonConvert.DeserializeObject<SprintModel>(File.ReadAllText(fileName));
-                Boards = sm.Boards;
-                Sprints = sm.Sprints;
-
-                SelectedBoards.Add(Boards.First(i => i.Item1 == sm.SelectedBoard));
-                RaisePropertyChanged(nameof(SelectedBoards));
-                SelectedSprint = Sprints.First(i => i.Item1 == sm.SelectedSprint);
-                
-            }
-        }
-
-
     }
 }

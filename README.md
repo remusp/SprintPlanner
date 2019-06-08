@@ -1,7 +1,5 @@
 # SprintPlanner
 ## TODOs:
-* About box
-* Settings / Configurable server 
 * Commited field for stories / tasks
 * Fix negative capacity bug
 * Story points
@@ -20,7 +18,6 @@
 * Demo view
 * Retrospective view
 * Multiselect combo for sprint list (just for search feature)
-* Navigation instead of windows ?
 * Installer
 * Logging support: nlog vs log4net
 * Encrypt saved password

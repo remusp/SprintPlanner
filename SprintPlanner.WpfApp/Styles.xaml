@@ -12,6 +12,16 @@
            x:Key="TextBlockStyle">
         <Setter Property="Margin"
                 Value="5" />
+        <Setter Property="VerticalAlignment"
+                Value="Center" />
+    </Style>
+    <Style TargetType="TextBox"
+           x:Key="TextBoxStyle"
+           BasedOn="{StaticResource {x:Type TextBox}}">
+        <Setter Property="Margin"
+                Value="5" />
+        <Setter Property="mh:TextBoxHelper.ClearTextButton"
+                Value="True" />
     </Style>
 
     <Style TargetType="Button"

@@ -2,6 +2,9 @@
  * Logged in user displayed in title bar
  * Logout button in title bar
  * Fixed bug causing user data to not be loaded when there is no team configured
+ * Switched to tabbed views instead of windows
+ * Added About view
+ * Added Settings view
  
 ### Version 0.0.3 (2019-06-03)
  * Added user pictures

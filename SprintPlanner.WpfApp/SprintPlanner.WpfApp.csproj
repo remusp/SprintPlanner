@@ -59,35 +59,48 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Business.cs" />
     <Compile Include="Infrastructure\PasswordHelper.cs" />
-    <Compile Include="UI\Capacity\CapacityModel.cs" />
-    <Compile Include="UI\Capacity\CapacityWindowViewModel.cs" />
-    <Compile Include="UI\Login\LoginWindow.xaml.cs">
-      <DependentUpon>LoginWindow.xaml</DependentUpon>
+    <Compile Include="IStorageManipulator.cs" />
+    <Compile Include="UI\About\AboutView.xaml.cs">
+      <DependentUpon>AboutView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Login\LoginWindowViewModel.cs" />
-    <Compile Include="UI\MainPlanner\ExternalLoadViewModel.cs" />
-    <Compile Include="UI\MainPlanner\IssueView.xaml.cs">
+    <Compile Include="UI\About\AboutViewModel.cs" />
+    <Compile Include="UI\Capacity\CapacityViewModel.cs" />
+    <Compile Include="UI\Login\LoginView.xaml.cs">
+      <DependentUpon>LoginView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Login\LoginViewModel.cs" />
+    <Compile Include="UI\Planning\IssueView.xaml.cs">
       <DependentUpon>IssueView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\MainPlanner\IssueViewModel.cs" />
+    <Compile Include="UI\Planning\IssueViewModel.cs" />
     <Compile Include="UI\MainPlanner\MainPlannerWindow.xaml.cs">
       <DependentUpon>MainPlannerWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\MainPlanner\MainPlannerWindowViewModel.cs" />
-    <Compile Include="UI\MainPlanner\SprintModel.cs" />
-    <Compile Include="UI\MainPlanner\UserLoadView.xaml.cs">
+    <Compile Include="UI\Planning\UserLoadView.xaml.cs">
       <DependentUpon>UserLoadView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\MainPlanner\UserLoadViewModel.cs" />
-    <Compile Include="UI\MainPlanner\UserStatus.cs" />
+    <Compile Include="UI\Planning\UserLoadViewModel.cs" />
+    <Compile Include="UI\Planning\UserStatus.cs" />
+    <Compile Include="UI\Planning\PlanningView.xaml.cs">
+      <DependentUpon>PlanningView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Planning\PlanningViewModel.cs" />
+    <Compile Include="UI\SettingsUI\SettingsView.xaml.cs">
+      <DependentUpon>SettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SettingsUI\SettingsViewModel.cs" />
     <Compile Include="UserDetails.cs" />
     <Page Include="Styles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Capacity\CapacityWindow.xaml">
+    <Page Include="UI\About\AboutView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Capacity\CapacityView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -95,15 +108,15 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="UI\Capacity\CapacityWindow.xaml.cs">
-      <DependentUpon>CapacityWindow.xaml</DependentUpon>
+    <Compile Include="UI\Capacity\CapacityView.xaml.cs">
+      <DependentUpon>CapacityView.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="UI\Login\LoginWindow.xaml">
+    <Page Include="UI\Login\LoginView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\MainPlanner\IssueView.xaml">
+    <Page Include="UI\Planning\IssueView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -111,7 +124,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\MainPlanner\UserLoadView.xaml">
+    <Page Include="UI\Planning\UserLoadView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Planning\PlanningView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\SettingsUI\SettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -146,11 +167,12 @@
     <PackageReference Include="MvvmLight">
       <Version>5.4.1.1</Version>
     </PackageReference>
-    <PackageReference Include="Sdl.MultiSelectComboBox">
-      <Version>1.0.4</Version>
-    </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MultiSelectComboBox\Sdl.MultiSelectComboBox.csproj">
+      <Project>{0378f38f-5bf3-497f-91c2-1ee77c874593}</Project>
+      <Name>Sdl.MultiSelectComboBox</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SprintPlanner.Core\SprintPlanner.Core.csproj">
       <Project>{61c683ce-8d63-4b03-9987-9c727f0502ac}</Project>
       <Name>SprintPlanner.Core</Name>

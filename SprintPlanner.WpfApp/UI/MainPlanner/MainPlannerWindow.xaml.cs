@@ -1,10 +1,9 @@
 ﻿using MahApps.Metro.Controls;
 using SprintPlanner.Core;
+using SprintPlanner.Core.Logic;
 using SprintPlanner.WpfApp.Properties;
 using System.IO;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
 
 namespace SprintPlanner.WpfApp.UI.MainPlanner
 {
@@ -37,10 +36,12 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             }
 
             Business.Jira = new JiraWrapper(_webRequester) { Url = Settings.Default.Server };
+
+
             var vm = new MainPlannerWindowViewModel(this);
+            vm.Load();
             DataContext = vm;
             vm.EnsureLoggedIn();
-            vm.Load();
 
         }
 
@@ -60,46 +61,15 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
             if (DataContext is MainPlannerWindowViewModel vm)
             {
+                if (vm.MainViewModel is IStorageManipulator m)
+                {
+                    m.Flush();
+                }
+
                 vm.Persist();
             }
         }
 
-        private void ListBox_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
-        {
-            if (GetScrollViewer(sender as DependencyObject) is ScrollViewer scrollViwer)
-            {
-                if (e.Delta < 0)
-                {
-                    scrollViwer.ScrollToVerticalOffset(scrollViwer.VerticalOffset + 80);//TODO: scrollspeed setting
-                }
-                else if (e.Delta > 0)
-                {
-                    scrollViwer.ScrollToVerticalOffset(scrollViwer.VerticalOffset - 80);
-                }
-            }
-        }
 
-
-        public static DependencyObject GetScrollViewer(DependencyObject o)
-        {
-            if (o is ScrollViewer)
-            { return o; }
-
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(o); i++)
-            {
-                var child = VisualTreeHelper.GetChild(o, i);
-
-                var result = GetScrollViewer(child);
-                if (result == null)
-                {
-                    continue;
-                }
-                else
-                {
-                    return result;
-                }
-            }
-            return null;
-        }
     }
 }

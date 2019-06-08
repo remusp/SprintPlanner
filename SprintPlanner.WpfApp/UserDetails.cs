@@ -85,12 +85,14 @@ namespace SprintPlanner.WpfApp
 
         public decimal Capacity
         {
+            // TODO: Duplicate capacity formula
             get { return (DaysInSprint - DaysOff) * HoursPerDay; }
 
         }
 
         public decimal ScaledCapacity
         {
+            // TODO: Duplicate scaled capacity formula
             get { return Capacity * CapacityFactor; }
         }
     }

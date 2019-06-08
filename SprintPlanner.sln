@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		VersionHistory.md = VersionHistory.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sdl.MultiSelectComboBox", "MultiSelectComboBox\Sdl.MultiSelectComboBox.csproj", "{0378F38F-5BF3-497F-91C2-1EE77C874593}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{5501631D-BCAF-4E74-966B-98FE79064A0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5501631D-BCAF-4E74-966B-98FE79064A0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5501631D-BCAF-4E74-966B-98FE79064A0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0378F38F-5BF3-497F-91C2-1EE77C874593}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0378F38F-5BF3-497F-91C2-1EE77C874593}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0378F38F-5BF3-497F-91C2-1EE77C874593}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0378F38F-5BF3-497F-91C2-1EE77C874593}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -144,7 +144,9 @@ namespace SprintPlanner.WpfApp.UI.Capacity
                         Users.Add(new UserDetails
                         {
                             Uid = item,
-                            UserName = name
+                            UserName = name,
+                            DaysInSprint = DaysInSprint,
+                            CapacityFactor = CapacityFactor
                         });
                     }
                 }

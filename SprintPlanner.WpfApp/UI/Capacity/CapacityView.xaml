@@ -33,6 +33,7 @@
                        Style="{StaticResource TextBlockStyle}" />
             <mh:NumericUpDown Value="{Binding DaysInSprint}"
                               Style="{StaticResource UpDownStyle}"
+                              Minimum="1"
                               Grid.Row="0"
                               Grid.Column="1" />
             <Button Content="Refresh (F5)"
@@ -47,6 +48,8 @@
             <mh:NumericUpDown Value="{Binding CapacityFactor}"
                               Style="{StaticResource UpDownStyle}"
                               Interval="0.1"
+                              Minimum="0"
+                              Maximum="1"
                               Grid.Row="1"
                               Grid.Column="1" />
             <DataGrid AutoGenerateColumns="False"
@@ -62,21 +65,37 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <mh:NumericUpDown Value="{Binding HoursPerDay, UpdateSourceTrigger=PropertyChanged}"
-                                                  Interval="0.1" />
+                                                  Interval="0.1" 
+                                                  Minimum="0"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                     <DataGridTemplateColumn Header="Days off">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <mh:NumericUpDown Value="{Binding DaysOff, UpdateSourceTrigger=PropertyChanged}" />
+                                <mh:NumericUpDown Value="{Binding DaysOff, UpdateSourceTrigger=PropertyChanged}"
+                                                  Minimum="0" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTextColumn Header="Capacity (h)"
-                                        Binding="{Binding Capacity, Mode=OneWay}" />
-                    <DataGridTextColumn Header="Scaled Capacity (h)"
-                                        Binding="{Binding ScaledCapacity, Mode=OneWay}" />
+                    <DataGridTemplateColumn Header="Capacity (h)">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <mh:NumericUpDown Value="{Binding Capacity,  Mode=OneWay}"
+                                                  Minimum="0"
+                                                  HideUpDownButtons="True" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Scaled Capacity (h)">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <mh:NumericUpDown Value="{Binding ScaledCapacity,  Mode=OneWay}"
+                                                  Minimum="0"
+                                                  HideUpDownButtons="True" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>

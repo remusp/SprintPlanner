@@ -3,9 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:inf="clr-namespace:SprintPlanner.WpfApp.Infrastructure"
              xmlns:mh="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              mc:Ignorable="d"
+             x:Name="This"
              MinWidth="300"
              MinHeight="250"
              d:DesignHeight="450"
@@ -18,7 +18,7 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <TextBlock Text="User name"
@@ -32,13 +32,13 @@
                    Style="{StaticResource TextBlockStyle}"
                    Grid.Row="1"
                    Grid.Column="0" />
-        <PasswordBox inf:PasswordHelper.Attach="True"
-                    VerticalAlignment="Center"
+        <PasswordBox x:Name="userPassword"
+                     VerticalAlignment="Center"
                      Margin="5"
-                     inf:PasswordHelper.Password="{Binding Password, Mode=TwoWay}"
                      mh:TextBoxHelper.ClearTextButton="True"
                      Grid.Row="1"
-                     Grid.Column="1" />
+                     Grid.Column="1"
+                     Style="{StaticResource MetroButtonRevealedPasswordBox}" />
         <CheckBox Content="Keep me logged in"
                   Margin="5"
                   IsChecked="{Binding StoreCredentials}"
@@ -48,6 +48,7 @@
                 VerticalAlignment="Top"
                 Style="{StaticResource ButtonStyle}"
                 Command="{Binding LoginCommand}"
+                CommandParameter="{Binding ElementName=This}"
                 Grid.Row="3"
                 Grid.ColumnSpan="2" />
     </Grid>

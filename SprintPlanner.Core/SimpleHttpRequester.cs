@@ -1,16 +1,18 @@
-﻿using System;
+﻿using SprintPlanner.Core.Extensions;
+using System;
 using System.IO;
 using System.Net;
+using System.Security;
 using System.Text;
 
 namespace SprintPlanner.Core
 {
     public class SimpleHttpRequester : IHttpRequester
     {
-        public virtual string HttpGetByWebRequest(string uri, string username, string password)
+        public virtual string HttpGetByWebRequest(string uri, string username, SecureString password)
         {
             //For Basic Authentication
-            string authInfo = username + ":" + password;
+            string authInfo = $"{username}:{password.Decrypt()}";
             authInfo = Convert.ToBase64String(Encoding.Default.GetBytes(authInfo));
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
@@ -30,10 +32,10 @@ namespace SprintPlanner.Core
             return strResponse;
         }
 
-        public virtual byte[] HttpGetBinaryByWebRequest(string uri, string username, string password)
+        public virtual byte[] HttpGetBinaryByWebRequest(string uri, string username, SecureString password)
         {
             //For Basic Authentication
-            string authInfo = username + ":" + password;
+            string authInfo = $"{username}:{password.Decrypt()}";
             authInfo = Convert.ToBase64String(Encoding.Default.GetBytes(authInfo));
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);

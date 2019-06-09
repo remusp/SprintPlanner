@@ -83,6 +83,7 @@
                             <DataTemplate>
                                 <mh:NumericUpDown Value="{Binding Capacity,  Mode=OneWay}"
                                                   Minimum="0"
+                                                  IsReadOnly="True"
                                                   HideUpDownButtons="True" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
@@ -92,6 +93,7 @@
                             <DataTemplate>
                                 <mh:NumericUpDown Value="{Binding ScaledCapacity,  Mode=OneWay}"
                                                   Minimum="0"
+                                                  IsReadOnly="True"
                                                   HideUpDownButtons="True" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>

@@ -73,11 +73,11 @@
                 <mh:HamburgerMenuItemCollection>
                     <mh:HamburgerMenuIconItem Icon="{ip:Entypo Kind=PaperPlane, Width=48, Height=48}"
                                               Command="{Binding PlanningViewCommand}"
+                                              IsEnabled="{Binding IsEnabledPlanning}"
                                               Label="Planning" />
-                    <mh:HamburgerMenuIconItem Icon="{ip:FontAwesome UsersSolid, Width=48, Height=48}"
-                                              Label="Team" />
                     <mh:HamburgerMenuIconItem Icon="{ip:Modern Kind=ScaleUnbalanced, Width=48, Height=48}"
                                               Command="{Binding CapacityViewCommand}"
+                                              IsEnabled="{Binding IsEnabledCapacity}"
                                               Label="Team Capacity" />
                 </mh:HamburgerMenuItemCollection>
 

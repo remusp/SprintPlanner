@@ -11,6 +11,7 @@ using SprintPlanner.WpfApp.UI.Planning;
 using SprintPlanner.WpfApp.UI.SettingsUI;
 using System.IO;
 using System.Reflection;
+using System.Security;
 using System.Windows;
 using System.Windows.Input;
 
@@ -49,6 +50,31 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
                 ProductVersion = assembly.GetName().Version.ToString()
             };
         }
+
+        private bool _isEnabledPlanning;
+
+        public bool IsEnabledPlanning
+        {
+            get { return _isEnabledPlanning; }
+            set
+            {
+                _isEnabledPlanning = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        private bool _isEnabledCapacity;
+
+        public bool IsEnabledCapacity
+        {
+            get { return _isEnabledCapacity; }
+            set
+            {
+                _isEnabledCapacity = value;
+                RaisePropertyChanged();
+            }
+        }
+
 
 
 
@@ -138,17 +164,41 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             }
             else
             {
+                string str = Base64Decode(Settings.Default.Pass);
+
+                var secure = new SecureString();
+                foreach (char c in str)
+                {
+                    secure.AppendChar(c);
+                }
+
                 // TODO: duplicate login
-                bool isLoggedIn = Business.Jira.Login(Settings.Default.User, Settings.Default.Pass);
+                bool isLoggedIn = Business.Jira.Login(Settings.Default.User, secure);
                 if (isLoggedIn)
                 {
                     LoggedInUserPictureData = Business.Jira.GetPicture(Settings.Default.User);
                     LogoutVisibility = Visibility.Visible;
+                    SetView(_planningViewModel);
+
+                    IsEnabledPlanning = true;
+                    IsEnabledCapacity = true;
+                }
+                else
+                {
+                    SetView(_loginViewModel);
+                    IsEnabledPlanning = false;
+                    IsEnabledCapacity = false;
                 }
 
-                SetView(_planningViewModel);
+                
 
             }
+        }
+
+        public static string Base64Decode(string base64EncodedData)
+        {
+            var base64EncodedBytes = System.Convert.FromBase64String(base64EncodedData);
+            return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
         }
 
         private void LoginSucceededHandler()
@@ -159,9 +209,17 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             {
                 LoggedInUserPictureData = Business.Jira.GetPicture(Settings.Default.User);
                 LogoutVisibility = Visibility.Visible;
-            }
+                SetView(_planningViewModel);
 
-            SetView(_planningViewModel);
+                IsEnabledPlanning = true;
+                IsEnabledCapacity = true;
+            }
+            else
+            {
+                SetView(_loginViewModel);
+                IsEnabledPlanning = false;
+                IsEnabledCapacity = false;
+            }
         }
 
         private void CapacityViewCommandExecute()
@@ -234,7 +292,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         private void LogoutExecute()
         {
             Settings.Default.User = string.Empty;
-            Settings.Default.Pass = string.Empty;
+            Settings.Default.Pass = null;
             Settings.Default.StoreCredentials = false;
             Settings.Default.Save();
 
@@ -242,6 +300,8 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             Business.Jira.Logout();
             LogoutVisibility = Visibility.Collapsed;
             SetView(_loginViewModel);
+            IsEnabledPlanning = false;
+            IsEnabledCapacity = false;
         }
 
         private void PlanningViewCommandExecute()

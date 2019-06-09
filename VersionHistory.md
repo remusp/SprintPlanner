@@ -6,6 +6,8 @@
  * Added About view
  * Added Settings view
  * Fixed negative capacity
+ * Introduced SecureString for password
+ * Planning and capacity views are enabled only if user is logged in
  
 ### Version 0.0.3 (2019-06-03)
  * Added user pictures

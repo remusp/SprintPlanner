@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security;
 using System.Text;
 
 namespace SprintPlanner.Core
@@ -27,7 +28,7 @@ namespace SprintPlanner.Core
             }
         }
 
-        public override string HttpGetByWebRequest(string uri, string username, string password)
+        public override string HttpGetByWebRequest(string uri, string username, SecureString password)
         {
             string response = string.Empty;
             if (_webCache.ContainsKey(uri))
@@ -47,7 +48,7 @@ namespace SprintPlanner.Core
             return response;
         }
 
-        public override byte[] HttpGetBinaryByWebRequest(string uri, string username, string password)
+        public override byte[] HttpGetBinaryByWebRequest(string uri, string username, SecureString password)
         {
             byte[] response = null;
             if (_webCache.ContainsKey(uri))

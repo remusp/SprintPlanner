@@ -3,13 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security;
 
 namespace SprintPlanner.Core
 {
     public class JiraWrapper
     {
         private string _username;
-        private string _password;
+        private SecureString _password;
         private IHttpRequester _webRequester;
 
         public JiraWrapper(IHttpRequester webRequester)
@@ -19,7 +20,7 @@ namespace SprintPlanner.Core
 
         public string Url { get; set; }
 
-        public bool Login(string username, string password)
+        public bool Login(string username, SecureString password)
         {
             _username = username;
             _password = password;
@@ -159,7 +160,7 @@ namespace SprintPlanner.Core
         public void Logout()
         {
             _username = string.Empty;
-            _password = string.Empty;
+            _password = null;
         }
 
         private List<Value> GetAllBoards()
@@ -186,7 +187,7 @@ namespace SprintPlanner.Core
             return _webRequester.HttpGetBinaryByWebRequest(uri, _username, _password);
         }
 
-        private bool CheckValidLogin(string username, string password)
+        private bool CheckValidLogin(string username, SecureString password)
         {
             try
             {

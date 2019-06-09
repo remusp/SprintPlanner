@@ -55,7 +55,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             if (!Settings.Default.StoreCredentials)
             {
                 Settings.Default.User = string.Empty;
-                Settings.Default.Pass = string.Empty;
+                Settings.Default.Pass = null;
                 Settings.Default.Save();
             }
 

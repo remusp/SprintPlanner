@@ -1,9 +1,11 @@
-﻿namespace SprintPlanner.Core
+﻿using System.Security;
+
+namespace SprintPlanner.Core
 {
     public interface IHttpRequester
     {
-        string HttpGetByWebRequest(string uri, string username, string password);
+        string HttpGetByWebRequest(string uri, string username, SecureString password);
 
-        byte[] HttpGetBinaryByWebRequest(string uri, string username, string password);
+        byte[] HttpGetBinaryByWebRequest(string uri, string username, SecureString password);
     }
 }

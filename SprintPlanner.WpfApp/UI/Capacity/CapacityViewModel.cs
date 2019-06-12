@@ -177,15 +177,19 @@ namespace SprintPlanner.WpfApp.UI.Capacity
         public void Pull()
         {
             DaysInSprint = Business.Data.Capacity.DaysInSprint;
-            Users = new ObservableCollection<UserDetails>(Business.Data.Capacity.Users.Select(u => new UserDetails
+            if (Business.Data?.Capacity?.Users != null)
             {
-                Uid = u.Uid,
-                UserName = u.UserName,
-                HoursPerDay = u.HoursPerDay,
-                DaysOff = u.DaysOff,
-                DaysInSprint = u.DaysInSprint,
-                CapacityFactor = u.CapacityFactor
-            }));
+                Users = new ObservableCollection<UserDetails>(Business.Data.Capacity.Users?.Select(u => new UserDetails
+                {
+                    Uid = u.Uid,
+                    UserName = u.UserName,
+                    HoursPerDay = u.HoursPerDay,
+                    DaysOff = u.DaysOff,
+                    DaysInSprint = u.DaysInSprint,
+                    CapacityFactor = u.CapacityFactor
+                }));
+            }
+
             CapacityFactor = Business.Data.Capacity.CapacityFactor;
 
             _boardId = Business.Data.Sprint.SelectedBoard;

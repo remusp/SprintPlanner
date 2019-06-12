@@ -115,6 +115,14 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             {
                 Business.Data = JsonConvert.DeserializeObject<DataStorageModel>(File.ReadAllText(fileName));
             }
+            else
+            {
+                Business.Data = new DataStorageModel()
+                {
+                    Sprint = new SprintStorageModel(),
+                    Capacity = new CapacityStorageModel()
+                };
+            }
         }
 
         #region LoggedInUserPictureData Property
@@ -190,7 +198,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
                     IsEnabledCapacity = false;
                 }
 
-                
+
 
             }
         }

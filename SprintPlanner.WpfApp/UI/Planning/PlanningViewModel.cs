@@ -310,15 +310,22 @@ namespace SprintPlanner.WpfApp.UI.Planning
         {
             Business.Data.Sprint.SelectedBoard = SelectedBoards.FirstOrDefault()?.Item1 ?? 0;
             Business.Data.Sprint.SelectedSprint = SelectedSprint?.Item1 ?? 0;
-            Business.Data.Sprint.Boards = Boards.ToList();
-            Business.Data.Sprint.Sprints = Sprints.ToList();
+            Business.Data.Sprint.Boards = Boards?.ToList();
+            Business.Data.Sprint.Sprints = Sprints?.ToList();
         }
 
         public void Pull()
         {
             _initializing = true;
-            Boards = new ObservableCollection<Tuple<int, string>>(Business.Data.Sprint.Boards);
-            Sprints = new ObservableCollection<Tuple<int, string>>(Business.Data.Sprint.Sprints);
+            if (Business.Data?.Sprint?.Boards != null)
+            {
+                Boards = new ObservableCollection<Tuple<int, string>>(Business.Data.Sprint.Boards);
+            }
+
+            if (Business.Data?.Sprint?.Sprints != null)
+            {
+                Sprints = new ObservableCollection<Tuple<int, string>>(Business.Data.Sprint.Sprints);
+            }
 
             try
             {

@@ -16,6 +16,7 @@ namespace SprintPlanner.WpfApp.UI.Planning
 {
     public class PlanningViewModel : ViewModelBase, IStorageManipulator
     {
+        private const string STATUS_DONE = "6";
         private bool _initializing;
 
         private MetroWindow _window;
@@ -187,7 +188,13 @@ namespace SprintPlanner.WpfApp.UI.Planning
             {
                 var capacities = new List<UserLoadViewModel>();
                 var team = new List<string>();
-                var loads = Business.Jira.GetIssuesPerAssignee(SelectedBoards.First().Item1, SelectedSprint.Item1);
+                var allIssues = Business.Jira.GetAllIssuesInSprint(SelectedBoards.First().Item1, SelectedSprint.Item1);
+                var openAssignedIssues = allIssues.Where(i => i.fields.status.id != STATUS_DONE && i.fields.assignee != null);
+
+                double storyPointsRaw = allIssues.Where(i => i.fields.customfield_10013 != null).Select(j => j.fields.customfield_10013).Sum().Value;
+                StoryPoints = (int)Math.Round(storyPointsRaw);
+
+                var loads = openAssignedIssues.Where(l => l.fields.issuetype.subtask || l.fields.subtasks.Count == 0).GroupBy(i => i.fields.assignee.name);
 
 
                 capacities = (from u in Business.Data.Capacity.Users
@@ -200,10 +207,6 @@ namespace SprintPlanner.WpfApp.UI.Planning
                                   Status = UserStatus.Normal
                               }).ToList();
 
-                //var storyPoints = loads.SelectMany(l => l)
-                //    .Where(i => i.fields.issuetype.id == "7" && i.fields.customfield_10013 != null)
-                //    .GroupBy(i => i.key)
-                //    .Select(g => int.Parse(g.First().fields.customfield_16035.ToString())).Sum();
 
                 foreach (UserLoadViewModel u in capacities)
                 {
@@ -215,12 +218,12 @@ namespace SprintPlanner.WpfApp.UI.Planning
                         u.Status = GetStatusAccordingToLoad(u);
                         u.Issues = new ObservableCollection<IssueViewModel>(load.Select(i => new IssueViewModel
                         {
-                            TaskId = i.key,
-                            TaskLink = $"https://jira.sdl.com/browse/{i.key}",
-                            StoryLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.fields.parent.key : string.Empty)}",
-                            StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : string.Empty,
-                            ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : string.Empty,
-                            Name = i.fields.summary,
+                            TaskId = i.fields.issuetype.subtask ? i.key : string.Empty,
+                            StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : i.key,
+                            TaskLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.key : string.Empty)}",
+                            StoryLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.fields.parent.key : i.key)}",
+                            ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : i.fields.summary,
+                            Name = i.fields.issuetype.subtask ? i.fields.summary : string.Empty,
                             Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
                         }));
 
@@ -242,12 +245,12 @@ namespace SprintPlanner.WpfApp.UI.Planning
                         Load = load.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m,
                         Issues = new ObservableCollection<IssueViewModel>(load.Select(i => new IssueViewModel
                         {
-                            TaskId = i.key,
-                            StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : string.Empty,
-                            TaskLink = $"https://jira.sdl.com/browse/{i.key}",
-                            StoryLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.fields.parent.key : string.Empty)}",
-                            ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : string.Empty,
-                            Name = i.fields.summary,
+                            TaskId = i.fields.issuetype.subtask ? i.key : string.Empty,
+                            StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : i.key,
+                            TaskLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.key : string.Empty)}",
+                            StoryLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.fields.parent.key : i.key)}",
+                            ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : i.fields.summary,
+                            Name = i.fields.issuetype.subtask ? i.fields.summary : string.Empty,
                             Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
                         }))
                     });
@@ -265,12 +268,12 @@ namespace SprintPlanner.WpfApp.UI.Planning
                         Load = unassignedIssues.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m,
                         Issues = new ObservableCollection<IssueViewModel>(unassignedIssues.Select(i => new IssueViewModel
                         {
-                            TaskId = i.key,
-                            StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : string.Empty,
-                            TaskLink = $"https://jira.sdl.com/browse/{i.key}",
-                            StoryLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.fields.parent.key : string.Empty)}",
-                            ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : string.Empty,
-                            Name = i.fields.summary,
+                            TaskId = i.fields.issuetype.subtask ? i.key : string.Empty,
+                            StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : i.key,
+                            TaskLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.key : string.Empty)}",
+                            StoryLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.fields.parent.key : i.key)}",
+                            ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : i.fields.summary,
+                            Name = i.fields.issuetype.subtask ? i.fields.summary : string.Empty,
                             Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
                         }))
                     });

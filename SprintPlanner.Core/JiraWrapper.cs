@@ -9,8 +9,8 @@ namespace SprintPlanner.Core
 {
     public class JiraWrapper
     {
-        private string _username;
         private SecureString _password;
+        private string _username;
         private IHttpRequester _webRequester;
 
         public JiraWrapper(IHttpRequester webRequester)
@@ -20,25 +20,9 @@ namespace SprintPlanner.Core
 
         public string Url { get; set; }
 
-        public bool Login(string username, SecureString password)
-        {
-            _username = username;
-            _password = password;
-
-            return CheckValidLogin(username, password);
-        }
-
-        public List<string> GetAllAssigneesInSprint(int boardId, int sprintId)
-        {
-            List<Issue> issues = GetAllIssuesBySprint(boardId, sprintId);
-            var persons = issues.Where(l => l.fields.assignee != null).Select(j => j.fields.assignee.name).Distinct().ToList();
-
-            return persons;
-        }
-
         public List<Tuple<string, decimal>> GetAllAssigneesAndWorkInSprint(int boardId, int sprintId)
         {
-            List<Issue> issues = GetAllIssuesBySprint(boardId, sprintId);
+            List<Issue> issues = GetAllIssuesInSprint(boardId, sprintId);
 
             IEnumerable<IGrouping<string, Issue>> issuesPerAssignee = issues.Where(l => l.fields.assignee != null).GroupBy(i => i.fields.assignee.name);
             var result = new List<Tuple<string, decimal>>();
@@ -52,32 +36,12 @@ namespace SprintPlanner.Core
             return result;
         }
 
-
-        public IEnumerable<IGrouping<string, Issue>> GetIssuesPerAssignee(int boardId, int sprintId)
+        public List<string> GetAllAssigneesInSprint(int boardId, int sprintId)
         {
-            List<Issue> issues = GetAllIssuesBySprint(boardId, sprintId);
-            // Status "6" = Done
-            return issues.Where(l => l.fields.subtasks.Count == 0 && l.fields.status.id != "6" && l.fields.assignee != null).GroupBy(i => i.fields.assignee.name);
-        }
+            List<Issue> issues = GetAllIssuesInSprint(boardId, sprintId);
+            var persons = issues.Where(l => l.fields.assignee != null).Select(j => j.fields.assignee.name).Distinct().ToList();
 
-        public IEnumerable<Issue> GetUnassignedIssues(int boardId, int sprintId)
-        {
-            List<Issue> issues = GetAllIssuesBySprint(boardId, sprintId);
-            // Status "6" = Done
-            return issues.Where(l => l.fields.subtasks.Count == 0 && l.fields.status.id != "6" && l.fields.assignee == null);
-        }
-
-        public List<Tuple<int, string>> GetOpenSprints(int boardId)
-        {
-            List<Value> values = GetOpenSprintsbyBoardId(boardId);
-            var result = new List<Tuple<int, string>>();
-
-            foreach (var value in values)
-            {
-                result.Add(new Tuple<int, string>(value.id, value.name));
-            }
-
-            return result;
+            return persons;
         }
 
         public Dictionary<int, string> GetBoards()
@@ -93,6 +57,26 @@ namespace SprintPlanner.Core
             return result;
         }
 
+        public List<Tuple<int, string>> GetOpenSprints(int boardId)
+        {
+            List<Value> values = GetOpenSprintsbyBoardId(boardId);
+            var result = new List<Tuple<int, string>>();
+
+            foreach (var value in values)
+            {
+                result.Add(new Tuple<int, string>(value.id, value.name));
+            }
+
+            return result;
+        }
+
+        public IEnumerable<Issue> GetUnassignedIssues(int boardId, int sprintId)
+        {
+            List<Issue> issues = GetAllIssuesInSprint(boardId, sprintId);
+            // Status "6" = Done
+            return issues.Where(l => l.fields.subtasks.Count == 0 && l.fields.status.id != "6" && l.fields.assignee == null);
+        }
+
         public string GetUserDisplayName(string uid)
         {
             string uri = new Uri(Url).Append($"/rest/api/2/user?username={uid}").AbsoluteUri;
@@ -101,27 +85,17 @@ namespace SprintPlanner.Core
             return asignee.displayName;
         }
 
+        public bool Login(string username, SecureString password)
+        {
+            _username = username;
+            _password = password;
+
+            return CheckValidLogin(username, password);
+        }
+
         #region private
 
-        private string GetSprintIssuesPath(int retries, int boardId, int sprintId)
-        {
-            string uri = new Uri(Url).Append("/rest/agile/1.0/board", boardId.ToString(), "sprint", sprintId.ToString(), "issue").AbsoluteUri;
-            return uri + "?startAt=" + (retries * 50) + "&maxResults=" + ((retries + 1) * 50);
-        }
-
-        private string GetBoardSprintPath(int retries, int boardId)
-        {
-            string uri = new Uri(Url).Append("/rest/agile/1.0/board", boardId.ToString(), "sprint").AbsoluteUri;
-            return uri + "?startAt=" + (retries * 50) + "&maxResults=" + ((retries + 1) * 50);
-        }
-
-        private string GetBoards(int retries)
-        {
-            string uri = new Uri(Url).Append("/rest/agile/1.0/board").AbsoluteUri;
-            return uri + "?startAt=" + (retries * 50) + "&maxResults=" + ((retries + 1) * 50);
-        }
-
-        private List<Issue> GetAllIssuesBySprint(int boardId, int sprintId)
+        public List<Issue> GetAllIssuesInSprint(int boardId, int sprintId)
         {
             var issues = new List<Issue>();
             int? issueCount = null;
@@ -139,28 +113,30 @@ namespace SprintPlanner.Core
             return issues;
         }
 
-        private List<Value> GetOpenSprintsbyBoardId(int boardId)
+        public byte[] GetPicture(string uid)
         {
-            var issues = new List<Value>();
-            int? issueCount = null;
-            int retries = 0;
-
-            while (!issueCount.HasValue || issueCount.Value > 49)
-            {
-                string x = _webRequester.HttpGetByWebRequest(GetBoardSprintPath(retries, boardId), _username, _password);
-                var deserializedCall = JsonConvert.DeserializeObject<BoardSprintsDTO>(x);
-                issues.AddRange(deserializedCall.values.Where(s => s.state != "closed"));
-                issueCount = deserializedCall.values.Select(s => s.id).Count();
-                retries++;
-            }
-
-            return issues;
+            string uri = new Uri(Url).Append($"/secure/useravatar?ownerId={uid}").AbsoluteUri;
+            return _webRequester.HttpGetBinaryByWebRequest(uri, _username, _password);
         }
 
         public void Logout()
         {
             _username = string.Empty;
             _password = null;
+        }
+
+        private bool CheckValidLogin(string username, SecureString password)
+        {
+            try
+            {
+                string uri = new Uri(Url).Append("/rest/agile/1.0/board/1").AbsoluteUri;
+                _webRequester.HttpGetByWebRequest(uri, _username, _password);
+                return true;
+            }
+            catch (WebException)
+            {
+                return false;
+            }
         }
 
         private List<Value> GetAllBoards()
@@ -181,27 +157,42 @@ namespace SprintPlanner.Core
             return boards;
         }
 
-        public byte[] GetPicture(string uid)
+        private string GetBoards(int retries)
         {
-            string uri = new Uri(Url).Append($"/secure/useravatar?ownerId={uid}").AbsoluteUri;
-            return _webRequester.HttpGetBinaryByWebRequest(uri, _username, _password);
+            string uri = new Uri(Url).Append("/rest/agile/1.0/board").AbsoluteUri;
+            return uri + "?startAt=" + (retries * 50) + "&maxResults=" + ((retries + 1) * 50);
         }
 
-        private bool CheckValidLogin(string username, SecureString password)
+        private string GetBoardSprintPath(int retries, int boardId)
         {
-            try
-            {
-                string uri = new Uri(Url).Append("/rest/agile/1.0/board/1").AbsoluteUri;
-                _webRequester.HttpGetByWebRequest(uri, _username, _password);
-                return true;
-            }
-            catch (WebException)
-            {
-                return false;
-            }
+            string uri = new Uri(Url).Append("/rest/agile/1.0/board", boardId.ToString(), "sprint").AbsoluteUri;
+            return uri + "?startAt=" + (retries * 50) + "&maxResults=" + ((retries + 1) * 50);
         }
 
-        #endregion
+        private List<Value> GetOpenSprintsbyBoardId(int boardId)
+        {
+            var issues = new List<Value>();
+            int? issueCount = null;
+            int retries = 0;
 
+            while (!issueCount.HasValue || issueCount.Value > 49)
+            {
+                string x = _webRequester.HttpGetByWebRequest(GetBoardSprintPath(retries, boardId), _username, _password);
+                var deserializedCall = JsonConvert.DeserializeObject<BoardSprintsDTO>(x);
+                issues.AddRange(deserializedCall.values.Where(s => s.state != "closed"));
+                issueCount = deserializedCall.values.Select(s => s.id).Count();
+                retries++;
+            }
+
+            return issues;
+        }
+
+        private string GetSprintIssuesPath(int retries, int boardId, int sprintId)
+        {
+            string uri = new Uri(Url).Append("/rest/agile/1.0/board", boardId.ToString(), "sprint", sprintId.ToString(), "issue").AbsoluteUri;
+            return uri + "?startAt=" + (retries * 50) + "&maxResults=" + ((retries + 1) * 50);
+        }
+
+        #endregion private
     }
 }

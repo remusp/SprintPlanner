@@ -168,12 +168,11 @@
     <PackageReference Include="MvvmLight">
       <Version>5.4.1.1</Version>
     </PackageReference>
+    <PackageReference Include="Sdl.MultiSelectComboBox">
+      <Version>1.0.7</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MultiSelectComboBox\Sdl.MultiSelectComboBox.csproj">
-      <Project>{0378f38f-5bf3-497f-91c2-1ee77c874593}</Project>
-      <Name>Sdl.MultiSelectComboBox</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SprintPlanner.Core\SprintPlanner.Core.csproj">
       <Project>{61c683ce-8d63-4b03-9987-9c727f0502ac}</Project>
       <Name>SprintPlanner.Core</Name>

@@ -1,4 +1,7 @@
-### Version 0.0.4 (2019-08-02)
+ 
+### Version 0.0.4 (2019-08-05)
+ * Optimied sprint data fetching 
+ * Fixed board and sprint selection issues in combos
  * Added story points
  * Logged in user displayed in title bar
  * Logout button in title bar

@@ -20,9 +20,9 @@ namespace SprintPlanner.Core
 
         public string Url { get; set; }
 
-        public List<Tuple<string, decimal>> GetAllAssigneesAndWorkInSprint(int boardId, int sprintId)
+        public List<Tuple<string, decimal>> GetAllAssigneesAndWorkInSprint(int sprintId)
         {
-            List<Issue> issues = GetAllIssuesInSprint(boardId, sprintId);
+            List<Issue> issues = GetAllIssuesInSprint(sprintId);
 
             IEnumerable<IGrouping<string, Issue>> issuesPerAssignee = issues.Where(l => l.fields.assignee != null).GroupBy(i => i.fields.assignee.name);
             var result = new List<Tuple<string, decimal>>();
@@ -36,12 +36,31 @@ namespace SprintPlanner.Core
             return result;
         }
 
-        public List<string> GetAllAssigneesInSprint(int boardId, int sprintId)
+        public List<string> GetAllAssigneesInSprint(int sprintId)
         {
-            List<Issue> issues = GetAllIssuesInSprint(boardId, sprintId);
+            List<Issue> issues = GetAllIssuesInSprint(sprintId);
             var persons = issues.Where(l => l.fields.assignee != null).Select(j => j.fields.assignee.name).Distinct().ToList();
 
             return persons;
+        }
+
+        public List<Issue> GetAllIssuesInSprint(int sprintId)
+        {
+            var issues = new List<Issue>();
+            int issueCount = 0;
+            int retries = 0;
+            int pageSize = 1000;
+
+            do
+            {
+                string x = _webRequester.HttpGetByWebRequest(GetSprintIssuesPath(sprintId, pageSize, retries), _username, _password);
+                var deserializedCall = JsonConvert.DeserializeObject<SprintIssuesDTO>(x);
+                issues.AddRange(deserializedCall.issues);
+                issueCount = deserializedCall.issues.Count;
+                retries++;
+            } while (issueCount >= pageSize);
+
+            return issues;
         }
 
         public Dictionary<int, string> GetBoards()
@@ -70,11 +89,10 @@ namespace SprintPlanner.Core
             return result;
         }
 
-        public IEnumerable<Issue> GetUnassignedIssues(int boardId, int sprintId)
+        public byte[] GetPicture(string uid)
         {
-            List<Issue> issues = GetAllIssuesInSprint(boardId, sprintId);
-            // Status "6" = Done
-            return issues.Where(l => l.fields.subtasks.Count == 0 && l.fields.status.id != "6" && l.fields.assignee == null);
+            string uri = new Uri(Url).Append($"/secure/useravatar?ownerId={uid}").AbsoluteUri;
+            return _webRequester.HttpGetBinaryByWebRequest(uri, _username, _password);
         }
 
         public string GetUserDisplayName(string uid)
@@ -91,32 +109,6 @@ namespace SprintPlanner.Core
             _password = password;
 
             return CheckValidLogin(username, password);
-        }
-
-        #region private
-
-        public List<Issue> GetAllIssuesInSprint(int boardId, int sprintId)
-        {
-            var issues = new List<Issue>();
-            int? issueCount = null;
-            int retries = 0;
-
-            while (!issueCount.HasValue || issueCount.Value > 49)
-            {
-                string x = _webRequester.HttpGetByWebRequest(GetSprintIssuesPath(retries, boardId, sprintId), _username, _password);
-                var deserializedCall = JsonConvert.DeserializeObject<SprintIssuesDTO>(x);
-                issues.AddRange(deserializedCall.issues);
-                issueCount = deserializedCall.issues.Count;
-                retries++;
-            }
-
-            return issues;
-        }
-
-        public byte[] GetPicture(string uid)
-        {
-            string uri = new Uri(Url).Append($"/secure/useravatar?ownerId={uid}").AbsoluteUri;
-            return _webRequester.HttpGetBinaryByWebRequest(uri, _username, _password);
         }
 
         public void Logout()
@@ -187,12 +179,10 @@ namespace SprintPlanner.Core
             return issues;
         }
 
-        private string GetSprintIssuesPath(int retries, int boardId, int sprintId)
+        private string GetSprintIssuesPath(int sprintId, int pageSize, int startPage)
         {
-            string uri = new Uri(Url).Append("/rest/agile/1.0/board", boardId.ToString(), "sprint", sprintId.ToString(), "issue").AbsoluteUri;
-            return uri + "?startAt=" + (retries * 50) + "&maxResults=" + ((retries + 1) * 50);
+            string uri = new Uri(Url).Append($"/rest/api/2/search?jql=Sprint={sprintId}&startAt={startPage * pageSize}&maxResults={pageSize}&fields=id,key,timetracking,status,assignee,customfield_10013,issuetype,subtasks,parent,summary").AbsoluteUri;
+            return uri;
         }
-
-        #endregion private
     }
 }

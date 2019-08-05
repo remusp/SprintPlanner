@@ -38,14 +38,14 @@ namespace SprintPlanner
             }
             Console.WriteLine("--------------------");
 
-            var assignees = jh.GetAllAssigneesInSprint(1137, 6182);
+            var assignees = jh.GetAllAssigneesInSprint(6182);
             foreach (var item in assignees)
             {
                 Console.WriteLine(item);
             }
             Console.WriteLine("--------------------");
 
-            var assigneeswithallocation = jh.GetAllAssigneesAndWorkInSprint(1137, 6182);
+            var assigneeswithallocation = jh.GetAllAssigneesAndWorkInSprint(6182);
             foreach (var item in assigneeswithallocation)
             {
                 decimal hours = item.Item2 / 3600m;

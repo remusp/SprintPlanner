@@ -1,10 +1,8 @@
 # SprintPlanner
 ## TODOs:
-1. Fix sprint selection issues in combos
 1. Progress spinners
-1. Optimize JIRA calls
+1. Fix hardcoded links to JIRA and hardcoded issue request
 1. Story points field in settings (needed bc technical reasons)
-1. Fix hardcoded links to JIRA
 1. GO PUBLIC :D \\:D/
 1. Commited field for stories / tasks
 1. Dev / QA capacity

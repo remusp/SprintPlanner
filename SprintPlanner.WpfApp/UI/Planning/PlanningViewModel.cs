@@ -25,6 +25,7 @@ namespace SprintPlanner.WpfApp.UI.Planning
         {
             _selectedBoards = new ObservableCollection<Tuple<int, string>>();
             UserLoads = new ObservableCollection<UserLoadViewModel>();
+            Boards = new ObservableCollection<Tuple<int, string>>();
             _window = w;
         }
 
@@ -184,29 +185,39 @@ namespace SprintPlanner.WpfApp.UI.Planning
 
         private void SyncLoadComandExecute()
         {
+            Stopwatch performanceTimer = new Stopwatch();
+            performanceTimer.Start();
             try
             {
                 var capacities = new List<UserLoadViewModel>();
                 var team = new List<string>();
-                var allIssues = Business.Jira.GetAllIssuesInSprint(SelectedBoards.First().Item1, SelectedSprint.Item1);
-                var openAssignedIssues = allIssues.Where(i => i.fields.status.id != STATUS_DONE && i.fields.assignee != null);
+
+                Stopwatch query1 = new Stopwatch();
+                query1.Start();
+                var allIssues = Business.Jira.GetAllIssuesInSprint(SelectedSprint.Item1);
+                query1.Stop();
+                Debug.WriteLine($"Query 1: {query1.Elapsed}");
+
+                var openIssues = allIssues.Where(i => i.fields.status.id != STATUS_DONE);
+                var openAssignedIssues = openIssues.Where(i => i.fields.assignee != null);
 
                 double storyPointsRaw = allIssues.Where(i => i.fields.customfield_10013 != null).Select(j => j.fields.customfield_10013).Sum().Value;
                 StoryPoints = (int)Math.Round(storyPointsRaw);
 
                 var loads = openAssignedIssues.Where(l => l.fields.issuetype.subtask || l.fields.subtasks.Count == 0).GroupBy(i => i.fields.assignee.name);
 
-
-                capacities = (from u in Business.Data.Capacity.Users
-                              select new UserLoadViewModel
-                              {
-                                  Name = u.UserName,
-                                  Uid = u.Uid,
-                                  Capacity = (u.DaysInSprint - u.DaysOff) * u.HoursPerDay, // TODO: Duplicate capacity formula
-                                  CapacityFactor = u.CapacityFactor,
-                                  Status = UserStatus.Normal
-                              }).ToList();
-
+                if (Business.Data.Capacity.Users != null)
+                {
+                    capacities = (from u in Business.Data.Capacity.Users
+                                  select new UserLoadViewModel
+                                  {
+                                      Name = u.UserName,
+                                      Uid = u.Uid,
+                                      Capacity = (u.DaysInSprint - u.DaysOff) * u.HoursPerDay, // TODO: Duplicate capacity formula
+                                      CapacityFactor = u.CapacityFactor,
+                                      Status = UserStatus.Normal
+                                  }).ToList();
+                }
 
                 foreach (UserLoadViewModel u in capacities)
                 {
@@ -230,11 +241,30 @@ namespace SprintPlanner.WpfApp.UI.Planning
                     }
                 }
 
-                team = Business.Data.Capacity.Users.Select(u => u.Uid).ToList();
-
+                if (Business.Data.Capacity.Users != null)
+                {
+                    team = Business.Data.Capacity.Users.Select(u => u.Uid).ToList();
+                }
 
                 foreach (var load in loads.Where(l => !team.Contains(l.Key)))
                 {
+                    var v = new UserLoadViewModel();
+                        v.Name = Business.Jira.GetUserDisplayName(load.Key);
+                        v.Status = UserStatus.External;
+                        v.Uid = load.Key;
+                        v.Capacity = 0;
+                        v.PictureData = Business.Jira.GetPicture(load.Key);
+                        v.Load = load.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m; 
+                        v.Issues = new ObservableCollection<IssueViewModel>(load.Select(i => new IssueViewModel
+                        {
+                            TaskId = i.fields.issuetype.subtask ? i.key : string.Empty,
+                            StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : i.key,
+                            TaskLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.key : string.Empty)}",
+                            StoryLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.fields.parent.key : i.key)}",
+                            ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : i.fields.summary,
+                            Name = i.fields.issuetype.subtask ? i.fields.summary : string.Empty,
+                            Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
+                        }));
                     capacities.Add(new UserLoadViewModel
                     {
                         Name = Business.Jira.GetUserDisplayName(load.Key),
@@ -256,7 +286,7 @@ namespace SprintPlanner.WpfApp.UI.Planning
                     });
                 }
 
-                IEnumerable<Issue> unassignedIssues = Business.Jira.GetUnassignedIssues(SelectedBoards.First().Item1, SelectedSprint.Item1);
+                IEnumerable<Issue> unassignedIssues = openIssues.Where(i => (i.fields.assignee == null) && (i.fields.issuetype.subtask || i.fields.subtasks.Count == 0));
                 if (unassignedIssues.Any())
                 {
                     capacities.Add(new UserLoadViewModel
@@ -287,11 +317,21 @@ namespace SprintPlanner.WpfApp.UI.Planning
                 _window.ShowMessageAsync("Error getting team tasks", ex.Message + Environment.NewLine + ex.StackTrace);
             }
 
+            performanceTimer.Stop();
+
+            Debug.WriteLine($"Sync load duration: {performanceTimer.Elapsed}");
+
         }
 
         private void ReloadComandExecute()
         {
-            Boards = new ObservableCollection<Tuple<int, string>>(Business.Jira.GetBoards().Select(b => new Tuple<int, string>(b.Key, b.Value)).ToList());
+            //Boards = new ObservableCollection<Tuple<int, string>>(Business.Jira.GetBoards().Select(b => new Tuple<int, string>(b.Key, b.Value)).ToList());
+            Boards.Clear();
+            Business.Jira.GetBoards().Select(b => new Tuple<int, string>(b.Key, b.Value)).ToList().ForEach(i =>
+            {
+                Boards.Add(i);
+            });
+
         }
 
         private UserStatus GetStatusAccordingToLoad(UserLoadViewModel u)
@@ -340,6 +380,8 @@ namespace SprintPlanner.WpfApp.UI.Planning
             {
                 Debug.WriteLine($"{ex.Message} {ex.StackTrace}");
             }
+
+            _initializing = false;
 
         }
     }

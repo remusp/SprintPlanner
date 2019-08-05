@@ -133,7 +133,7 @@ namespace SprintPlanner.WpfApp.UI.Capacity
             Users.Clear();
             Task<List<string>>.Factory.StartNew(() =>
             {
-                return Business.Jira.GetAllAssigneesInSprint(_boardId, _sprintId);
+                return Business.Jira.GetAllAssigneesInSprint(_sprintId);
             }).ContinueWith((t) =>
             {
                 try

@@ -20,4 +20,7 @@
   * "/rest/api/2/user/assignable/search?project=PROJECT_NAME_HERE"
   * https://community.atlassian.com/t5/Answers-Developer-Questions/rest-api-2-user-search-not-returning-user/qaq-p/464379
   * https://community.atlassian.com/t5/Jira-questions/Any-way-to-get-all-users-list-using-JIRA-REST-API/qaq-p/518530
+  
+## Version History
+See [Version History](VersionHistory.md)
     

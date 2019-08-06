@@ -10,13 +10,18 @@
              mc:Ignorable="d"
              d:DesignHeight="450"
              d:DesignWidth="800">
-  <Grid>
+  <UserControl.Resources>
+    <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+  </UserControl.Resources>
+  <Grid IsEnabled="{Binding IsNotBusy}">
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="*" />
       <ColumnDefinition Width="Auto" />
     </Grid.ColumnDefinitions>
+
     <DockPanel HorizontalAlignment="Stretch"
                Grid.Column="0">
+
       <Grid VerticalAlignment="Top"
             DockPanel.Dock="Top"
             HorizontalAlignment="Stretch">
@@ -90,15 +95,15 @@
                        FontSize="24"
                        FontWeight="DemiBold"
                        Style="{StaticResource TextBlockStyle}"
-                       Grid.Row="1" 
-                       Visibility="Collapsed"/>
+                       Grid.Row="1"
+                       Visibility="Collapsed" />
             <TextBlock Text="{Binding CommittedStoryPoints}"
                        FontSize="24"
                        FontWeight="DemiBold"
                        Style="{StaticResource TextBlockStyle}"
                        Grid.Row="1"
-                       Grid.Column="1" 
-                       Visibility="Collapsed"/>
+                       Grid.Column="1"
+                       Visibility="Collapsed" />
           </Grid>
           <ItemsControl Grid.Row="1"
                         Grid.ColumnSpan="4"
@@ -114,10 +119,14 @@
               </DataTemplate>
             </ItemsControl.ItemTemplate>
           </ItemsControl>
+
         </StackPanel>
       </ScrollViewer>
 
     </DockPanel>
+    <mh:ProgressRing Grid.Row="1"
+                     VerticalAlignment="Center"
+                     Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}" />
     <mh:HamburgerMenu DisplayMode="CompactOverlay"
                       HamburgerWidth="64"
                       CompactPaneLength="64"

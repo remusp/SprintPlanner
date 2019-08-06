@@ -1,5 +1,6 @@
  
-### Version 0.0.4 (2019-08-05)
+### Version 0.0.4 (2019-08-06)
+ * Progress spinner for planning data
  * Optimied sprint data fetching 
  * Fixed board and sprint selection issues in combos
  * Added story points

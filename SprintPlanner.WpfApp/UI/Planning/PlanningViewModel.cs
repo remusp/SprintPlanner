@@ -4,12 +4,14 @@ using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using SprintPlanner.Core;
 using SprintPlanner.Core.Logic;
+using SprintPlanner.WpfApp.Properties;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace SprintPlanner.WpfApp.UI.Planning
@@ -113,6 +115,27 @@ namespace SprintPlanner.WpfApp.UI.Planning
             }
         }
 
+        #region IsBusy Property
+
+        private bool _isBusy;
+        public bool IsBusy
+        {
+            get
+            {
+                return _isBusy;
+            }
+
+            set
+            {
+                _isBusy = value;
+                RaisePropertyChanged();
+                RaisePropertyChanged(nameof(IsNotBusy));
+            }
+        }
+
+        #endregion IsBusy Property
+
+        public bool IsNotBusy => !_isBusy;
 
         private ICommand _reloadCommand;
 
@@ -185,76 +208,82 @@ namespace SprintPlanner.WpfApp.UI.Planning
 
         private void SyncLoadComandExecute()
         {
-            Stopwatch performanceTimer = new Stopwatch();
-            performanceTimer.Start();
-            try
+            IsBusy = true;
+            Task.Factory.StartNew(() =>
             {
-                var capacities = new List<UserLoadViewModel>();
-                var team = new List<string>();
-
-                Stopwatch query1 = new Stopwatch();
-                query1.Start();
-                var allIssues = Business.Jira.GetAllIssuesInSprint(SelectedSprint.Item1);
-                query1.Stop();
-                Debug.WriteLine($"Query 1: {query1.Elapsed}");
-
-                var openIssues = allIssues.Where(i => i.fields.status.id != STATUS_DONE);
-                var openAssignedIssues = openIssues.Where(i => i.fields.assignee != null);
-
-                double storyPointsRaw = allIssues.Where(i => i.fields.customfield_10013 != null).Select(j => j.fields.customfield_10013).Sum().Value;
-                StoryPoints = (int)Math.Round(storyPointsRaw);
-
-                var loads = openAssignedIssues.Where(l => l.fields.issuetype.subtask || l.fields.subtasks.Count == 0).GroupBy(i => i.fields.assignee.name);
-
-                if (Business.Data.Capacity.Users != null)
+                Stopwatch performanceTimer = new Stopwatch();
+                performanceTimer.Start();
+                try
                 {
-                    capacities = (from u in Business.Data.Capacity.Users
-                                  select new UserLoadViewModel
-                                  {
-                                      Name = u.UserName,
-                                      Uid = u.Uid,
-                                      Capacity = (u.DaysInSprint - u.DaysOff) * u.HoursPerDay, // TODO: Duplicate capacity formula
-                                      CapacityFactor = u.CapacityFactor,
-                                      Status = UserStatus.Normal
-                                  }).ToList();
-                }
+                    var capacities = new List<UserLoadViewModel>();
+                    var team = new List<string>();
 
-                foreach (UserLoadViewModel u in capacities)
-                {
-                    u.PictureData = Business.Jira.GetPicture(u.Uid);
-                    var load = loads.FirstOrDefault(l => l.Key.Equals(u.Uid));
-                    if (load != null)
+                    Stopwatch query1 = new Stopwatch();
+                    query1.Start();
+                    var allIssues = Business.Jira.GetAllIssuesInSprint(SelectedSprint.Item1);
+                    query1.Stop();
+                    Debug.WriteLine($"Query 1: {query1.Elapsed}");
+
+                    var openIssues = allIssues.Where(i => i.fields.status.id != STATUS_DONE);
+                    var openAssignedIssues = openIssues.Where(i => i.fields.assignee != null);
+
+                    double storyPointsRaw = allIssues.Where(i => i.fields.customfield_10013 != null).Select(j => j.fields.customfield_10013).Sum().Value;
+                    StoryPoints = (int)Math.Round(storyPointsRaw);
+
+                    var loads = openAssignedIssues.Where(l => l.fields.issuetype.subtask || l.fields.subtasks.Count == 0).GroupBy(i => i.fields.assignee.name);
+
+                    if (Business.Data.Capacity.Users != null)
                     {
-                        u.Load = load.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m;
-                        u.Status = GetStatusAccordingToLoad(u);
-                        u.Issues = new ObservableCollection<IssueViewModel>(load.Select(i => new IssueViewModel
-                        {
-                            TaskId = i.fields.issuetype.subtask ? i.key : string.Empty,
-                            StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : i.key,
-                            TaskLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.key : string.Empty)}",
-                            StoryLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.fields.parent.key : i.key)}",
-                            ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : i.fields.summary,
-                            Name = i.fields.issuetype.subtask ? i.fields.summary : string.Empty,
-                            Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
-                        }));
-
+                        capacities = (from u in Business.Data.Capacity.Users
+                                      select new UserLoadViewModel
+                                      {
+                                          Name = u.UserName,
+                                          Uid = u.Uid,
+                                          Capacity = (u.DaysInSprint - u.DaysOff) * u.HoursPerDay, // TODO: Duplicate capacity formula
+                                          CapacityFactor = u.CapacityFactor,
+                                          Status = UserStatus.Normal
+                                      }).ToList();
                     }
-                }
 
-                if (Business.Data.Capacity.Users != null)
-                {
-                    team = Business.Data.Capacity.Users.Select(u => u.Uid).ToList();
-                }
+                    //string issueLinkTemplate = $"https://jira.sdl.com/browse/";
+                    //new Uri(Settings.Default.Server).Append("browse")
 
-                foreach (var load in loads.Where(l => !team.Contains(l.Key)))
-                {
-                    var v = new UserLoadViewModel();
+                    foreach (UserLoadViewModel u in capacities)
+                    {
+                        u.PictureData = Business.Jira.GetPicture(u.Uid);
+                        var load = loads.FirstOrDefault(l => l.Key.Equals(u.Uid));
+                        if (load != null)
+                        {
+                            u.Load = load.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m;
+                            u.Status = GetStatusAccordingToLoad(u);
+                            u.Issues = new ObservableCollection<IssueViewModel>(load.Select(i => new IssueViewModel
+                            {
+                                TaskId = i.fields.issuetype.subtask ? i.key : string.Empty,
+                                StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : i.key,
+                                TaskLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.key : string.Empty)}",
+                                StoryLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.fields.parent.key : i.key)}",
+                                ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : i.fields.summary,
+                                Name = i.fields.issuetype.subtask ? i.fields.summary : string.Empty,
+                                Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
+                            }));
+
+                        }
+                    }
+
+                    if (Business.Data.Capacity.Users != null)
+                    {
+                        team = Business.Data.Capacity.Users.Select(u => u.Uid).ToList();
+                    }
+
+                    foreach (var load in loads.Where(l => !team.Contains(l.Key)))
+                    {
+                        var v = new UserLoadViewModel();
                         v.Name = Business.Jira.GetUserDisplayName(load.Key);
                         v.Status = UserStatus.External;
                         v.Uid = load.Key;
                         v.Capacity = 0;
                         v.PictureData = Business.Jira.GetPicture(load.Key);
-                        v.Load = load.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m; 
+                        v.Load = load.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m;
                         v.Issues = new ObservableCollection<IssueViewModel>(load.Select(i => new IssueViewModel
                         {
                             TaskId = i.fields.issuetype.subtask ? i.key : string.Empty,
@@ -265,67 +294,69 @@ namespace SprintPlanner.WpfApp.UI.Planning
                             Name = i.fields.issuetype.subtask ? i.fields.summary : string.Empty,
                             Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
                         }));
-                    capacities.Add(new UserLoadViewModel
-                    {
-                        Name = Business.Jira.GetUserDisplayName(load.Key),
-                        Status = UserStatus.External,
-                        Uid = load.Key,
-                        Capacity = 0,
-                        PictureData = Business.Jira.GetPicture(load.Key),
-                        Load = load.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m,
-                        Issues = new ObservableCollection<IssueViewModel>(load.Select(i => new IssueViewModel
+                        capacities.Add(new UserLoadViewModel
                         {
-                            TaskId = i.fields.issuetype.subtask ? i.key : string.Empty,
-                            StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : i.key,
-                            TaskLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.key : string.Empty)}",
-                            StoryLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.fields.parent.key : i.key)}",
-                            ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : i.fields.summary,
-                            Name = i.fields.issuetype.subtask ? i.fields.summary : string.Empty,
-                            Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
-                        }))
-                    });
-                }
+                            Name = Business.Jira.GetUserDisplayName(load.Key),
+                            Status = UserStatus.External,
+                            Uid = load.Key,
+                            Capacity = 0,
+                            PictureData = Business.Jira.GetPicture(load.Key),
+                            Load = load.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m,
+                            Issues = new ObservableCollection<IssueViewModel>(load.Select(i => new IssueViewModel
+                            {
+                                TaskId = i.fields.issuetype.subtask ? i.key : string.Empty,
+                                StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : i.key,
+                                TaskLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.key : string.Empty)}",
+                                StoryLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.fields.parent.key : i.key)}",
+                                ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : i.fields.summary,
+                                Name = i.fields.issuetype.subtask ? i.fields.summary : string.Empty,
+                                Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
+                            }))
+                        });
+                    }
 
-                IEnumerable<Issue> unassignedIssues = openIssues.Where(i => (i.fields.assignee == null) && (i.fields.issuetype.subtask || i.fields.subtasks.Count == 0));
-                if (unassignedIssues.Any())
+                    IEnumerable<Issue> unassignedIssues = openIssues.Where(i => (i.fields.assignee == null) && (i.fields.issuetype.subtask || i.fields.subtasks.Count == 0));
+                    if (unassignedIssues.Any())
+                    {
+                        capacities.Add(new UserLoadViewModel
+                        {
+                            Name = "Unassigned",
+                            Status = UserStatus.External,
+                            Capacity = 0,
+                            PictureData = File.ReadAllBytes(@"Data\Unassigned.png"),
+                            Load = unassignedIssues.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m,
+                            Issues = new ObservableCollection<IssueViewModel>(unassignedIssues.Select(i => new IssueViewModel
+                            {
+                                TaskId = i.fields.issuetype.subtask ? i.key : string.Empty,
+                                StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : i.key,
+                                TaskLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.key : string.Empty)}",
+                                StoryLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.fields.parent.key : i.key)}",
+                                ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : i.fields.summary,
+                                Name = i.fields.issuetype.subtask ? i.fields.summary : string.Empty,
+                                Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
+                            }))
+                        });
+                    }
+
+                    UserLoads = new ObservableCollection<UserLoadViewModel>(capacities);
+
+                }
+                catch (Exception ex)
                 {
-                    capacities.Add(new UserLoadViewModel
-                    {
-                        Name = "Unassigned",
-                        Status = UserStatus.External,
-                        Capacity = 0,
-                        PictureData = File.ReadAllBytes(@"Data\Unassigned.png"),
-                        Load = unassignedIssues.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m,
-                        Issues = new ObservableCollection<IssueViewModel>(unassignedIssues.Select(i => new IssueViewModel
-                        {
-                            TaskId = i.fields.issuetype.subtask ? i.key : string.Empty,
-                            StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : i.key,
-                            TaskLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.key : string.Empty)}",
-                            StoryLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.fields.parent.key : i.key)}",
-                            ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : i.fields.summary,
-                            Name = i.fields.issuetype.subtask ? i.fields.summary : string.Empty,
-                            Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
-                        }))
-                    });
+                    _window.ShowMessageAsync("Error getting team tasks", ex.Message + Environment.NewLine + ex.StackTrace);
                 }
 
-                UserLoads = new ObservableCollection<UserLoadViewModel>(capacities);
+                performanceTimer.Stop();
 
-            }
-            catch (Exception ex)
+                Debug.WriteLine($"Sync load duration: {performanceTimer.Elapsed}");
+            }).ContinueWith(t =>
             {
-                _window.ShowMessageAsync("Error getting team tasks", ex.Message + Environment.NewLine + ex.StackTrace);
-            }
-
-            performanceTimer.Stop();
-
-            Debug.WriteLine($"Sync load duration: {performanceTimer.Elapsed}");
-
+                IsBusy = false;
+            });
         }
 
         private void ReloadComandExecute()
         {
-            //Boards = new ObservableCollection<Tuple<int, string>>(Business.Jira.GetBoards().Select(b => new Tuple<int, string>(b.Key, b.Value)).ToList());
             Boards.Clear();
             Business.Jira.GetBoards().Select(b => new Tuple<int, string>(b.Key, b.Value)).ToList().ForEach(i =>
             {

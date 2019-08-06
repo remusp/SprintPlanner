@@ -22,5 +22,5 @@
   * https://community.atlassian.com/t5/Jira-questions/Any-way-to-get-all-users-list-using-JIRA-REST-API/qaq-p/518530
   
 ## Version History
-See [Vrsion History](VersionHistory.md)
+See [Version History](VersionHistory.md)
     

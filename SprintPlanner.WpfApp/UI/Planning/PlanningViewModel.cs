@@ -220,7 +220,13 @@ namespace SprintPlanner.WpfApp.UI.Planning
 
                     Stopwatch query1 = new Stopwatch();
                     query1.Start();
-                    var allIssues = Business.Jira.GetAllIssuesInSprint(SelectedSprint.Item1);
+                    var mandatoryFields = new List<string>
+                    {
+                        "id", "key", "timetracking", "status", "assignee",
+                        "issuetype", "subtasks", "parent","summary","customfield_10013"
+                    };
+
+                    var allIssues = Business.Jira.GetAllIssuesInSprint(SelectedSprint.Item1, mandatoryFields);
                     query1.Stop();
                     Debug.WriteLine($"Query 1: {query1.Elapsed}");
 
@@ -245,8 +251,7 @@ namespace SprintPlanner.WpfApp.UI.Planning
                                       }).ToList();
                     }
 
-                    //string issueLinkTemplate = $"https://jira.sdl.com/browse/";
-                    //new Uri(Settings.Default.Server).Append("browse")
+                    string link = new Uri(Settings.Default.Server).Append("browse/").AbsoluteUri;
 
                     foreach (UserLoadViewModel u in capacities)
                     {
@@ -260,8 +265,8 @@ namespace SprintPlanner.WpfApp.UI.Planning
                             {
                                 TaskId = i.fields.issuetype.subtask ? i.key : string.Empty,
                                 StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : i.key,
-                                TaskLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.key : string.Empty)}",
-                                StoryLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.fields.parent.key : i.key)}",
+                                TaskLink = link + $"{(i.fields.issuetype.subtask ? i.key : string.Empty)}",
+                                StoryLink = link + $"{(i.fields.issuetype.subtask ? i.fields.parent.key : i.key)}",
                                 ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : i.fields.summary,
                                 Name = i.fields.issuetype.subtask ? i.fields.summary : string.Empty,
                                 Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
@@ -288,8 +293,8 @@ namespace SprintPlanner.WpfApp.UI.Planning
                         {
                             TaskId = i.fields.issuetype.subtask ? i.key : string.Empty,
                             StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : i.key,
-                            TaskLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.key : string.Empty)}",
-                            StoryLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.fields.parent.key : i.key)}",
+                            TaskLink = link + $"{(i.fields.issuetype.subtask ? i.key : string.Empty)}",
+                            StoryLink = link + $"{(i.fields.issuetype.subtask ? i.fields.parent.key : i.key)}",
                             ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : i.fields.summary,
                             Name = i.fields.issuetype.subtask ? i.fields.summary : string.Empty,
                             Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
@@ -306,8 +311,8 @@ namespace SprintPlanner.WpfApp.UI.Planning
                             {
                                 TaskId = i.fields.issuetype.subtask ? i.key : string.Empty,
                                 StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : i.key,
-                                TaskLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.key : string.Empty)}",
-                                StoryLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.fields.parent.key : i.key)}",
+                                TaskLink = link + $"{(i.fields.issuetype.subtask ? i.key : string.Empty)}",
+                                StoryLink = link + $"{(i.fields.issuetype.subtask ? i.fields.parent.key : i.key)}",
                                 ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : i.fields.summary,
                                 Name = i.fields.issuetype.subtask ? i.fields.summary : string.Empty,
                                 Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
@@ -329,8 +334,8 @@ namespace SprintPlanner.WpfApp.UI.Planning
                             {
                                 TaskId = i.fields.issuetype.subtask ? i.key : string.Empty,
                                 StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : i.key,
-                                TaskLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.key : string.Empty)}",
-                                StoryLink = $"https://jira.sdl.com/browse/{(i.fields.issuetype.subtask ? i.fields.parent.key : i.key)}",
+                                TaskLink = link + $"{(i.fields.issuetype.subtask ? i.key : string.Empty)}",
+                                StoryLink = link + $"{(i.fields.issuetype.subtask ? i.fields.parent.key : i.key)}",
                                 ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : i.fields.summary,
                                 Name = i.fields.issuetype.subtask ? i.fields.summary : string.Empty,
                                 Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
@@ -357,12 +362,20 @@ namespace SprintPlanner.WpfApp.UI.Planning
 
         private void ReloadComandExecute()
         {
+            IsBusy = true;
             Boards.Clear();
-            Business.Jira.GetBoards().Select(b => new Tuple<int, string>(b.Key, b.Value)).ToList().ForEach(i =>
+            Task.Factory.StartNew(() =>
             {
-                Boards.Add(i);
-            });
+                return Business.Jira.GetBoards();
 
+            }).ContinueWith(t =>
+            {
+                t.Result.Select(b => new Tuple<int, string>(b.Key, b.Value)).ToList().ForEach(i =>
+                {
+                    Boards.Add(i);
+                });
+                IsBusy = false;
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         private UserStatus GetStatusAccordingToLoad(UserLoadViewModel u)

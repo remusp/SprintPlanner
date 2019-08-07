@@ -1,6 +1,7 @@
  
 ### Version 0.0.4 (2019-08-06)
  * Application icon
+ * Fixed hardcoded links to JIRA 
  * Progress spinner for planning data
  * Optimied sprint data fetching 
  * Fixed board and sprint selection issues in combos

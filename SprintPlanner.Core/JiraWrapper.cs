@@ -44,7 +44,7 @@ namespace SprintPlanner.Core
             return persons;
         }
 
-        public List<Issue> GetAllIssuesInSprint(int sprintId)
+        public List<Issue> GetAllIssuesInSprint(int sprintId, List<string> mandatoryFields = null)
         {
             var issues = new List<Issue>();
             int issueCount = 0;
@@ -53,7 +53,7 @@ namespace SprintPlanner.Core
 
             do
             {
-                string x = _webRequester.HttpGetByWebRequest(GetSprintIssuesPath(sprintId, pageSize, retries), _username, _password);
+                string x = _webRequester.HttpGetByWebRequest(GetSprintIssuesPath(sprintId, pageSize, retries, mandatoryFields), _username, _password);
                 var deserializedCall = JsonConvert.DeserializeObject<SprintIssuesDTO>(x);
                 issues.AddRange(deserializedCall.issues);
                 issueCount = deserializedCall.issues.Count;
@@ -179,9 +179,15 @@ namespace SprintPlanner.Core
             return issues;
         }
 
-        private string GetSprintIssuesPath(int sprintId, int pageSize, int startPage)
+        private string GetSprintIssuesPath(int sprintId, int pageSize, int startPage, List<string> mandatoryFields)
         {
-            string uri = new Uri(Url).Append($"/rest/api/2/search?jql=Sprint={sprintId}&startAt={startPage * pageSize}&maxResults={pageSize}&fields=id,key,timetracking,status,assignee,customfield_10013,issuetype,subtasks,parent,summary").AbsoluteUri;
+            string fieldsPart = string.Empty;
+            if (mandatoryFields != null)
+            {
+                fieldsPart = $"&fields={string.Join(",", mandatoryFields)}";
+            }
+            
+            string uri = new Uri(Url).Append($"/rest/api/2/search?jql=Sprint={sprintId}&startAt={startPage * pageSize}&maxResults={pageSize}{fieldsPart}").AbsoluteUri;
             return uri;
         }
     }

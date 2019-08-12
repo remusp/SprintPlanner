@@ -11,7 +11,7 @@ namespace SprintPlanner.Core
     {
         private SecureString _password;
         private string _username;
-        private IHttpRequester _webRequester;
+        private readonly IHttpRequester _webRequester;
 
         public JiraWrapper(IHttpRequester webRequester)
         {
@@ -135,15 +135,13 @@ namespace SprintPlanner.Core
         {
             var boards = new List<Value>();
             int? boardCount = null;
-            int retries = 0;
 
-            while (!boardCount.HasValue || boardCount.Value > 49)
+            for (int retries = 0; !boardCount.HasValue || boardCount.Value > 49; retries++)
             {
                 string x = _webRequester.HttpGetByWebRequest(GetBoards(retries), _username, _password);
                 var deserializedCall = JsonConvert.DeserializeObject<BoardSprintsDTO>(x);
                 boards.AddRange(deserializedCall.values.Where(s => s.state != "closed"));
                 boardCount = deserializedCall.values.Select(s => s.id).Count();
-                retries++;
             }
 
             return boards;
@@ -165,15 +163,13 @@ namespace SprintPlanner.Core
         {
             var issues = new List<Value>();
             int? issueCount = null;
-            int retries = 0;
 
-            while (!issueCount.HasValue || issueCount.Value > 49)
+            for (int retries = 0; !issueCount.HasValue || issueCount.Value > 49; retries++)
             {
                 string x = _webRequester.HttpGetByWebRequest(GetBoardSprintPath(retries, boardId), _username, _password);
                 var deserializedCall = JsonConvert.DeserializeObject<BoardSprintsDTO>(x);
                 issues.AddRange(deserializedCall.values.Where(s => s.state != "closed"));
                 issueCount = deserializedCall.values.Select(s => s.id).Count();
-                retries++;
             }
 
             return issues;
@@ -186,7 +182,7 @@ namespace SprintPlanner.Core
             {
                 fieldsPart = $"&fields={string.Join(",", mandatoryFields)}";
             }
-            
+
             string uri = new Uri(Url).Append($"/rest/api/2/search?jql=Sprint={sprintId}&startAt={startPage * pageSize}&maxResults={pageSize}{fieldsPart}").AbsoluteUri;
             return uri;
         }

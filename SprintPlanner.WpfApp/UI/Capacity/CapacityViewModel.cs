@@ -1,6 +1,9 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
 using SprintPlanner.Core.Logic;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -13,15 +16,15 @@ namespace SprintPlanner.WpfApp.UI.Capacity
     {
         private int _sprintId;
         private int _boardId;
+        private readonly MetroWindow _window;
 
-        public CapacityViewModel()
+        public CapacityViewModel(MetroWindow w)
         {
             Users = new ObservableCollection<UserDetails>();
             CapacityFactor = 1;
+            _window = w;
             PropertyChanged += CapacityWindowViewModel_PropertyChanged;
         }
-
-
 
         private void CapacityWindowViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
@@ -131,24 +134,32 @@ namespace SprintPlanner.WpfApp.UI.Capacity
             IsBusy = true;
             BusyReason = "Fetching users...";
             Users.Clear();
-            Task<List<string>>.Factory.StartNew(() =>
-            {
-                return Business.Jira.GetAllAssigneesInSprint(_sprintId);
-            }).ContinueWith((t) =>
+            Task<List<string>>.Factory.StartNew(() => Business.Jira.GetAllAssigneesInSprint(_sprintId)).ContinueWith((t) =>
             {
                 try
                 {
-                    foreach (var item in t.Result)
+                    if (!t.IsFaulted)
                     {
-                        string name = Business.Jira.GetUserDisplayName(item);
-                        Users.Add(new UserDetails
+                        foreach (var item in t.Result)
                         {
-                            Uid = item,
-                            UserName = name,
-                            DaysInSprint = DaysInSprint,
-                            CapacityFactor = CapacityFactor
-                        });
+                            string name = Business.Jira.GetUserDisplayName(item);
+                            Users.Add(new UserDetails
+                            {
+                                Uid = item,
+                                UserName = name,
+                                DaysInSprint = DaysInSprint,
+                                CapacityFactor = CapacityFactor
+                            });
+                        }
                     }
+                    else
+                    {
+                        var message = string.Join("; ", t.Exception.InnerExceptions);
+                        var stackTraces = string.Join($"---{Environment.NewLine}", t.Exception.InnerExceptions.Select(ie => ie.StackTrace));
+                        var flatException = t.Exception.Flatten();
+                        _window.ShowMessageAsync("Error fetching users", $"{message}{Environment.NewLine}{stackTraces}");
+                    }
+
                 }
                 finally
                 {

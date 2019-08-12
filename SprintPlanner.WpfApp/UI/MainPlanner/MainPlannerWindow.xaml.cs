@@ -12,7 +12,8 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
     /// </summary>
     public partial class MainPlannerWindow : MetroWindow
     {
-        private IHttpRequester _webRequester;
+        private readonly IHttpRequester _webRequester;
+
         public MainPlannerWindow()
         {
             InitializeComponent();

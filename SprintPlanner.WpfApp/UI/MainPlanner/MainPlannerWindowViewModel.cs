@@ -39,7 +39,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             LogoutVisibility = Visibility.Collapsed;
 
             _planningViewModel = new PlanningViewModel(w);
-            _capacityViewModel = new CapacityViewModel();
+            _capacityViewModel = new CapacityViewModel(w);
             _settingsViewModel = new SettingsViewModel();
             _loginViewModel = new LoginViewModel(w);
             _loginViewModel.LoginSucceeded += LoginSucceededHandler;

@@ -1,68 +1,58 @@
 ﻿using GalaSoft.MvvmLight;
+using SprintPlanner.Core.Logic;
 using System.Collections.ObjectModel;
 
 namespace SprintPlanner.WpfApp.UI.Planning
 {
     public class UserLoadViewModel : ViewModelBase
     {
-        private string _uid;
+        private readonly UserDetailsModel _userModel;
+
+        public UserLoadViewModel(UserDetailsModel user)
+        {
+            _userModel = user;
+        }
 
         public string Uid
         {
-            get { return _uid; }
+            get { return _userModel.Uid; }
             set
             {
-                _uid = value;
+                _userModel.Uid = value;
                 RaisePropertyChanged();
             }
         }
-
-        private string _name;
 
         public string Name
         {
-            get { return _name; }
+            get { return _userModel.UserName; }
             set
             {
-                _name = value;
+                _userModel.UserName = value;
                 RaisePropertyChanged();
             }
         }
 
-
-        private decimal _capacity;
-
         public decimal Capacity
         {
-            get { return _capacity; }
-            set
-            {
-                _capacity = value;
-                RaisePropertyChanged();
-                RaisePropertyChanged(nameof(ScaledCapacity));
-            }
+            get { return _userModel.Capacity; }
         }
 
         public decimal ScaledCapacity
         {
-            // TODO: Duplicate scaled capacity formula
-            get { return Capacity * CapacityFactor; }
+            get { return _userModel.ScaledCapacity; }
         }
-
-        private decimal _capacityFactor;
 
         public decimal CapacityFactor
         {
-            get { return _capacityFactor; }
+            get { return _userModel.CapacityFactor; }
             set
             {
-                _capacityFactor = value;
+                _userModel.CapacityFactor = value;
                 RaisePropertyChanged();
                 RaisePropertyChanged(nameof(ScaledCapacity));
             }
         }
-
-
 
         private decimal _load;
 
@@ -87,10 +77,6 @@ namespace SprintPlanner.WpfApp.UI.Planning
                 RaisePropertyChanged();
             }
         }
-
-
-
-
 
         #region PictureData Property
 

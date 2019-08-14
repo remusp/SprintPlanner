@@ -1,83 +1,81 @@
-﻿using GalaSoft.MvvmLight;
+﻿using System;
+using GalaSoft.MvvmLight;
+using SprintPlanner.Core.Logic;
 
 namespace SprintPlanner.WpfApp
 {
     public class UserDetails : ViewModelBase
     {
-        private string _uid;
+        private readonly UserDetailsModel _model;
+
+        public UserDetails(UserDetailsModel model)
+        {
+            _model = model;
+        }
 
         public string Uid
         {
-            get { return _uid; }
+            get { return _model.Uid; }
             set
             {
-                _uid = value;
+                _model.Uid = value;
                 RaisePropertyChanged();
             }
         }
-
-        private string _userName;
 
         public string UserName
         {
-            get { return _userName; }
+            get { return _model.UserName; }
             set
             {
-                _userName = value;
+                _model.UserName = value;
                 RaisePropertyChanged();
             }
         }
-
-        private decimal _hoursPerDay;
 
         public decimal HoursPerDay
         {
-            get { return _hoursPerDay; }
+            get { return _model.HoursPerDay; }
             set
             {
-                _hoursPerDay = value;
+                _model.HoursPerDay = value;
                 RaisePropertyChanged();
                 RaisePropertyChanged(nameof(Capacity));
                 RaisePropertyChanged(nameof(ScaledCapacity));
             }
         }
-
-        private int _daysOff;
 
         public int DaysOff
         {
-            get { return _daysOff; }
+            get { return _model.DaysOff; }
             set
             {
-                _daysOff = value;
+                _model.DaysOff = value;
                 RaisePropertyChanged();
                 RaisePropertyChanged(nameof(Capacity));
                 RaisePropertyChanged(nameof(ScaledCapacity));
             }
         }
 
-        private int _daysInSprint;
 
         public int DaysInSprint
         {
-            get { return _daysInSprint; }
+            get { return _model.DaysInSprint; }
             set
             {
-                _daysInSprint = value;
+                _model.DaysInSprint = value;
                 RaisePropertyChanged();
                 RaisePropertyChanged(nameof(Capacity));
                 RaisePropertyChanged(nameof(ScaledCapacity));
             }
         }
 
-        private decimal _capacityFactor;
-
         public decimal CapacityFactor
         {
-            get { return _capacityFactor; }
+            get { return _model.CapacityFactor; }
             set
             {
-                _capacityFactor = value;
+                _model.CapacityFactor = value;
                 RaisePropertyChanged();
                 RaisePropertyChanged(nameof(ScaledCapacity));
             }
@@ -85,15 +83,20 @@ namespace SprintPlanner.WpfApp
 
         public decimal Capacity
         {
-            // TODO: Duplicate capacity formula
-            get { return (DaysInSprint - DaysOff) * HoursPerDay; }
-
+            get
+            {
+                return _model.Capacity;
+            }
         }
 
         public decimal ScaledCapacity
         {
-            // TODO: Duplicate scaled capacity formula
-            get { return Capacity * CapacityFactor; }
+            get { return _model.ScaledCapacity; }
+        }
+
+        public UserDetailsModel GetModel()
+        {
+            return _model;
         }
     }
 }

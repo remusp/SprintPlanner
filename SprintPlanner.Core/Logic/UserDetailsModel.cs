@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SprintPlanner.Core.Logic
+﻿namespace SprintPlanner.Core.Logic
 {
     public class UserDetailsModel
     {
@@ -17,5 +13,9 @@ namespace SprintPlanner.Core.Logic
         public int DaysInSprint { get; set; }
 
         public decimal CapacityFactor { get; set; }
+
+        public decimal Capacity { get { return (DaysInSprint - DaysOff) * HoursPerDay; } }
+
+        public decimal ScaledCapacity { get { return Capacity * CapacityFactor; } }
     }
 }

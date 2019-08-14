@@ -143,13 +143,13 @@ namespace SprintPlanner.WpfApp.UI.Capacity
                         foreach (var item in t.Result)
                         {
                             string name = Business.Jira.GetUserDisplayName(item);
-                            Users.Add(new UserDetails
+                            Users.Add(new UserDetails(new UserDetailsModel
                             {
                                 Uid = item,
                                 UserName = name,
                                 DaysInSprint = DaysInSprint,
                                 CapacityFactor = CapacityFactor
-                            });
+                            }));
                         }
                     }
                     else
@@ -174,15 +174,7 @@ namespace SprintPlanner.WpfApp.UI.Capacity
         {
             Business.Data.Capacity.DaysInSprint = DaysInSprint;
             Business.Data.Capacity.CapacityFactor = CapacityFactor;
-            Business.Data.Capacity.Users = Users.Select(u => new UserDetailsModel
-            {
-                Uid = u.Uid,
-                UserName = u.UserName,
-                HoursPerDay = u.HoursPerDay,
-                DaysOff = u.DaysOff,
-                DaysInSprint = u.DaysInSprint,
-                CapacityFactor = u.CapacityFactor
-            }).ToList();
+            Business.Data.Capacity.Users = Users.Select(u => u.GetModel()).ToList();
         }
 
         public void Pull()
@@ -190,15 +182,7 @@ namespace SprintPlanner.WpfApp.UI.Capacity
             DaysInSprint = Business.Data.Capacity.DaysInSprint;
             if (Business.Data?.Capacity?.Users != null)
             {
-                Users = new ObservableCollection<UserDetails>(Business.Data.Capacity.Users?.Select(u => new UserDetails
-                {
-                    Uid = u.Uid,
-                    UserName = u.UserName,
-                    HoursPerDay = u.HoursPerDay,
-                    DaysOff = u.DaysOff,
-                    DaysInSprint = u.DaysInSprint,
-                    CapacityFactor = u.CapacityFactor
-                }));
+                Users = new ObservableCollection<UserDetails>(Business.Data.Capacity.Users?.Select(u => new UserDetails(u)));
             }
 
             CapacityFactor = Business.Data.Capacity.CapacityFactor;

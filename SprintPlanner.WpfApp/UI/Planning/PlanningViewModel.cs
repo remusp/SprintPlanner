@@ -218,40 +218,14 @@ namespace SprintPlanner.WpfApp.UI.Planning
                 StoryPoints = (int)Math.Round(storyPointsRaw);
 
                 var loads = openAssignedIssues.Where(l => l.fields.issuetype.subtask || l.fields.subtasks.Count == 0).GroupBy(i => i.fields.assignee.name);
+                string link = new Uri(Settings.Default.Server).Append("browse/").AbsoluteUri;
 
                 if (Business.Data.Capacity.Users != null)
                 {
-                    capacities = (from u in Business.Data.Capacity.Users
-                                  select new UserLoadViewModel
-                                  {
-                                      Name = u.UserName,
-                                      Uid = u.Uid,
-                                      Capacity = (u.DaysInSprint - u.DaysOff) * u.HoursPerDay, // TODO: Duplicate capacity formula
-                                      CapacityFactor = u.CapacityFactor,
-                                      Status = UserStatus.Normal
-                                  }).ToList();
-                }
-
-                string link = new Uri(Settings.Default.Server).Append("browse/").AbsoluteUri;
-
-                foreach (UserLoadViewModel u in capacities)
-                {
-                    u.PictureData = Business.Jira.GetPicture(u.Uid);
-                    var load = loads.FirstOrDefault(l => l.Key.Equals(u.Uid));
-                    if (load != null)
+                    foreach (var user in Business.Data.Capacity.Users)
                     {
-                        u.Load = load.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m;
-                        u.Status = GetStatusAccordingToLoad(u);
-                        u.Issues = new ObservableCollection<IssueViewModel>(load.Select(i => new IssueViewModel
-                        {
-                            TaskId = i.fields.issuetype.subtask ? i.key : string.Empty,
-                            StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : i.key,
-                            TaskLink = link + $"{(i.fields.issuetype.subtask ? i.key : string.Empty)}",
-                            StoryLink = link + $"{(i.fields.issuetype.subtask ? i.fields.parent.key : i.key)}",
-                            ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : i.fields.summary,
-                            Name = i.fields.issuetype.subtask ? i.fields.summary : string.Empty,
-                            Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
-                        }));
+                        var userIssues = loads.FirstOrDefault(l => l.Key.Equals(user.Uid));
+                        AddCapacity(capacities, userIssues, user, link, Business.Jira.GetPicture(user.Uid));
                     }
                 }
 
@@ -262,65 +236,24 @@ namespace SprintPlanner.WpfApp.UI.Planning
 
                 foreach (var load in loads.Where(l => !team.Contains(l.Key)))
                 {
-                    //var v = new UserLoadViewModel();
-                    //v.Name = Business.Jira.GetUserDisplayName(load.Key);
-                    //v.Status = UserStatus.External;
-                    //v.Uid = load.Key;
-                    //v.Capacity = 0;
-                    //v.PictureData = Business.Jira.GetPicture(load.Key);
-                    //v.Load = load.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m;
-                    //v.Issues = new ObservableCollection<IssueViewModel>(load.Select(i => new IssueViewModel
-                    //{
-                    //    TaskId = i.fields.issuetype.subtask ? i.key : string.Empty,
-                    //    StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : i.key,
-                    //    TaskLink = link + $"{(i.fields.issuetype.subtask ? i.key : string.Empty)}",
-                    //    StoryLink = link + $"{(i.fields.issuetype.subtask ? i.fields.parent.key : i.key)}",
-                    //    ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : i.fields.summary,
-                    //    Name = i.fields.issuetype.subtask ? i.fields.summary : string.Empty,
-                    //    Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
-                    //}));
-                    capacities.Add(new UserLoadViewModel
+                    var user = new UserDetailsModel
                     {
-                        Name = Business.Jira.GetUserDisplayName(load.Key),
-                        Status = UserStatus.External,
-                        Uid = load.Key,
-                        Capacity = 0,
-                        PictureData = Business.Jira.GetPicture(load.Key),
-                        Load = load.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m,
-                        Issues = new ObservableCollection<IssueViewModel>(load.Select(i => new IssueViewModel
-                        {
-                            TaskId = i.fields.issuetype.subtask ? i.key : string.Empty,
-                            StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : i.key,
-                            TaskLink = link + $"{(i.fields.issuetype.subtask ? i.key : string.Empty)}",
-                            StoryLink = link + $"{(i.fields.issuetype.subtask ? i.fields.parent.key : i.key)}",
-                            ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : i.fields.summary,
-                            Name = i.fields.issuetype.subtask ? i.fields.summary : string.Empty,
-                            Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
-                        }))
-                    });
+                        UserName = Business.Jira.GetUserDisplayName(load.Key),
+                        Uid = load.Key
+                    };
+
+                    AddCapacity(capacities, load, user, link, Business.Jira.GetPicture(load.Key), UserStatus.External);
                 }
 
                 IEnumerable<Issue> unassignedIssues = openIssues.Where(i => (i.fields.assignee == null) && (i.fields.issuetype.subtask || i.fields.subtasks.Count == 0));
                 if (unassignedIssues.Any())
                 {
-                    capacities.Add(new UserLoadViewModel
+                    var user = new UserDetailsModel
                     {
-                        Name = "Unassigned",
-                        Status = UserStatus.External,
-                        Capacity = 0,
-                        PictureData = File.ReadAllBytes(@"Data\Unassigned.png"),
-                        Load = unassignedIssues.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m,
-                        Issues = new ObservableCollection<IssueViewModel>(unassignedIssues.Select(i => new IssueViewModel
-                        {
-                            TaskId = i.fields.issuetype.subtask ? i.key : string.Empty,
-                            StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : i.key,
-                            TaskLink = link + $"{(i.fields.issuetype.subtask ? i.key : string.Empty)}",
-                            StoryLink = link + $"{(i.fields.issuetype.subtask ? i.fields.parent.key : i.key)}",
-                            ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : i.fields.summary,
-                            Name = i.fields.issuetype.subtask ? i.fields.summary : string.Empty,
-                            Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
-                        }))
-                    });
+                        UserName = "Unassigned"
+                    };
+
+                    AddCapacity(capacities, unassignedIssues, user, link, File.ReadAllBytes(@"Data\Unassigned.png"), UserStatus.External);
                 }
 
                 UserLoads = new ObservableCollection<UserLoadViewModel>(capacities);
@@ -342,6 +275,28 @@ namespace SprintPlanner.WpfApp.UI.Planning
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
+        private void AddCapacity(List<UserLoadViewModel> capacities, IEnumerable<Issue> issues, UserDetailsModel user, string link, byte[] picture, UserStatus? explicitStatus = null)
+        {
+            decimal load = issues != null ? issues.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m : 0;
+            var computedStatus = GetStatusAccordingToLoad(user, load);
+            capacities.Add(new UserLoadViewModel(user)
+            {
+                Status = explicitStatus ?? computedStatus,
+                PictureData = picture,
+                Load = load,
+                Issues = new ObservableCollection<IssueViewModel>(issues.Select(i => new IssueViewModel
+                {
+                    TaskId = i.fields.issuetype.subtask ? i.key : string.Empty,
+                    StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : i.key,
+                    TaskLink = link + $"{(i.fields.issuetype.subtask ? i.key : string.Empty)}",
+                    StoryLink = link + $"{(i.fields.issuetype.subtask ? i.fields.parent.key : i.key)}",
+                    ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : i.fields.summary,
+                    Name = i.fields.issuetype.subtask ? i.fields.summary : string.Empty,
+                    Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
+                }))
+            });
+        }
+
         private void ReloadComandExecute()
         {
             IsBusy = true;
@@ -353,14 +308,14 @@ namespace SprintPlanner.WpfApp.UI.Planning
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
-        private UserStatus GetStatusAccordingToLoad(UserLoadViewModel u)
+        private UserStatus GetStatusAccordingToLoad(UserDetailsModel u, decimal load)
         {
-            if (u.Load >= u.Capacity)
+            if (load >= u.Capacity)
             {
                 return UserStatus.Danger;
             }
 
-            if ((u.Load >= u.ScaledCapacity) || (u.Load < u.ScaledCapacity * 0.625m))
+            if ((load >= u.ScaledCapacity) || (load < u.ScaledCapacity * 0.625m))
             {
                 return UserStatus.Warning;
             }

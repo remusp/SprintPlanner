@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,14 +48,15 @@ namespace SprintPlanner.Core
         public List<Issue> GetAllIssuesInSprint(int sprintId, List<string> mandatoryFields = null)
         {
             var issues = new List<Issue>();
-            int issueCount = 0;
             int retries = 0;
             int pageSize = 1000;
 
+            int issueCount;
             do
             {
                 string x = _webRequester.HttpGetByWebRequest(GetSprintIssuesPath(sprintId, pageSize, retries, mandatoryFields), _username, _password);
                 var deserializedCall = JsonConvert.DeserializeObject<SprintIssuesDTO>(x);
+                var data = JObject.Parse(x);
                 issues.AddRange(deserializedCall.issues);
                 issueCount = deserializedCall.issues.Count;
                 retries++;

@@ -176,8 +176,21 @@ namespace SprintPlanner.WpfApp.UI.Planning
             {
                 try
                 {
-                    Sprints = new ObservableCollection<Tuple<int, string>>(Business.Jira.GetOpenSprints(SelectedBoards.First().Item1));
-                    SelectedSprint = Sprints.FirstOrDefault();
+                    IsBusy = true;
+                    Task.Factory.StartNew(() => Business.Jira.GetOpenSprints(SelectedBoards.First().Item1)).ContinueWith(t =>
+                    {
+                        if (t.IsFaulted)
+                        {
+                            _window.ShowMessageAsync("Error fetching open sprints", t.Exception.Flatten().Message + Environment.NewLine + t.Exception.Flatten().StackTrace);
+                        }
+                        else
+                        {
+                            Sprints = new ObservableCollection<Tuple<int, string>>(t.Result);
+                            SelectedSprint = Sprints.FirstOrDefault();
+                        }
+
+                        IsBusy = false;
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
                 }
                 catch (Exception ex)
                 {
@@ -284,7 +297,7 @@ namespace SprintPlanner.WpfApp.UI.Planning
                 Status = explicitStatus ?? computedStatus,
                 PictureData = picture,
                 Load = load,
-                Issues = new ObservableCollection<IssueViewModel>(issues.Select(i => new IssueViewModel
+                Issues = issues != null ? new ObservableCollection<IssueViewModel>(issues.Select(i => new IssueViewModel
                 {
                     TaskId = i.fields.issuetype.subtask ? i.key : string.Empty,
                     StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : i.key,
@@ -293,7 +306,7 @@ namespace SprintPlanner.WpfApp.UI.Planning
                     ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : i.fields.summary,
                     Name = i.fields.issuetype.subtask ? i.fields.summary : string.Empty,
                     Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
-                }))
+                })) : new ObservableCollection<IssueViewModel>()
             });
         }
 

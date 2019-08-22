@@ -57,6 +57,7 @@ namespace SprintPlanner.Core
                 string x = _webRequester.HttpGetByWebRequest(GetSprintIssuesPath(sprintId, pageSize, retries, mandatoryFields), _username, _password);
                 var deserializedCall = JsonConvert.DeserializeObject<SprintIssuesDTO>(x);
                 var data = JObject.Parse(x);
+                var storyPoints = data["issues"][9]["fields"]["customfield_10013"];
                 issues.AddRange(deserializedCall.issues);
                 issueCount = deserializedCall.issues.Count;
                 retries++;
@@ -80,6 +81,7 @@ namespace SprintPlanner.Core
 
         public List<Tuple<int, string>> GetOpenSprints(int boardId)
         {
+            // TODO: investigate if this call can be optimized
             List<Value> values = GetOpenSprintsbyBoardId(boardId);
             var result = new List<Tuple<int, string>>();
 

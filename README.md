@@ -1,6 +1,5 @@
 # SprintPlanner
 ## TODOs:
-1. Progress spinners
 1. Fix hardcoded issue request
 1. Story points field in settings (needed bc technical reasons)
 1. GO PUBLIC :D \\:D/

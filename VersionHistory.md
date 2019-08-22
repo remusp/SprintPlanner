@@ -1,5 +1,5 @@
  
-### Version 0.0.4 (2019-08-06)
+### Version 0.0.4 (2019-08-09)
  * Application icon
  * Fixed hardcoded links to JIRA 
  * Progress spinner for planning data

@@ -165,6 +165,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="ExcelLibrary">
+      <Version>1.2011.7.31</Version>
+    </PackageReference>
     <PackageReference Include="MahApps.Metro">
       <Version>1.6.5</Version>
     </PackageReference>

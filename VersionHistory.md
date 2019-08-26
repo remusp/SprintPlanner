@@ -1,4 +1,7 @@
  
+### Version 0.0.5 (2019-08-xx)
+ * Export to excel
+ 
 ### Version 0.0.4 (2019-08-09)
  * Application icon
  * Fixed hardcoded links to JIRA 

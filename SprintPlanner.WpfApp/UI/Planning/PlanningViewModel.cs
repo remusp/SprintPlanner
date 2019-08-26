@@ -1,7 +1,9 @@
-﻿using GalaSoft.MvvmLight;
+﻿using ExcelLibrary.SpreadSheet;
+using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Win32;
 using SprintPlanner.Core;
 using SprintPlanner.Core.Logic;
 using SprintPlanner.WpfApp.Properties;
@@ -148,7 +150,7 @@ namespace SprintPlanner.WpfApp.UI.Planning
             }
         }
 
-        //SyncLoadCommand
+        #region SyncLoad command
 
         private ICommand _syncLoadCommand;
 
@@ -160,6 +162,22 @@ namespace SprintPlanner.WpfApp.UI.Planning
             }
         }
 
+        #endregion SyncLoad command
+
+        #region Export command
+
+        private ICommand _exportCommand;
+
+        public ICommand ExportCommand
+        {
+            get
+            {
+                return _exportCommand ?? (_exportCommand = new RelayCommand(ExportComandExecute));
+            }
+        }
+
+        #endregion Export command
+
         private ICommand _selectedBoardChangedCommand;
 
         public ICommand SelectedBoardChangedCommand
@@ -169,6 +187,8 @@ namespace SprintPlanner.WpfApp.UI.Planning
                 return _selectedBoardChangedCommand ?? (_selectedBoardChangedCommand = new RelayCommand(SelectedBoardChangedComandExecute));
             }
         }
+
+
 
         private void SelectedBoardChangedComandExecute()
         {
@@ -199,6 +219,56 @@ namespace SprintPlanner.WpfApp.UI.Planning
             }
 
             _initializing = false;
+        }
+
+        private void ExportComandExecute()
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "Excel (*.xls)|*.xls|Excel (*.xlsx)|*.xlsx";
+
+            var dialogResult = sfd.ShowDialog();
+
+            if (dialogResult != true)
+            {
+                return;
+            }
+
+            string file = sfd.FileName;
+            Workbook workbook = new Workbook();
+            Worksheet worksheet = new Worksheet("Sprint");
+            //worksheet.Cells[0, 1] = new Cell((short)1);
+            //worksheet.Cells[2, 0] = new Cell(9999999);
+            //worksheet.Cells[3, 3] = new Cell((decimal)3.45);
+            //worksheet.Cells[2, 2] = new Cell("Text string");
+            //worksheet.Cells[2, 4] = new Cell("Second string");
+            //worksheet.Cells[4, 0] = new Cell(32764.5, "#,##0.00");
+            //worksheet.Cells[5, 1] = new Cell(DateTime.Now, @"YYYY-MM-DD"); worksheet.Cells.ColumnWidth[0, 1] = 3000;
+            for (int i = 0; i < 100; i++)
+                worksheet.Cells[i, 0] = new Cell("");
+
+            int cr = 0;
+            foreach (var l in UserLoads)
+            {
+                worksheet.Cells[cr, 0] = new Cell(l.Name);
+                worksheet.Cells[cr, 1] = new Cell(l.Load);
+                worksheet.Cells[cr, 2] = new Cell(l.ScaledCapacity);
+                cr++;
+
+                foreach (var issue in l.Issues)
+                {
+                    worksheet.Cells[cr, 0] = new Cell(issue.StoryId);
+                    worksheet.Cells[cr, 1] = new Cell(issue.TaskId);
+                    worksheet.Cells[cr, 2] = new Cell(issue.Hours);
+                    worksheet.Cells[cr, 3] = new Cell(issue.ParentName);
+                    worksheet.Cells[cr, 4] = new Cell(issue.Name);
+                    cr++;
+                }
+
+                cr++;
+            }
+
+            workbook.Worksheets.Add(worksheet);
+            workbook.Save(file);
         }
 
         private void SyncLoadComandExecute()

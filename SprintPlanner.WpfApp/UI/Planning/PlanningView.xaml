@@ -143,6 +143,9 @@
           <mh:HamburgerMenuIconItem Icon="{ip:FontAwesome Kind=SpinnerSolid, Width=48, Height=48}"
                                     Command="{Binding SyncLoadCommand}"
                                     Label="Get team data" />
+          <mh:HamburgerMenuIconItem Icon="{ip:FontAwesome Kind=SpinnerSolid, Width=48, Height=48}"
+                                    Command="{Binding ExportCommand}"
+                                    Label="Export" />
         </mh:HamburgerMenuItemCollection>
 
       </mh:HamburgerMenu.ItemsSource>

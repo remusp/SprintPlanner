@@ -57,7 +57,6 @@ namespace SprintPlanner.Core
                 string x = _webRequester.HttpGetByWebRequest(GetSprintIssuesPath(sprintId, pageSize, retries, mandatoryFields), _username, _password);
                 var deserializedCall = JsonConvert.DeserializeObject<SprintIssuesDTO>(x);
                 var data = JObject.Parse(x);
-                var storyPoints = data["issues"][9]["fields"]["customfield_10013"];
                 issues.AddRange(deserializedCall.issues);
                 issueCount = deserializedCall.issues.Count;
                 retries++;

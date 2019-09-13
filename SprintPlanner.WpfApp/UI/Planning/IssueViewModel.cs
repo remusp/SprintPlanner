@@ -1,93 +1,81 @@
-﻿using GalaSoft.MvvmLight;
+﻿using SprintPlanner.Core.Logic;
 
 namespace SprintPlanner.WpfApp.UI.Planning
 {
-    public class IssueViewModel : ViewModelBase
+    public class IssueViewModel : WrappingViewModel<IssueModel>
     {
-        private string _storyId;
-
-        public string StoryId
+        public IssueViewModel(IssueModel model) : base(model)
         {
-            get { return _storyId; }
-            set
-            {
-                _storyId = value;
-                RaisePropertyChanged();
-            }
         }
-
-        private string _name;
-
-        public string Name
-        {
-            get { return _name; }
-            set
-            {
-                _name = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        private string _parentName;
-
-        public string ParentName
-        {
-            get { return _parentName; }
-            set
-            {
-                _parentName = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        private decimal _hours;
 
         public decimal Hours
         {
-            get { return _hours; }
+            get { return _model.Hours; }
             set
             {
-                _hours = value;
+                _model.Hours = value;
                 RaisePropertyChanged();
             }
         }
 
-        private string _taskId;
-
-        public string TaskId
+        public string Name
         {
-            get { return _taskId; }
+            get { return _model.Name; }
             set
             {
-                _taskId = value;
+                _model.Name = value;
                 RaisePropertyChanged();
             }
         }
 
-        private string _taskLink;
-
-        public string TaskLink
+        public string ParentName
         {
-            get { return _taskLink; }
+            get { return _model.ParentName; }
             set
             {
-                _taskLink = value;
+                _model.ParentName = value;
                 RaisePropertyChanged();
             }
         }
 
-
-        private string _storyLink;
+        public string StoryId
+        {
+            get { return _model.StoryId; }
+            set
+            {
+                _model.StoryId = value;
+                RaisePropertyChanged();
+            }
+        }
 
         public string StoryLink
         {
-            get { return _storyLink; }
+            get { return _model.StoryLink; }
             set
             {
-                _storyLink = value;
+                _model.StoryLink = value;
                 RaisePropertyChanged();
             }
         }
 
+        public string TaskId
+        {
+            get { return _model.TaskId; }
+            set
+            {
+                _model.TaskId = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string TaskLink
+        {
+            get { return _model.TaskLink; }
+            set
+            {
+                _model.TaskLink = value;
+                RaisePropertyChanged();
+            }
+        }
     }
 }

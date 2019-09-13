@@ -1,16 +1,12 @@
-﻿using System;
-using GalaSoft.MvvmLight;
-using SprintPlanner.Core.Logic;
+﻿using SprintPlanner.Core.Logic;
 
 namespace SprintPlanner.WpfApp
 {
-    public class UserDetails : ViewModelBase
+    public class UserDetails : WrappingViewModel<UserDetailsModel>
     {
-        private readonly UserDetailsModel _model;
-
-        public UserDetails(UserDetailsModel model)
+        public UserDetails(UserDetailsModel model) : base(model)
         {
-            _model = model;
+
         }
 
         public string Uid
@@ -92,11 +88,6 @@ namespace SprintPlanner.WpfApp
         public decimal ScaledCapacity
         {
             get { return _model.ScaledCapacity; }
-        }
-
-        public UserDetailsModel GetModel()
-        {
-            return _model;
         }
     }
 }

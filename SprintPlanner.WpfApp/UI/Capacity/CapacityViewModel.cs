@@ -15,7 +15,6 @@ namespace SprintPlanner.WpfApp.UI.Capacity
     public class CapacityViewModel : ViewModelBase, IStorageManipulator
     {
         private int _sprintId;
-        private int _boardId;
         private readonly MetroWindow _window;
 
         public CapacityViewModel(MetroWindow w)
@@ -187,7 +186,6 @@ namespace SprintPlanner.WpfApp.UI.Capacity
 
             CapacityFactor = Business.Data.Capacity.CapacityFactor;
 
-            _boardId = Business.Data.Sprint.SelectedBoard;
             _sprintId = Business.Data.Sprint.SelectedSprint;
         }
     }

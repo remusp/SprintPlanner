@@ -15,7 +15,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="StoryPointsField" Type="System.String" Scope="User">
-      <Value Profile="(Default)">customfield_100138</Value>
+      <Value Profile="(Default)">customfield_10013</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -23,7 +23,9 @@ namespace SprintPlanner.Core
 
         public List<Tuple<string, decimal>> GetAllAssigneesAndWorkInSprint(int sprintId)
         {
-            List<Issue> issues = GetAllIssuesInSprint(sprintId);
+            var extendedIssues = GetAllIssuesInSprint(sprintId);
+
+            List<Issue> issues = extendedIssues.Item1;
 
             IEnumerable<IGrouping<string, Issue>> issuesPerAssignee = issues.Where(l => l.fields.assignee != null).GroupBy(i => i.fields.assignee.name);
             var result = new List<Tuple<string, decimal>>();
@@ -39,17 +41,19 @@ namespace SprintPlanner.Core
 
         public List<string> GetAllAssigneesInSprint(int sprintId)
         {
-            List<Issue> issues = GetAllIssuesInSprint(sprintId);
+            var extendedIssues = GetAllIssuesInSprint(sprintId);
+            List<Issue> issues = extendedIssues.Item1;
             var persons = issues.Where(l => l.fields.assignee != null).Select(j => j.fields.assignee.name).Distinct().ToList();
 
             return persons;
         }
 
-        public List<Issue> GetAllIssuesInSprint(int sprintId, List<string> mandatoryFields = null)
+        public Tuple<List<Issue>, Dictionary<string, List<JContainer>>> GetAllIssuesInSprint(int sprintId, List<string> mandatoryFields = null, List<string> customFields = null)
         {
+            Dictionary<string, List<JContainer>> customData = new Dictionary<string, List<JContainer>>();
             var issues = new List<Issue>();
             int retries = 0;
-            int pageSize = 1000;
+            const int pageSize = 1000;
 
             int issueCount;
             do
@@ -57,12 +61,24 @@ namespace SprintPlanner.Core
                 string x = _webRequester.HttpGetByWebRequest(GetSprintIssuesPath(sprintId, pageSize, retries, mandatoryFields), _username, _password);
                 var deserializedCall = JsonConvert.DeserializeObject<SprintIssuesDTO>(x);
                 var data = JObject.Parse(x);
+
+                foreach (var issue in data["issues"])
+                {
+                    List<JContainer> issueCustomValues = new List<JContainer>();
+                    foreach (var field in customFields)
+                    {
+                        issueCustomValues.Add(issue["fields"][field]?.Parent);
+                    }
+
+                    customData.Add(issue["key"].Value<string>(), issueCustomValues);
+                }
+
                 issues.AddRange(deserializedCall.issues);
                 issueCount = deserializedCall.issues.Count;
                 retries++;
             } while (issueCount >= pageSize);
 
-            return issues;
+            return new Tuple<List<Issue>, Dictionary<string, List<JContainer>>>(issues, customData);
         }
 
         public Dictionary<int, string> GetBoards()

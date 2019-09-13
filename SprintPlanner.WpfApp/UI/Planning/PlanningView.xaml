@@ -137,13 +137,13 @@
                       Grid.Column="1">
       <mh:HamburgerMenu.ItemsSource>
         <mh:HamburgerMenuItemCollection>
-          <mh:HamburgerMenuIconItem Icon="{ip:FontAwesome Kind=SyncAltSolid, Width=48, Height=48}"
+          <mh:HamburgerMenuIconItem Icon="{ip:Octicons Kind=Clippy, Width=48, Height=48}"
                                     Command="{Binding ReloadCommand}"
                                     Label="Read boards" />
-          <mh:HamburgerMenuIconItem Icon="{ip:FontAwesome Kind=SpinnerSolid, Width=48, Height=48}"
+          <mh:HamburgerMenuIconItem Icon="{ip:Material Kind=AccountConvert, Width=48, Height=48}"
                                     Command="{Binding SyncLoadCommand}"
                                     Label="Get team data" />
-          <mh:HamburgerMenuIconItem Icon="{ip:FontAwesome Kind=SpinnerSolid, Width=48, Height=48}"
+          <mh:HamburgerMenuIconItem Icon="{ip:SimpleIcons Kind=MicrosoftExcel, Width=48, Height=48}"
                                     Command="{Binding ExportCommand}"
                                     Label="Export" />
         </mh:HamburgerMenuItemCollection>

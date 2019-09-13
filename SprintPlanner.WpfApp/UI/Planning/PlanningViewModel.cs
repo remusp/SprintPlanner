@@ -1,11 +1,12 @@
-﻿using ExcelLibrary.SpreadSheet;
-using GalaSoft.MvvmLight;
+﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Win32;
+using Newtonsoft.Json.Linq;
 using SprintPlanner.Core;
 using SprintPlanner.Core.Logic;
+using SprintPlanner.Core.Reporting;
 using SprintPlanner.WpfApp.Properties;
 using System;
 using System.Collections.Generic;
@@ -25,12 +26,15 @@ namespace SprintPlanner.WpfApp.UI.Planning
 
         private readonly MetroWindow _window;
 
+        private ReportGenerator _reportGenerator;
+
         public PlanningViewModel(MetroWindow w)
         {
             _selectedBoards = new ObservableCollection<Tuple<int, string>>();
             UserLoads = new ObservableCollection<UserLoadViewModel>();
             Boards = new ObservableCollection<Tuple<int, string>>();
             _window = w;
+            _reportGenerator = new ReportGenerator();
         }
 
         private ObservableCollection<Tuple<int, string>> _boards;
@@ -101,18 +105,6 @@ namespace SprintPlanner.WpfApp.UI.Planning
             set
             {
                 _storyPoints = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        private int _committedStoryPoints;
-
-        public int CommittedStoryPoints
-        {
-            get { return _committedStoryPoints; }
-            set
-            {
-                _committedStoryPoints = value;
                 RaisePropertyChanged();
             }
         }
@@ -223,8 +215,15 @@ namespace SprintPlanner.WpfApp.UI.Planning
 
         private void ExportComandExecute()
         {
+            if (!_reportGenerator.HasData())
+            {
+                _window.ShowMessageAsync("Please load sprint data first!", string.Empty);
+                return;
+            }
+
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.Filter = "Excel (*.xls)|*.xls|Excel (*.xlsx)|*.xlsx";
+            sfd.FileName = SelectedSprint.Item2;
 
             var dialogResult = sfd.ShowDialog();
 
@@ -233,43 +232,10 @@ namespace SprintPlanner.WpfApp.UI.Planning
                 return;
             }
 
-            string file = sfd.FileName;
-            Workbook workbook = new Workbook();
-            Worksheet worksheet = new Worksheet("Sprint");
-            //worksheet.Cells[0, 1] = new Cell((short)1);
-            //worksheet.Cells[2, 0] = new Cell(9999999);
-            //worksheet.Cells[3, 3] = new Cell((decimal)3.45);
-            //worksheet.Cells[2, 2] = new Cell("Text string");
-            //worksheet.Cells[2, 4] = new Cell("Second string");
-            //worksheet.Cells[4, 0] = new Cell(32764.5, "#,##0.00");
-            //worksheet.Cells[5, 1] = new Cell(DateTime.Now, @"YYYY-MM-DD"); worksheet.Cells.ColumnWidth[0, 1] = 3000;
-            for (int i = 0; i < 100; i++)
-                worksheet.Cells[i, 0] = new Cell("");
-
-            int cr = 0;
-            foreach (var l in UserLoads)
-            {
-                worksheet.Cells[cr, 0] = new Cell(l.Name);
-                worksheet.Cells[cr, 1] = new Cell(l.Load);
-                worksheet.Cells[cr, 2] = new Cell(l.ScaledCapacity);
-                cr++;
-
-                foreach (var issue in l.Issues)
-                {
-                    worksheet.Cells[cr, 0] = new Cell(issue.StoryId);
-                    worksheet.Cells[cr, 1] = new Cell(issue.TaskId);
-                    worksheet.Cells[cr, 2] = new Cell(issue.Hours);
-                    worksheet.Cells[cr, 3] = new Cell(issue.ParentName);
-                    worksheet.Cells[cr, 4] = new Cell(issue.Name);
-                    cr++;
-                }
-
-                cr++;
-            }
-
-            workbook.Worksheets.Add(worksheet);
-            workbook.Save(file);
+            _reportGenerator.GenerateReport(sfd.FileName);
         }
+
+
 
         private void SyncLoadComandExecute()
         {
@@ -287,17 +253,26 @@ namespace SprintPlanner.WpfApp.UI.Planning
                 var mandatoryFields = new List<string>
                     {
                         "id", "key", "timetracking", "status", "assignee",
-                        "issuetype", "subtasks", "parent","summary","customfield_10013"
+                        "issuetype", "subtasks", "parent","summary",Settings.Default.StoryPointsField
                     };
 
-                var allIssues = Business.Jira.GetAllIssuesInSprint(SelectedSprint.Item1, mandatoryFields);
+                var customFields = new List<string> { Settings.Default.StoryPointsField };
+
+                var extendedIssues = Business.Jira.GetAllIssuesInSprint(SelectedSprint.Item1, mandatoryFields, customFields);
+                var allIssues = extendedIssues.Item1;
                 query1.Stop();
                 Debug.WriteLine($"Query 1: {query1.Elapsed}");
 
                 var openIssues = allIssues.Where(i => i.fields.status.id != STATUS_DONE);
-                var openAssignedIssues = openIssues.Where(i => i.fields.assignee != null);
 
-                double storyPointsRaw = allIssues.Where(i => i.fields.customfield_10013 != null).Select(j => j.fields.customfield_10013).Sum().Value;
+
+                var openAssignedIssues = openIssues.Where(i => i.fields.assignee != null);
+                var openIssueKeys = openIssues.Select(i => i.key);
+                var customDataForOpenIssues = extendedIssues.Item2.Where(kvp => openIssueKeys.Contains(kvp.Key));
+
+                var flatCustomDataForOpenIssues = customDataForOpenIssues.SelectMany(kvp => kvp.Value);
+                double storyPointsRaw = flatCustomDataForOpenIssues.Where(d => d != null && d is JProperty).Select(d1 => d1 as JProperty).Where(d2 => d2.Name == Settings.Default.StoryPointsField).Sum(d3 => d3.Value.Value<double>());
+
                 StoryPoints = (int)Math.Round(storyPointsRaw);
 
                 var loads = openAssignedIssues.Where(l => l.fields.issuetype.subtask || l.fields.subtasks.Count == 0).GroupBy(i => i.fields.assignee.name);
@@ -340,6 +315,8 @@ namespace SprintPlanner.WpfApp.UI.Planning
                 }
 
                 UserLoads = new ObservableCollection<UserLoadViewModel>(capacities);
+                _reportGenerator.SetReportData(openIssues, UserLoads.Select(ul => ul.GetModel()), customDataForOpenIssues);
+                _reportGenerator.StoryPointsField = Settings.Default.StoryPointsField;
 
                 performanceTimer.Stop();
 
@@ -362,12 +339,11 @@ namespace SprintPlanner.WpfApp.UI.Planning
         {
             decimal load = issues != null ? issues.Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m : 0;
             var computedStatus = GetStatusAccordingToLoad(user, load);
-            capacities.Add(new UserLoadViewModel(user)
+
+            List<IssueModel> issuesModel;
+            if (issues != null)
             {
-                Status = explicitStatus ?? computedStatus,
-                PictureData = picture,
-                Load = load,
-                Issues = issues != null ? new ObservableCollection<IssueViewModel>(issues.Select(i => new IssueViewModel
+                issuesModel = issues.Select(i => new IssueModel
                 {
                     TaskId = i.fields.issuetype.subtask ? i.key : string.Empty,
                     StoryId = i.fields.issuetype.subtask ? i.fields.parent.key : i.key,
@@ -376,7 +352,20 @@ namespace SprintPlanner.WpfApp.UI.Planning
                     ParentName = i.fields.issuetype.subtask ? i.fields.parent.fields.summary : i.fields.summary,
                     Name = i.fields.issuetype.subtask ? i.fields.summary : string.Empty,
                     Hours = i.fields.timetracking.remainingEstimateSeconds / 3600m
-                })) : new ObservableCollection<IssueViewModel>()
+                }).ToList();
+            }
+            else
+            {
+                issuesModel = new List<IssueModel>();
+            }
+
+            capacities.Add(new UserLoadViewModel(new UserLoadModel(user, issuesModel)
+            {
+                Load = load,
+                PictureData = picture,
+            })
+            {
+                Status = explicitStatus ?? computedStatus,
             });
         }
 

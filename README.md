@@ -1,15 +1,15 @@
 # SprintPlanner
 ## TODOs:
-1. Fix hardcoded issue request
+2. Fix hardcoded issue request
 1. Story points field in settings (needed bc technical reasons)
+3. Fix datafiles location and enable installer
+5. Percent capacity load
+3. Demo recording how to use
 1. GO PUBLIC :D \\:D/
-1. Commited field for stories / tasks
 1. Dev / QA capacity
 1. Planning view: toggle expand/collapse btn
 1. Demo view
-1. Retrospective view
 1. Multiselect combo for sprint list (just for search feature)
-1. Installer
 1. Logging support: nlog vs log4net
 1. Remove the need for backing fields in VMs AND run CodeMaid \\:D/
 1. Decouple window launching functionality from VMs

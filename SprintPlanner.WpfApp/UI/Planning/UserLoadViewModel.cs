@@ -1,68 +1,93 @@
-﻿using GalaSoft.MvvmLight;
-using SprintPlanner.Core.Logic;
+﻿using SprintPlanner.Core.Logic;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Linq;
 
 namespace SprintPlanner.WpfApp.UI.Planning
 {
-    public class UserLoadViewModel : ViewModelBase
+    public class UserLoadViewModel : WrappingViewModel<UserLoadModel>
     {
-        private readonly UserDetailsModel _userModel;
-
-        public UserLoadViewModel(UserDetailsModel user)
+        public UserLoadViewModel(UserLoadModel model) : base(model)
         {
-            _userModel = user;
+            _issues = new ObservableCollection<IssueViewModel>(model.Issues.Select(i => new IssueViewModel(i)));
+            _issues.CollectionChanged += Issues_CollectionChanged;
+        }
+
+        private void Issues_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    if (e.NewItems is List<IssueViewModel> nl)
+                    {
+                        nl.ForEach(i => _model.Issues.Add(i.GetModel()));
+                    }
+
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+                    if (e.OldItems is List<IssueViewModel> ol)
+                    {
+                        ol.ForEach(i => _model.Issues.Remove(i.GetModel()));
+                    }
+
+                    break;
+
+                default:
+                    throw new NotImplementedException("Not supported yet!");
+            }
         }
 
         public string Uid
         {
-            get { return _userModel.Uid; }
+            get { return _model.UserDetails.Uid; }
             set
             {
-                _userModel.Uid = value;
+                _model.UserDetails.Uid = value;
                 RaisePropertyChanged();
             }
         }
 
         public string Name
         {
-            get { return _userModel.UserName; }
+            get { return _model.UserDetails.UserName; }
             set
             {
-                _userModel.UserName = value;
+                _model.UserDetails.UserName = value;
                 RaisePropertyChanged();
             }
         }
 
         public decimal Capacity
         {
-            get { return _userModel.Capacity; }
+            get { return _model.UserDetails.Capacity; }
         }
 
         public decimal ScaledCapacity
         {
-            get { return _userModel.ScaledCapacity; }
+            get { return _model.UserDetails.ScaledCapacity; }
         }
 
         public decimal CapacityFactor
         {
-            get { return _userModel.CapacityFactor; }
+            get { return _model.UserDetails.CapacityFactor; }
             set
             {
-                _userModel.CapacityFactor = value;
+                _model.UserDetails.CapacityFactor = value;
                 RaisePropertyChanged();
                 RaisePropertyChanged(nameof(ScaledCapacity));
             }
         }
 
-        private decimal _load;
-
         public decimal Load
         {
-            get { return _load; }
+            get { return _model.Load; }
             set
             {
-                _load = value;
-                RaisePropertyChanged(nameof(_load));
+                _model.Load = value;
+                RaisePropertyChanged();
             }
         }
 
@@ -78,24 +103,20 @@ namespace SprintPlanner.WpfApp.UI.Planning
             }
         }
 
-        #region PictureData Property
-
-        private byte[] _pictureData;
         public byte[] PictureData
         {
             get
             {
-                return _pictureData;
+                return _model.PictureData;
             }
 
             set
             {
-                _pictureData = value;
+                _model.PictureData = value;
                 RaisePropertyChanged();
             }
         }
 
-        #endregion PictureData Property
 
         private UserStatus _status;
 

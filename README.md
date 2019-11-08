@@ -1,10 +1,12 @@
 # SprintPlanner
 ## TODOs:
-2. Fix hardcoded issue request
+1. Selected sprint lost when switching view to team capacity
+1. Percent load and remaining available hours
+1. Reloading data loses collapsed user info
+1. Fix hardcoded issue request
 1. Story points field in settings (needed bc technical reasons)
-3. Fix datafiles location and enable installer
-5. Percent capacity load
-3. Demo recording how to use
+1. Fix datafiles location and enable installer
+1. Demo recording how to use
 1. GO PUBLIC :D \\:D/
 1. Dev / QA capacity
 1. Planning view: toggle expand/collapse btn

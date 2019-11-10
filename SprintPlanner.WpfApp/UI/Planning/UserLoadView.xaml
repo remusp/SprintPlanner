@@ -8,7 +8,7 @@
              d:DesignHeight="450"
              d:DesignWidth="800">
 
-    <Expander IsExpanded="True"
+    <Expander IsExpanded="{Binding IsExpanded}"
               Margin="5">
         <Expander.Style>
             <Style TargetType="Expander"

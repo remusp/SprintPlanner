@@ -20,17 +20,17 @@ namespace SprintPlanner.WpfApp.UI.Planning
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    if (e.NewItems is List<IssueViewModel> nl)
+                    if (e.NewItems is List<IssueViewModel> newItemsList)
                     {
-                        nl.ForEach(i => _model.Issues.Add(i.GetModel()));
+                        newItemsList.ForEach(i => _model.Issues.Add(i.GetModel()));
                     }
 
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-                    if (e.OldItems is List<IssueViewModel> ol)
+                    if (e.OldItems is List<IssueViewModel> oldItemsList)
                     {
-                        ol.ForEach(i => _model.Issues.Remove(i.GetModel()));
+                        oldItemsList.ForEach(i => _model.Issues.Remove(i.GetModel()));
                     }
 
                     break;
@@ -123,11 +123,15 @@ namespace SprintPlanner.WpfApp.UI.Planning
         public UserStatus Status
         {
             get { return _status; }
-            set
-            {
-                _status = value;
-                RaisePropertyChanged();
-            }
+            set => Set(ref _status, value);
+        }
+
+        private bool _isExpanded;
+
+        public bool IsExpanded
+        {
+            get => _isExpanded;
+            set => Set(ref _isExpanded, value);
         }
 
 

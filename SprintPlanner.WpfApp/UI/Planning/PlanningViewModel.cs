@@ -191,14 +191,15 @@ namespace SprintPlanner.WpfApp.UI.Planning
                     IsBusy = true;
                     Task.Factory.StartNew(() => Business.Jira.GetOpenSprints(SelectedBoards.First().Item1)).ContinueWith(t =>
                     {
-                        if (t.IsFaulted)
+                        if (!t.IsFaulted)
                         {
-                            _window.ShowMessageAsync("Error fetching open sprints", t.Exception.Flatten().Message + Environment.NewLine + t.Exception.Flatten().StackTrace);
+                            Sprints = new ObservableCollection<Tuple<int, string>>(t.Result);
+                            var sprint = Sprints.FirstOrDefault(i => i.Item1 == Business.Data.Sprint.SelectedSprint);
+                            SelectedSprint = sprint ?? Sprints.FirstOrDefault();
                         }
                         else
                         {
-                            Sprints = new ObservableCollection<Tuple<int, string>>(t.Result);
-                            SelectedSprint = Sprints.FirstOrDefault();
+                            _window.ShowMessageAsync("Error fetching open sprints", t.Exception.Flatten().Message + Environment.NewLine + t.Exception.Flatten().StackTrace);
                         }
 
                         IsBusy = false;
@@ -271,7 +272,7 @@ namespace SprintPlanner.WpfApp.UI.Planning
                 var customDataForOpenIssues = extendedIssues.Item2.Where(kvp => openIssueKeys.Contains(kvp.Key));
 
                 var flatCustomDataForOpenIssues = customDataForOpenIssues.SelectMany(kvp => kvp.Value);
-                double storyPointsRaw = flatCustomDataForOpenIssues.Where(d => d != null && d is JProperty).Select(d1 => d1 as JProperty).Where(d2 => d2.Name == Settings.Default.StoryPointsField).Sum(d3 => d3.Value.Value<double>());
+                double storyPointsRaw = flatCustomDataForOpenIssues.Where(d => d != null && d is JProperty).Select(d1 => d1 as JProperty).Where(d2 => d2.Name == Settings.Default.StoryPointsField).Sum(d3 => ((JValue)d3.Value).Value != null ? d3.Value.Value<double>() : 0);
 
                 StoryPoints = (int)Math.Round(storyPointsRaw);
 
@@ -418,8 +419,12 @@ namespace SprintPlanner.WpfApp.UI.Planning
 
             try
             {
-                SelectedBoards.Add(Boards.First(i => i.Item1 == Business.Data.Sprint.SelectedBoard));
-                RaisePropertyChanged(nameof(SelectedBoards));
+                var board = Boards.First(i => i.Item1 == Business.Data.Sprint.SelectedBoard);
+                if (!SelectedBoards.Contains(board))
+                {
+                    SelectedBoards.Add(board);
+                }
+
                 SelectedSprint = Sprints.First(i => i.Item1 == Business.Data.Sprint.SelectedSprint);
             }
             catch (Exception ex)

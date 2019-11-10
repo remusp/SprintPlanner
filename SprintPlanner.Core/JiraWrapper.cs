@@ -62,15 +62,18 @@ namespace SprintPlanner.Core
                 var deserializedCall = JsonConvert.DeserializeObject<SprintIssuesDTO>(x);
                 var data = JObject.Parse(x);
 
-                foreach (var issue in data["issues"])
+                if(customFields != null)
                 {
-                    List<JContainer> issueCustomValues = new List<JContainer>();
-                    foreach (var field in customFields)
+                    foreach (var issue in data["issues"])
                     {
-                        issueCustomValues.Add(issue["fields"][field]?.Parent);
-                    }
+                        List<JContainer> issueCustomValues = new List<JContainer>();
+                        foreach (var field in customFields)
+                        {
+                            issueCustomValues.Add(issue["fields"][field]?.Parent);
+                        }
 
-                    customData.Add(issue["key"].Value<string>(), issueCustomValues);
+                        customData.Add(issue["key"].Value<string>(), issueCustomValues);
+                    }
                 }
 
                 issues.AddRange(deserializedCall.issues);

@@ -1,12 +1,11 @@
 # SprintPlanner
 ## TODOs:
-1. Selected sprint lost when switching view to team capacity
 1. Percent load and remaining available hours
-1. Reloading data loses collapsed user info
 1. Fix hardcoded issue request
 1. Story points field in settings (needed bc technical reasons)
 1. Fix datafiles location and enable installer
 1. Demo recording how to use
+1. User name and picture are read from server in each request
 1. GO PUBLIC :D \\:D/
 1. Dev / QA capacity
 1. Planning view: toggle expand/collapse btn
@@ -14,6 +13,7 @@
 1. Multiselect combo for sprint list (just for search feature)
 1. Logging support: nlog vs log4net
 1. Remove the need for backing fields in VMs AND run CodeMaid \\:D/
+1. Hardcoded and duplicated styling properties
 1. Decouple window launching functionality from VMs
 1. Team Configuration window 
   * Add users from current sprint

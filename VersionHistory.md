@@ -2,6 +2,7 @@
 ### Version 0.0.5 (2019-11-xx)
  * Export to excel
  * Fixed selected sprint loss in planning when jumping to other views
+ * Planning view remembers collapsed users after data is refreshed
  
 ### Version 0.0.4 (2019-08-09)
  * Application icon

@@ -80,6 +80,7 @@
       <DependentUpon>LoginView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Login\LoginViewModel.cs" />
+    <Compile Include="UI\Planning\AvailabilityConverter.cs" />
     <Compile Include="UI\Planning\IssueView.xaml.cs">
       <DependentUpon>IssueView.xaml</DependentUpon>
     </Compile>

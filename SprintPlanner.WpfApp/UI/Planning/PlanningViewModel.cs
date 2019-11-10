@@ -188,22 +188,38 @@ namespace SprintPlanner.WpfApp.UI.Planning
             {
                 try
                 {
-                    IsBusy = true;
-                    Task.Factory.StartNew(() => Business.Jira.GetOpenSprints(SelectedBoards.First().Item1)).ContinueWith(t =>
+                    int board = -1;
+                    var boardTuple = SelectedBoards.FirstOrDefault();
+                    if (boardTuple != null)
                     {
-                        if (!t.IsFaulted)
-                        {
-                            Sprints = new ObservableCollection<Tuple<int, string>>(t.Result);
-                            var sprint = Sprints.FirstOrDefault(i => i.Item1 == Business.Data.Sprint.SelectedSprint);
-                            SelectedSprint = sprint ?? Sprints.FirstOrDefault();
-                        }
-                        else
-                        {
-                            _window.ShowMessageAsync("Error fetching open sprints", t.Exception.Flatten().Message + Environment.NewLine + t.Exception.Flatten().StackTrace);
-                        }
+                        board = boardTuple.Item1;
+                    }
 
-                        IsBusy = false;
-                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                    if (board >= 0 && Business.Data.Sprint.SelectedBoard == board)
+                    {
+                        return;
+                    }
+
+                    if (board >= 0) 
+                    {
+                        IsBusy = true;
+                        Task.Factory.StartNew(() => Business.Jira.GetOpenSprints(board)).ContinueWith(t =>
+                        {
+                            Business.Data.Sprint.SelectedBoard = board;
+                            if (!t.IsFaulted)
+                            {
+                                Sprints = new ObservableCollection<Tuple<int, string>>(t.Result);
+                                var sprint = Sprints.FirstOrDefault(i => i.Item1 == Business.Data.Sprint.SelectedSprint);
+                                SelectedSprint = sprint ?? Sprints.FirstOrDefault();
+                            }
+                            else
+                            {
+                                _window.ShowMessageAsync("Error fetching open sprints", t.Exception.Flatten().Message + Environment.NewLine + t.Exception.Flatten().StackTrace);
+                            }
+
+                            IsBusy = false;
+                        }, TaskScheduler.FromCurrentSynchronizationContext());
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -315,7 +331,21 @@ namespace SprintPlanner.WpfApp.UI.Planning
                     AddCapacity(capacities, unassignedIssues, user, link, File.ReadAllBytes(@"Data\Unassigned.png"), UserStatus.External);
                 }
 
+                var oldUserLoads = new ObservableCollection<UserLoadViewModel>(UserLoads);
                 UserLoads = new ObservableCollection<UserLoadViewModel>(capacities);
+
+                foreach (var user in oldUserLoads)
+                {
+                    if (user.IsExpanded == false)
+                    {
+                        var recreated = UserLoads.FirstOrDefault(u => u.Uid == user.Uid);
+                        if (recreated != null)
+                        {
+                            recreated.IsExpanded = user.IsExpanded;
+                        }
+                    }
+                }
+
                 _reportGenerator.SetReportData(openIssues, UserLoads.Select(ul => ul.GetModel()), customDataForOpenIssues);
                 _reportGenerator.StoryPointsField = Settings.Default.StoryPointsField;
 
@@ -407,7 +437,7 @@ namespace SprintPlanner.WpfApp.UI.Planning
         public void Pull()
         {
             _initializing = true;
-            if (Business.Data?.Sprint?.Boards != null)
+            if (Business.Data?.Sprint?.Boards != null && Boards.Count == 0)
             {
                 Boards = new ObservableCollection<Tuple<int, string>>(Business.Data.Sprint.Boards);
             }

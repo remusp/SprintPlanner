@@ -13,6 +13,7 @@ namespace SprintPlanner.WpfApp.UI.Planning
         {
             _issues = new ObservableCollection<IssueViewModel>(model.Issues.Select(i => new IssueViewModel(i)));
             _issues.CollectionChanged += Issues_CollectionChanged;
+            _isExpanded = true;
         }
 
         private void Issues_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -89,6 +90,25 @@ namespace SprintPlanner.WpfApp.UI.Planning
                 _model.Load = value;
                 RaisePropertyChanged();
             }
+        }
+
+        public decimal BookingPercent
+        {
+            get
+            {
+                decimal bp = 0;
+                if (_model.UserDetails.Capacity != 0)
+                {
+                    bp = _model.Load / _model.UserDetails.Capacity;
+                }
+
+                return bp;
+            }
+        }
+
+        public decimal Availability
+        {
+            get { return ScaledCapacity - _model.Load; }
         }
 
         private ObservableCollection<IssueViewModel> _issues;

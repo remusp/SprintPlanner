@@ -7,7 +7,9 @@
              mc:Ignorable="d"
              d:DesignHeight="450"
              d:DesignWidth="800">
-
+    <UserControl.Resources>
+        <l:AvailabilityConverter x:Key="ac"/>
+    </UserControl.Resources>
     <Expander IsExpanded="{Binding IsExpanded}"
               Margin="5">
         <Expander.Style>
@@ -40,11 +42,13 @@
                     <RowDefinition />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition SharedSizeGroup="Picture" />
                     <ColumnDefinition SharedSizeGroup="UserName" />
-                    <ColumnDefinition SharedSizeGroup="Load" />
+                    <ColumnDefinition SharedSizeGroup="Allocation" />
                     <ColumnDefinition SharedSizeGroup="Slash" />
                     <ColumnDefinition SharedSizeGroup="Capacity" />
-                    <ColumnDefinition SharedSizeGroup="Picture" />
+                    <ColumnDefinition SharedSizeGroup="PercentAllocation" />
+                    <ColumnDefinition SharedSizeGroup="Availability" />
                 </Grid.ColumnDefinitions>
                 <Image Grid.Column="0"
                        Margin="10,0,10,0"
@@ -61,24 +65,32 @@
                            FontSize="20"
                            FontWeight="DemiBold"
                            Grid.Column="2" />
+                
                 <TextBlock Text="/"
                            Style="{StaticResource TextBlockStyle}"
                            VerticalAlignment="Center"
                            FontSize="20"
                            FontWeight="DemiBold"
                            Grid.Column="3" />
-                <TextBlock Style="{StaticResource TextBlockStyle}"
+                <TextBlock Text="{Binding Capacity, StringFormat={}{0} h}"
+                    Style="{StaticResource TextBlockStyle}"
                            VerticalAlignment="Center"
                            FontSize="20"
                            FontWeight="DemiBold"
-                           Grid.Column="4">
-                    <TextBlock.Text>
-                        <MultiBinding StringFormat="{}{0} ({1})">
-                            <Binding Path="ScaledCapacity" />
-                            <Binding Path="Capacity" />
-                        </MultiBinding>
-                    </TextBlock.Text>
-                </TextBlock>
+                           Grid.Column="4"/>
+                <TextBlock Text="{Binding BookingPercent, StringFormat={}({0:0.00%})}"
+                           Style="{StaticResource TextBlockStyle}"
+                           VerticalAlignment="Center"
+                           FontSize="20"
+                           FontWeight="DemiBold"
+                           Grid.Column="5" />
+                <TextBlock Text="{Binding Availability, Converter={StaticResource ac}}"
+                    Style="{StaticResource TextBlockStyle}"
+                           VerticalAlignment="Center"
+                           FontSize="20"
+                           FontWeight="DemiBold"
+                           Grid.Column="6"/>
+
             </Grid>
         </Expander.Header>
         <DataGrid ItemsSource="{Binding Issues}"

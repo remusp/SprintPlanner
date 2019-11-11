@@ -90,7 +90,12 @@ namespace SprintPlanner.Core.Reporting
             {
                 var spField = GetCustomFieldValueFor(issues[i - 1].key, StoryPointsField);
                 w.Cells[i, 0] = new Cell(issues[i - 1].key);
-                w.Cells[i, 1] = new Cell(spField.Value<double>());
+
+                if (((JValue)spField).Value != null)
+                {
+                    w.Cells[i, 1] = new Cell(spField.Value<double>());
+                }
+
                 w.Cells[i, 2] = new Cell(issues[i - 1].fields.summary);
             }
 

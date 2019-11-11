@@ -1,8 +1,12 @@
  
-### Version 0.0.5 (2019-11-xx)
+### Version 0.0.6 (2019-xx-xx)
+ * Fixed Export to excel crash for story with no SP
+
+### Version 0.0.5 (2019-11-11)
  * Export to excel
  * Fixed selected sprint loss in planning when jumping to other views
  * Planning view remembers collapsed users after data is refreshed
+ * Percent availability (needs tweaks) 
  
 ### Version 0.0.4 (2019-08-09)
  * Application icon

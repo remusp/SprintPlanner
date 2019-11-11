@@ -1,6 +1,7 @@
  
 ### Version 0.0.6 (2019-xx-xx)
  * Fixed Export to excel crash for story with no SP
+ * Sprint data path default to MyDocuments, selectable sprint data path
 
 ### Version 0.0.5 (2019-11-11)
  * Export to excel

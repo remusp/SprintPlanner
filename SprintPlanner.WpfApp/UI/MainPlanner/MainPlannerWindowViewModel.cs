@@ -9,6 +9,7 @@ using SprintPlanner.WpfApp.UI.Capacity;
 using SprintPlanner.WpfApp.UI.Login;
 using SprintPlanner.WpfApp.UI.Planning;
 using SprintPlanner.WpfApp.UI.SettingsUI;
+using System;
 using System.IO;
 using System.Reflection;
 using System.Security;
@@ -19,6 +20,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 {
     public class MainPlannerWindowViewModel : ViewModelBase
     {
+        private const string sprintFileName = "Sprint.spl.json";
 
         private readonly CapacityViewModel _capacityViewModel;
 
@@ -110,10 +112,24 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
         public void Load()
         {
-            const string fileName = "StoredData.json";
-            if (File.Exists(fileName))
+            var dataFolder = Settings.Default.SprintDataFolder;
+            
+            var assembly = Assembly.GetExecutingAssembly();
+            var appName = ((AssemblyTitleAttribute)assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute))).Title;
+            if (string.IsNullOrWhiteSpace(dataFolder))
             {
-                Business.Data = JsonConvert.DeserializeObject<DataStorageModel>(File.ReadAllText(fileName));
+                dataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), appName);
+                Settings.Default.SprintDataFolder = dataFolder;
+                Settings.Default.Save();
+
+                Directory.CreateDirectory(dataFolder);
+            }
+
+            var sprintFilePath = Path.Combine(dataFolder, sprintFileName);
+
+            if (File.Exists(sprintFilePath))
+            {
+                Business.Data = JsonConvert.DeserializeObject<DataStorageModel>(File.ReadAllText(sprintFilePath));
             }
             else
             {
@@ -159,10 +175,10 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         public void Persist()
         {
             string serialized = JsonConvert.SerializeObject(Business.Data, Formatting.Indented);
-            File.WriteAllText("StoredData.json", serialized);
+
+            var sprintFilePath = Path.Combine(Settings.Default.SprintDataFolder, sprintFileName);
+            File.WriteAllText(sprintFilePath, serialized);
         }
-
-
 
         public void EnsureLoggedIn()
         {

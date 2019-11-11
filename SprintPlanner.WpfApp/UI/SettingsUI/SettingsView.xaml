@@ -10,10 +10,12 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />
-            <RowDefinition /> 
+            <RowDefinition />
+            <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <!--Server address-->
@@ -30,6 +32,19 @@
                  Style="{StaticResource TextBoxStyle}"
                  Grid.Row="1"
                  Grid.Column="1" />
+        <!--Sprint data path-->
+        <TextBlock Text="Sprint data path"
+                   Style="{StaticResource TextBlockStyle}"
+                   Grid.Row="2"/>
+        <TextBox Text="{Binding SprintDataPath}"
+                 Style="{StaticResource TextBoxStyle}"
+                 Grid.Row="2"
+                 Grid.Column="1" />
+        <Button Content="..."
+                Style="{StaticResource ButtonStyle}"
+                Command="{Binding BrowseCommand}"
+                Grid.Row="2"
+                Grid.Column="2"/>
 
     </Grid>
 </UserControl>

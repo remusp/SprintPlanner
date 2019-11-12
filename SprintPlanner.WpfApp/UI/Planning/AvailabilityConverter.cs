@@ -1,29 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Data;
 
 namespace SprintPlanner.WpfApp.UI.Planning
 {
-    public class AvailabilityConverter : IValueConverter
+    public class AvailabilityConverter : IMultiValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+
+
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            var availability = (decimal)value;
+            var availability = (decimal)values[0];
+            var scaledCapacity = (decimal)values[1] * 100;
             if (availability >= 0)
             {
-                return $"{availability} h to 80%"; // TODO: do not hardcode
+                return $"{availability} h to {scaledCapacity}%";
             }
-            else 
+            else
             {
-                return $"{-1 * availability} h over 80%"; // TODO: do not hardcode
+                return $"{-1 * availability} h over {scaledCapacity}%";
             }
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }

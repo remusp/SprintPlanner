@@ -89,6 +89,8 @@ namespace SprintPlanner.WpfApp.UI.Planning
             {
                 _model.Load = value;
                 RaisePropertyChanged();
+                RaisePropertyChanged(nameof(BookingPercent));
+                RaisePropertyChanged(nameof(Availability));
             }
         }
 

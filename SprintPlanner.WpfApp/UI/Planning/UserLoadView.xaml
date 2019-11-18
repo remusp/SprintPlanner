@@ -122,6 +122,27 @@
         <DataGrid ItemsSource="{Binding Issues}"
                   AutoGenerateColumns="False"
                   CanUserAddRows="False">
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow"
+                       BasedOn="{StaticResource MetroDataGridRow}">
+                    <Setter Property="ContextMenu">
+                        <Setter.Value>
+                            <ContextMenu ItemsSource="{Binding Assignables}">
+                                <ContextMenu.ItemContainerStyle>
+                                    <Style TargetType="MenuItem">
+                                        <Setter Property="Header"
+                                                Value="{Binding Name}" />
+                                        <Setter Property="Command"
+                                                Value="{Binding AssignCommand}" />
+                                        <Setter Property="CommandParameter"
+                                                Value="{Binding}" />
+                                    </Style>
+                                </ContextMenu.ItemContainerStyle>
+                            </ContextMenu>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </DataGrid.RowStyle>
             <DataGrid.Resources>
                 <Style x:Key="LinkStyle">
                     <EventSetter Event="Hyperlink.Click"

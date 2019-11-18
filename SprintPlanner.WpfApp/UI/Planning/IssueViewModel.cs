@@ -1,4 +1,5 @@
 ﻿using SprintPlanner.Core.Logic;
+using System.Collections.Generic;
 
 namespace SprintPlanner.WpfApp.UI.Planning
 {
@@ -77,5 +78,14 @@ namespace SprintPlanner.WpfApp.UI.Planning
                 RaisePropertyChanged();
             }
         }
+
+        private List<Assignation> _assignables;
+
+        public List<Assignation> Assignables
+        {
+            get => _assignables;
+            set => Set(ref _assignables, value);
+        }
+
     }
 }

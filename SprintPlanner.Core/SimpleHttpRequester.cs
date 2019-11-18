@@ -106,5 +106,22 @@ namespace SprintPlanner.Core
             Array.Copy(buffer, ret, read);
             return ret;
         }
+
+        public void HttpPut(string uri, string data, string username, SecureString password)
+        {
+
+            byte[] dataBytes = Encoding.UTF8.GetBytes(data);
+            using (var client = new WebClient())
+            {
+                string authInfo = $"{username}:{password.Decrypt()}";
+                authInfo = Convert.ToBase64String(Encoding.Default.GetBytes(authInfo));
+
+                client.Headers["Authorization"] = "Basic " + authInfo;
+                client.Headers["Content-Type"] = "application/json";
+                client.UploadData(uri, "PUT", dataBytes);
+            }
+
+
+        }
     }
 }

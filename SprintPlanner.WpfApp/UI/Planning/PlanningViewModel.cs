@@ -180,7 +180,15 @@ namespace SprintPlanner.WpfApp.UI.Planning
             }
         }
 
+        private ICommand _assignCommand;
 
+        public ICommand AssignCommand
+        {
+            get
+            {
+                return _assignCommand ?? (_assignCommand = new RelayCommand<Assignation>(target => AssignCommandExecute(target)));
+            }
+        }
 
         private void SelectedBoardChangedComandExecute()
         {
@@ -200,7 +208,7 @@ namespace SprintPlanner.WpfApp.UI.Planning
                         return;
                     }
 
-                    if (board >= 0) 
+                    if (board >= 0)
                     {
                         IsBusy = true;
                         Task.Factory.StartNew(() => Business.Jira.GetOpenSprints(board)).ContinueWith(t =>
@@ -275,6 +283,8 @@ namespace SprintPlanner.WpfApp.UI.Planning
 
                 var customFields = new List<string> { Settings.Default.StoryPointsField };
 
+
+
                 var extendedIssues = Business.Jira.GetAllIssuesInSprint(SelectedSprint.Item1, mandatoryFields, customFields);
                 var allIssues = extendedIssues.Item1;
                 query1.Stop();
@@ -334,6 +344,21 @@ namespace SprintPlanner.WpfApp.UI.Planning
                 var oldUserLoads = new ObservableCollection<UserLoadViewModel>(UserLoads);
                 UserLoads = new ObservableCollection<UserLoadViewModel>(capacities);
 
+                var assignables = ExtractBasicUsers(UserLoads);
+                foreach (var ul in UserLoads)
+                {
+                    foreach (var issue in ul.Issues)
+                    {
+                        issue.Assignables = assignables.ConvertAll(a => (Assignation)a.Clone());
+                        foreach (var a in issue.Assignables)
+                        {
+                            a.IssueKey = string.IsNullOrWhiteSpace(issue.TaskId) ? issue.StoryId : issue.TaskId;
+                            a.UidSource = ul.Uid;
+                        }
+
+                    }
+                }
+
                 foreach (var user in oldUserLoads)
                 {
                     if (user.IsExpanded == false)
@@ -358,12 +383,23 @@ namespace SprintPlanner.WpfApp.UI.Planning
 
                 if (t.Exception != null)
                 {
+                    // TODO: refactor duplicate code #ExceptionHandling
                     var message = string.Join("; ", t.Exception.InnerExceptions);
                     var stackTraces = string.Join($"---{Environment.NewLine}", t.Exception.InnerExceptions.Select(ie => ie.StackTrace));
                     var flatException = t.Exception.Flatten();
                     _window.ShowMessageAsync("Error getting team tasks", $"{message}{Environment.NewLine}{stackTraces}");
                 }
             }, TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        private List<Assignation> ExtractBasicUsers(ObservableCollection<UserLoadViewModel> userLoads)
+        {
+            return userLoads.Select(u => new Assignation
+            {
+                UidTarget = u.Uid,
+                Name = u.Name,
+                AssignCommand = AssignCommand
+            }).ToList();
         }
 
         private void AddCapacity(List<UserLoadViewModel> capacities, IEnumerable<Issue> issues, UserDetailsModel user, string link, byte[] picture, UserStatus? explicitStatus = null)
@@ -398,6 +434,63 @@ namespace SprintPlanner.WpfApp.UI.Planning
             {
                 Status = explicitStatus ?? computedStatus,
             });
+        }
+
+        private void AssignCommandExecute(Assignation assignation)
+        {
+            IsBusy = true;
+            Task.Factory.StartNew(() =>
+            {
+                Business.Jira.AssignIssue(assignation.IssueKey, assignation.UidTarget);
+
+
+            }).ContinueWith(t =>
+            {
+                if (!t.IsFaulted)
+                {
+                    IssueViewModel issue = null;
+                    var sourceLoad = UserLoads.FirstOrDefault(ul => ul.Uid == assignation.UidSource);
+                    if (sourceLoad != null)
+                    {
+                        // TODO: make it work for issues without subtasks
+                        issue = sourceLoad.Issues.FirstOrDefault(i => i.TaskId == assignation.IssueKey);
+                        if (issue != null)
+                        {
+                            sourceLoad.Issues.Remove(issue);
+                            sourceLoad.Load = sourceLoad.Issues.Sum(i => i.Hours);
+                            if (sourceLoad.Status != UserStatus.External)
+                            {
+                                sourceLoad.Status = GetStatusAccordingToLoad(sourceLoad.GetModel().UserDetails, sourceLoad.Load);
+                            }
+
+                            var targetLoad = UserLoads.FirstOrDefault(ul => ul.Uid == assignation.UidTarget);
+                            if (targetLoad != null)
+                            {
+                                targetLoad.Issues.Add(issue);
+                                targetLoad.Load = targetLoad.Issues.Sum(i => i.Hours);
+                                if (targetLoad.Status != UserStatus.External)
+                                {
+                                    targetLoad.Status = GetStatusAccordingToLoad(targetLoad.GetModel().UserDetails, targetLoad.Load);
+                                }
+
+                                issue.Assignables.ForEach(a => a.UidSource = assignation.UidTarget);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (t.Exception != null)
+                    {
+                        // TODO: refactor duplicate code #ExceptionHandling
+                        var message = string.Join("; ", t.Exception.InnerExceptions);
+                        var stackTraces = string.Join($"---{Environment.NewLine}", t.Exception.InnerExceptions.Select(ie => ie.StackTrace));
+                        _window.ShowMessageAsync("Error assigning task", $"{message}{Environment.NewLine}{stackTraces}");
+                    }
+                }
+
+                IsBusy = false;
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         private void ReloadComandExecute()

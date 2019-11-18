@@ -62,7 +62,7 @@ namespace SprintPlanner.Core
                 var deserializedCall = JsonConvert.DeserializeObject<SprintIssuesDTO>(x);
                 var data = JObject.Parse(x);
 
-                if(customFields != null)
+                if (customFields != null)
                 {
                     foreach (var issue in data["issues"])
                     {
@@ -207,6 +207,14 @@ namespace SprintPlanner.Core
 
             string uri = new Uri(Url).Append($"/rest/api/2/search?jql=Sprint={sprintId}&startAt={startPage * pageSize}&maxResults={pageSize}{fieldsPart}").AbsoluteUri;
             return uri;
+        }
+
+        public void AssignIssue(string key, string user)
+        {
+            string uri = new Uri(Url).Append($"/rest/api/2/issue/{key}").AbsoluteUri;
+            string data = $"{{\"fields\": {{\"assignee\":{{\"name\":\"{user}\"}}}}}}";
+            _webRequester.HttpPut(uri, data, _username, _password);
+
         }
     }
 }

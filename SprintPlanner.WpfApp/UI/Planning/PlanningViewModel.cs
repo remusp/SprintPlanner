@@ -352,7 +352,8 @@ namespace SprintPlanner.WpfApp.UI.Planning
                         issue.Assignables = assignables.ConvertAll(a => (Assignation)a.Clone());
                         foreach (var a in issue.Assignables)
                         {
-                            a.IssueKey = string.IsNullOrWhiteSpace(issue.TaskId) ? issue.StoryId : issue.TaskId;
+                            a.Id = issue.Id;
+                            a.IssueKey = !string.IsNullOrWhiteSpace(issue.TaskId) ? issue.TaskId : issue.StoryId;
                             a.UidSource = ul.Uid;
                         }
 
@@ -453,7 +454,7 @@ namespace SprintPlanner.WpfApp.UI.Planning
                     if (sourceLoad != null)
                     {
                         // TODO: make it work for issues without subtasks
-                        issue = sourceLoad.Issues.FirstOrDefault(i => i.TaskId == assignation.IssueKey);
+                        issue = sourceLoad.Issues.FirstOrDefault(i => i.Id == assignation.Id);
                         if (issue != null)
                         {
                             sourceLoad.Issues.Remove(issue);

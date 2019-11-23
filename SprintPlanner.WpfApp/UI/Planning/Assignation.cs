@@ -13,6 +13,7 @@ namespace SprintPlanner.WpfApp.UI.Planning
 
         public ICommand AssignCommand { get; set; }
 
+        public string Id { get; set; }
         public string IssueKey { get; set; }
 
         public object Clone()
@@ -23,6 +24,7 @@ namespace SprintPlanner.WpfApp.UI.Planning
                 UidSource = this.UidSource,
                 Name = this.Name,
                 AssignCommand = this.AssignCommand,
+                Id = this.Id,
                 IssueKey = this.IssueKey
             };
         }

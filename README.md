@@ -5,7 +5,7 @@
 1. Demo recording how to use
 1. User name and picture are read from server in each request
 1. GO PUBLIC :D \\:D/
-1. Dev / QA capacity
+1. Dev / QA / other capacity
 1. Demo view
 1. Multiselect combo for sprint list (just for search feature)
 1. Logging support: nlog vs log4net

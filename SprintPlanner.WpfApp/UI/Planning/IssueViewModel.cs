@@ -87,5 +87,10 @@ namespace SprintPlanner.WpfApp.UI.Planning
             set => Set(ref _assignables, value);
         }
 
+        public string Id
+        {
+            get => $"{StoryId}+{TaskId}";
+        }
+
     }
 }

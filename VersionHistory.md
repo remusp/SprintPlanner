@@ -1,5 +1,6 @@
  
 ### Version 0.0.6 (2019-xx-xx)
+ * Issues can now be reassigned using context menu
  * Fixed Export to excel crash for story with no SP
  * Sprint data path default to MyDocuments, selectable sprint data path
  * Proper handling for percent availability and no capacity info

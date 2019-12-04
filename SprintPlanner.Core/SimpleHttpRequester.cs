@@ -13,6 +13,7 @@ namespace SprintPlanner.Core
         {
             //For Basic Authentication
             string authInfo = $"{username}:{password.Decrypt()}";
+            //string authInfo = $"{username}:84ciNdeQJhlEP1ak65Ga90DC";
             authInfo = Convert.ToBase64String(Encoding.Default.GetBytes(authInfo));
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);

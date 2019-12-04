@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Security;
@@ -147,8 +148,9 @@ namespace SprintPlanner.Core
                 _webRequester.HttpGetByWebRequest(uri, _username, _password);
                 return true;
             }
-            catch (WebException)
+            catch (WebException ex)
             {
+                Debug.WriteLine(ex.Message);
                 return false;
             }
         }

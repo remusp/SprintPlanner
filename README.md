@@ -1,5 +1,6 @@
 # SprintPlanner
 ## TODOs:
+1. Export holidays in excel report
 1. Fix hardcoded issue request
 1. Story points field in settings (needed bc technical reasons)
 1. Demo recording how to use

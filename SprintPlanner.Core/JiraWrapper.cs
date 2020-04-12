@@ -15,6 +15,7 @@ namespace SprintPlanner.Core
         private SecureString _password;
         private string _username;
         private readonly IHttpRequester _webRequester;
+        private bool _isCloud;
 
         public JiraWrapper(IHttpRequester webRequester)
         {
@@ -106,7 +107,8 @@ namespace SprintPlanner.Core
         private void AdaptCloudDataIfNeeded(List<Issue> issues)
         {
             var assignedIssues = issues.Where(i => i.fields.assignee != null).ToList();
-            if (IsCloudData(assignedIssues))
+            _isCloud = IsCloudData(assignedIssues);
+            if (_isCloud)
             {
                 foreach (var issue in assignedIssues)
                 {
@@ -249,10 +251,15 @@ namespace SprintPlanner.Core
         public void AssignIssue(string key, string user)
         {
             string uri = new Uri(ServerAddress).Append($"/rest/api/2/issue/{key}").AbsoluteUri;
-            //string data = $"{{\"fields\": {{\"assignee\":{{\"name\":\"{user}\"}}}}}}";
-            string data = $"{{\"fields\": {{\"assignee\":{{\"accountId\":\"{user}\"}}}}}}";
-            _webRequester.HttpPut(uri, data, _username, _password);
+            string userField = _isCloud ? "accountId" : "name";
 
+            if (user == null && _isCloud)
+            {
+                user = "-1";
+            }
+
+            string data = $"{{\"fields\": {{\"assignee\":{{\"{userField}\":\"{user}\"}}}}}}";
+            _webRequester.HttpPut(uri, data, _username, _password);
         }
     }
 }

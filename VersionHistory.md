@@ -1,5 +1,5 @@
 
- ### Version 0.0.7 (2020-04-xx)
+### Version 0.0.7 (2020-04-xx)
  * JIRA Cloud support
 
 ### Version 0.0.6 (2019-xx-xx)

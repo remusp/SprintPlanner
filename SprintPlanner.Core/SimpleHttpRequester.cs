@@ -106,9 +106,9 @@ namespace SprintPlanner.Core
             return ret;
         }
 
-        public void HttpPut(string uri, string data, string username, SecureString password)
+        public string HttpPut(string uri, string data, string username, SecureString password)
         {
-
+            byte[] response;
             byte[] dataBytes = Encoding.UTF8.GetBytes(data);
             using (var client = new WebClient())
             {
@@ -117,10 +117,10 @@ namespace SprintPlanner.Core
 
                 client.Headers["Authorization"] = "Basic " + authInfo;
                 client.Headers["Content-Type"] = "application/json";
-                client.UploadData(uri, "PUT", dataBytes);
+                response = client.UploadData(uri, "PUT", dataBytes);
             }
 
-
+            return Encoding.ASCII.GetString(response);
         }
     }
 }

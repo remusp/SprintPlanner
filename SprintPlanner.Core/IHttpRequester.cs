@@ -8,6 +8,6 @@ namespace SprintPlanner.Core
 
         byte[] HttpGetBinaryByWebRequest(string uri, string username, SecureString password);
 
-        void HttpPut(string uri, string data, string username, SecureString password);
+        string HttpPut(string uri, string data, string username, SecureString password);
     }
 }

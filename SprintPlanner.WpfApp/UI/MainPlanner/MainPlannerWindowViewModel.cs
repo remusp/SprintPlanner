@@ -10,7 +10,9 @@ using SprintPlanner.WpfApp.UI.Login;
 using SprintPlanner.WpfApp.UI.Planning;
 using SprintPlanner.WpfApp.UI.SettingsUI;
 using System;
+using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Reflection;
 using System.Security;
 using System.Windows;
@@ -113,7 +115,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         public void Load()
         {
             var dataFolder = Settings.Default.SprintDataFolder;
-            
+
             var assembly = Assembly.GetExecutingAssembly();
             var appName = ((AssemblyTitleAttribute)assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute))).Title;
             if (string.IsNullOrWhiteSpace(dataFolder))
@@ -200,7 +202,15 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
                 bool isLoggedIn = Business.Jira.Login(Settings.Default.User, secure);
                 if (isLoggedIn)
                 {
-                    LoggedInUserPictureData = Business.Jira.GetPicture(Settings.Default.User);
+                    try
+                    {
+                        LoggedInUserPictureData = Business.Jira.GetPicture(Settings.Default.User);
+                    }
+                    catch (WebException wex)
+                    {
+                        Debug.WriteLine(wex);
+                    }
+
                     LogoutVisibility = Visibility.Visible;
                     SetView(_planningViewModel);
 
@@ -231,7 +241,15 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             bool isLoggedIn = _loginViewModel.IsLoggedIn;
             if (isLoggedIn)
             {
-                LoggedInUserPictureData = Business.Jira.GetPicture(Settings.Default.User);
+                try
+                {
+                    LoggedInUserPictureData = Business.Jira.GetPicture(Settings.Default.User);
+                }
+                catch (WebException wex)
+                {
+                    Debug.WriteLine(wex);
+                }
+
                 LogoutVisibility = Visibility.Visible;
                 SetView(_planningViewModel);
 

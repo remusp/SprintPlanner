@@ -40,7 +40,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
             }
 
-            Business.Jira = new JiraWrapper(_webRequester) { Url = Settings.Default.Server };
+            Business.Jira = new JiraWrapper(_webRequester) { ServerAddress = Settings.Default.Server };
 
 
             var vm = new MainPlannerWindowViewModel(this);

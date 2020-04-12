@@ -28,7 +28,8 @@
                  Style="{StaticResource TextBoxStyle}"
                  Grid.Row="0"
                  Grid.Column="1" />
-        <TextBlock Text="Password"
+        <TextBlock Text="Password / API Key"
+                   ToolTip="Use password for Server Login.&#x0a;Use API Key for Cloud login."
                    Style="{StaticResource TextBlockStyle}"
                    Grid.Row="1"
                    Grid.Column="0" />

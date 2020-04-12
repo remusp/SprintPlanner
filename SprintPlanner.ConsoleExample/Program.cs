@@ -9,7 +9,7 @@ namespace SprintPlanner
         public static void Main(string[] args)
         {
             var jh = new JiraWrapper(new SimpleHttpRequester());
-            jh.Url = "https://jira.sdl.com";
+            jh.ServerAddress = "https://jira.sdl.com";
             //jh.Url = "https://issues.apache.org/jira";
             bool isLoggedIn = false;
             while (!isLoggedIn)

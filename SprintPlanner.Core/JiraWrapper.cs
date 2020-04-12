@@ -1,7 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using MoreLinq;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Security;
@@ -19,7 +21,7 @@ namespace SprintPlanner.Core
             _webRequester = webRequester;
         }
 
-        public string Url { get; set; }
+        public string ServerAddress { get; set; }
 
         public List<Tuple<string, decimal>> GetAllAssigneesAndWorkInSprint(int sprintId)
         {
@@ -39,13 +41,27 @@ namespace SprintPlanner.Core
             return result;
         }
 
-        public List<string> GetAllAssigneesInSprint(int sprintId)
+        public List<Assignee> GetAllAssigneesInSprint(int sprintId)
         {
             var extendedIssues = GetAllIssuesInSprint(sprintId);
             List<Issue> issues = extendedIssues.Item1;
-            var persons = issues.Where(l => l.fields.assignee != null).Select(j => j.fields.assignee.name).Distinct().ToList();
+            var allAssignees = issues.Where(l => l.fields.assignee != null).Select(j => j.fields.assignee);
 
-            return persons;
+            List<Assignee> distinctAssignees;
+            if (allAssignees.Any(a => a.name == null))
+            {
+                distinctAssignees = allAssignees.DistinctBy(a => a.accountId).ToList();
+                foreach (var assignee in distinctAssignees)
+                {
+                    assignee.name = assignee.accountId;
+                }
+            }
+            else
+            {
+                distinctAssignees = allAssignees.DistinctBy(a => a.name).ToList();
+            }
+
+            return distinctAssignees;
         }
 
         public Tuple<List<Issue>, Dictionary<string, List<JContainer>>> GetAllIssuesInSprint(int sprintId, List<string> mandatoryFields = null, List<string> customFields = null)
@@ -78,10 +94,30 @@ namespace SprintPlanner.Core
 
                 issues.AddRange(deserializedCall.issues);
                 issueCount = deserializedCall.issues.Count;
+
+                AdaptCloudDataIfNeeded(deserializedCall.issues);
+
                 retries++;
             } while (issueCount >= pageSize);
 
             return new Tuple<List<Issue>, Dictionary<string, List<JContainer>>>(issues, customData);
+        }
+
+        private void AdaptCloudDataIfNeeded(List<Issue> issues)
+        {
+            var assignedIssues = issues.Where(i => i.fields.assignee != null).ToList();
+            if (IsCloudData(assignedIssues))
+            {
+                foreach (var issue in assignedIssues)
+                {
+                    issue.fields.assignee.name = issue.fields.assignee.accountId;
+                }
+            }
+        }
+
+        private bool IsCloudData(List<Issue> issues)
+        {
+            return issues.Any(i => i.fields.assignee.accountId != null);
         }
 
         public Dictionary<int, string> GetBoards()
@@ -113,13 +149,13 @@ namespace SprintPlanner.Core
 
         public byte[] GetPicture(string uid)
         {
-            string uri = new Uri(Url).Append($"/secure/useravatar?ownerId={uid}").AbsoluteUri;
+            string uri = new Uri(ServerAddress).Append($"/secure/useravatar?ownerId={uid}").AbsoluteUri;
             return _webRequester.HttpGetBinaryByWebRequest(uri, _username, _password);
         }
 
         public string GetUserDisplayName(string uid)
         {
-            string uri = new Uri(Url).Append($"/rest/api/2/user?username={uid}").AbsoluteUri;
+            string uri = new Uri(ServerAddress).Append($"/rest/api/2/user?username={uid}").AbsoluteUri;
             string x = _webRequester.HttpGetByWebRequest(uri, _username, _password);
             Assignee asignee = JsonConvert.DeserializeObject<Assignee>(x);
             return asignee.displayName;
@@ -130,7 +166,7 @@ namespace SprintPlanner.Core
             _username = username;
             _password = password;
 
-            return CheckValidLogin(username, password);
+            return CheckValidLogin();
         }
 
         public void Logout()
@@ -139,16 +175,17 @@ namespace SprintPlanner.Core
             _password = null;
         }
 
-        private bool CheckValidLogin(string username, SecureString password)
+        private bool CheckValidLogin()
         {
             try
             {
-                string uri = new Uri(Url).Append("/rest/agile/1.0/board/1").AbsoluteUri;
+                string uri = new Uri(ServerAddress).Append("/rest/agile/1.0/board/1").AbsoluteUri;
                 _webRequester.HttpGetByWebRequest(uri, _username, _password);
                 return true;
             }
-            catch (WebException)
+            catch (WebException ex)
             {
+                Debug.WriteLine(ex);
                 return false;
             }
         }
@@ -171,13 +208,13 @@ namespace SprintPlanner.Core
 
         private string GetBoards(int retries)
         {
-            string uri = new Uri(Url).Append("/rest/agile/1.0/board").AbsoluteUri;
+            string uri = new Uri(ServerAddress).Append("/rest/agile/1.0/board").AbsoluteUri;
             return uri + "?startAt=" + (retries * 50) + "&maxResults=" + ((retries + 1) * 50);
         }
 
         private string GetBoardSprintPath(int retries, int boardId)
         {
-            string uri = new Uri(Url).Append("/rest/agile/1.0/board", boardId.ToString(), "sprint").AbsoluteUri;
+            string uri = new Uri(ServerAddress).Append("/rest/agile/1.0/board", boardId.ToString(), "sprint").AbsoluteUri;
             return uri + "?startAt=" + (retries * 50) + "&maxResults=" + ((retries + 1) * 50);
         }
 
@@ -205,14 +242,15 @@ namespace SprintPlanner.Core
                 fieldsPart = $"&fields={string.Join(",", mandatoryFields)}";
             }
 
-            string uri = new Uri(Url).Append($"/rest/api/2/search?jql=Sprint={sprintId}&startAt={startPage * pageSize}&maxResults={pageSize}{fieldsPart}").AbsoluteUri;
+            string uri = new Uri(ServerAddress).Append($"/rest/api/2/search?jql=Sprint={sprintId}&startAt={startPage * pageSize}&maxResults={pageSize}{fieldsPart}").AbsoluteUri;
             return uri;
         }
 
         public void AssignIssue(string key, string user)
         {
-            string uri = new Uri(Url).Append($"/rest/api/2/issue/{key}").AbsoluteUri;
-            string data = $"{{\"fields\": {{\"assignee\":{{\"name\":\"{user}\"}}}}}}";
+            string uri = new Uri(ServerAddress).Append($"/rest/api/2/issue/{key}").AbsoluteUri;
+            //string data = $"{{\"fields\": {{\"assignee\":{{\"name\":\"{user}\"}}}}}}";
+            string data = $"{{\"fields\": {{\"assignee\":{{\"accountId\":\"{user}\"}}}}}}";
             _webRequester.HttpPut(uri, data, _username, _password);
 
         }

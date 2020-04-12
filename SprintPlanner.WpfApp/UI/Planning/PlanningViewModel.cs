@@ -14,6 +14,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -310,7 +311,19 @@ namespace SprintPlanner.WpfApp.UI.Planning
                     foreach (var user in Business.Data.Capacity.Users)
                     {
                         var userIssues = loads.FirstOrDefault(l => l.Key.Equals(user.Uid));
-                        AddCapacity(capacities, userIssues, user, link, Business.Jira.GetPicture(user.Uid));
+                        byte[] pictureData = null;
+
+                        try
+                        {
+                            pictureData = Business.Jira.GetPicture(user.Uid);
+                        }
+                        catch (WebException wex)
+                        {
+                            Debug.WriteLine($"Unable to fetch picture for user {user.Uid}");
+                            Debug.WriteLine(wex);
+                        }
+
+                        AddCapacity(capacities, userIssues, user, link, pictureData);
                     }
                 }
 
@@ -323,7 +336,7 @@ namespace SprintPlanner.WpfApp.UI.Planning
                 {
                     var user = new UserDetailsModel
                     {
-                        UserName = Business.Jira.GetUserDisplayName(load.Key),
+                        UserName = load.First().fields.assignee.displayName,
                         Uid = load.Key
                     };
 
@@ -453,7 +466,6 @@ namespace SprintPlanner.WpfApp.UI.Planning
                     var sourceLoad = UserLoads.FirstOrDefault(ul => ul.Uid == assignation.UidSource);
                     if (sourceLoad != null)
                     {
-                        // TODO: make it work for issues without subtasks
                         issue = sourceLoad.Issues.FirstOrDefault(i => i.Id == assignation.Id);
                         if (issue != null)
                         {
@@ -512,7 +524,13 @@ namespace SprintPlanner.WpfApp.UI.Planning
                 return UserStatus.Danger;
             }
 
-            if ((load >= u.ScaledCapacity) || (load < u.ScaledCapacity * 0.625m))
+            decimal warningLowerLimit = u.ScaledCapacity - u.Capacity * 0.2m;
+            if (warningLowerLimit < 0)
+            {
+                warningLowerLimit = 0;
+            }
+
+            if ((load > u.ScaledCapacity) || (load < warningLowerLimit))
             {
                 return UserStatus.Warning;
             }

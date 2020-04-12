@@ -50,6 +50,8 @@
                 </Grid.ColumnDefinitions>
                 <Image Grid.Column="0"
                        Margin="10,0,10,0"
+                       MaxWidth="50"
+                       MaxHeight="50"
                        Source="{Binding PictureData}" />
                 <TextBlock Text="{Binding Name}"
                            Style="{StaticResource TextBlockStyle}"

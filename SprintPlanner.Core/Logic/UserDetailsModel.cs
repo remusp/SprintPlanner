@@ -16,6 +16,6 @@
 
         public decimal Capacity { get { return (DaysInSprint - DaysOff) * HoursPerDay; } }
 
-        public decimal ScaledCapacity { get { return Capacity * CapacityFactor; } }
+        public decimal ScaledCapacity { get { return Capacity * CapacityFactor / 100; } }
     }
 }

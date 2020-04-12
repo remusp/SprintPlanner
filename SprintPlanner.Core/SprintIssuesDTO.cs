@@ -66,6 +66,7 @@ namespace SprintPlanner.Core
 
     public class Assignee
     {
+        public string accountId { get; set; }
         public string self { get; set; }
         public string name { get; set; }
         public string key { get; set; }

@@ -12,8 +12,7 @@ namespace SprintPlanner.Core
         public virtual string HttpGetByWebRequest(string uri, string username, SecureString password)
         {
             //For Basic Authentication
-            string authInfo = $"{username}:{password.Decrypt()}";
-            authInfo = Convert.ToBase64String(Encoding.Default.GetBytes(authInfo));
+            string authInfo = Convert.ToBase64String(Encoding.Default.GetBytes($"{username}:{password.Decrypt()}"));
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
             request.Method = "GET";

@@ -1,4 +1,7 @@
- 
+
+ ### Version 0.0.7 (2020-04-xx)
+ * JIRA Cloud support
+
 ### Version 0.0.6 (2019-xx-xx)
  * Issues can now be reassigned using context menu
  * Fixed Export to excel crash for story with no SP

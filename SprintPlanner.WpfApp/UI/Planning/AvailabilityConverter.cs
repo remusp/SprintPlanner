@@ -11,14 +11,14 @@ namespace SprintPlanner.WpfApp.UI.Planning
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             var availability = (decimal)values[0];
-            var scaledCapacity = (decimal)values[1] * 100;
+            var targetAvailability = (decimal)values[1];
             if (availability >= 0)
             {
-                return $"{availability} h to {scaledCapacity}%";
+                return $"{availability} h to {targetAvailability}%";
             }
             else
             {
-                return $"{-1 * availability} h over {scaledCapacity}%";
+                return $"{-1 * availability} h over {targetAvailability}%";
             }
         }
 

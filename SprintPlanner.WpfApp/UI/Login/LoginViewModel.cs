@@ -7,9 +7,6 @@ using SprintPlanner.Core.Logic;
 using SprintPlanner.WpfApp.Infrastructure;
 using SprintPlanner.WpfApp.Properties;
 using System;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Security;
 using System.Windows.Input;
 
 namespace SprintPlanner.WpfApp.UI.Login
@@ -103,6 +100,7 @@ namespace SprintPlanner.WpfApp.UI.Login
 
             if (parameter is IHavePassword passwordContainer)
             {
+                Business.Jira.ServerAddress = Settings.Default.Server;
                 IsLoggedIn = Business.Jira.Login(UserName, passwordContainer.Password);
                 if (IsLoggedIn)
                 {

@@ -2,6 +2,7 @@
 using GalaSoft.MvvmLight.Command;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
+using SprintPlanner.Core;
 using SprintPlanner.Core.Logic;
 using System;
 using System.Collections.Generic;
@@ -133,19 +134,18 @@ namespace SprintPlanner.WpfApp.UI.Capacity
             IsBusy = true;
             BusyReason = "Fetching users...";
             Users.Clear();
-            Task<List<string>>.Factory.StartNew(() => Business.Jira.GetAllAssigneesInSprint(_sprintId)).ContinueWith((t) =>
+            Task<List<Assignee>>.Factory.StartNew(() => Business.Jira.GetAllAssigneesInSprint(_sprintId)).ContinueWith((t) =>
             {
                 try
                 {
                     if (!t.IsFaulted)
                     {
-                        foreach (var item in t.Result)
+                        foreach (var assignee in t.Result)
                         {
-                            string name = Business.Jira.GetUserDisplayName(item);
                             Users.Add(new UserDetails(new UserDetailsModel
                             {
-                                Uid = item,
-                                UserName = name,
+                                Uid = assignee.name,
+                                UserName = assignee.displayName,
                                 DaysInSprint = DaysInSprint,
                                 CapacityFactor = CapacityFactor
                             }));

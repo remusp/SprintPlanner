@@ -1,9 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Security;
-using System.Text;
 
 namespace SprintPlanner.Core
 {
@@ -30,7 +28,7 @@ namespace SprintPlanner.Core
 
         public override string HttpGetByWebRequest(string uri, string username, SecureString password)
         {
-            string response = string.Empty;
+            string response;
             if (_webCache.ContainsKey(uri))
             {
                 response = _webCache[uri].Response;

@@ -20,4 +20,5 @@ Features you might see in the (near?) future are listed below, roughly in order 
 1. Remove the need for backing fields in VMs AND run CodeMaid \\:D/
 1. Hardcoded and duplicated styling properties
 1. Logging support: nlog vs log4net
+1. Sign installer
 

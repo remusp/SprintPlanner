@@ -15,6 +15,7 @@ Pre-release:
 - Excel reports
 - Installer
 ## Get started
+- [Download installer](/remusp/SprintPlanner/releases/latest/download/SprintPlanner.zip)
 - Quick start
 - [Contributing and upcoming features](./docs/wishlist.md)
 

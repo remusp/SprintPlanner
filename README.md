@@ -12,7 +12,7 @@
 - Installer
 ## Get started
 - Quick start
-- Contributing and upcoming features
+- [Contributing and upcoming features](./docs/wishlist.md)
 
 ## TODOs:
 1. Export holidays in excel report

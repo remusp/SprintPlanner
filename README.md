@@ -1,4 +1,5 @@
 # SprintPlanner
+Sprint Planner is a desktop application that shows you an overview of the estimated effort vs. team availability for a JIRA sprint.
 ## TODOs:
 1. Export holidays in excel report
 1. Add load in excel report, difficult to see free days/availability 

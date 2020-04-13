@@ -16,6 +16,7 @@ Features you might see in the (near?) future are listed below, roughly in order 
 1. Fix crash caused by updating boards
 1. Better excel library, nicer excel reports
 1. Re-check: User name and picture are read from server in each request
+1. Read unassigned icon from server instead of assuming it
 1. Remove the need for backing fields in VMs AND run CodeMaid \\:D/
 1. Hardcoded and duplicated styling properties
 1. Logging support: nlog vs log4net

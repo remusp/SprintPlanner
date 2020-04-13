@@ -1,7 +1,6 @@
 
 # SprintPlanner
 Pre-release:
-1. Fix release links
 1. Set repo license
 1. Do quick start doc
 

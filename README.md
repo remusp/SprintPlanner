@@ -1,7 +1,6 @@
 
 # SprintPlanner
 Pre-release:
-1. Set repo license
 1. Do quick start doc
 
 **Sprint Planner** is a desktop application that simplifies the planning process by showing you an overview of the estimated effort vs. team availability for a **JIRA sprint**.

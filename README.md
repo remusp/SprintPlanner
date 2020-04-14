@@ -13,6 +13,7 @@
 ## Get started
 - [Download installer](https://github.com/remusp/SprintPlanner/releases/download/v0.0.7-beta/SprintPlanner.zip)
 - Quick start [WIP]
+- Useful tips [WIP]
 - [Contributing and upcoming features](./docs/wishlist.md)
 
 ## Version History

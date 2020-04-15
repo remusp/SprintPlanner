@@ -1,6 +1,7 @@
 ## Contributing and upcoming features
 Features you might see in the (near?) future are listed below, roughly in order of priority. Pull requests on any of the issues below will be really appreciated! If you see an @ next to an issue it means that someone is working on it.
 ### Wishlist:
+1. Sign installer to prevent Windows from bocking it
 1. Dev / QA / doc task / other capacity
 1. Multiselect combo for sprint list, merge data from more sprints
 1. Export to confluence table
@@ -13,6 +14,7 @@ Features you might see in the (near?) future are listed below, roughly in order 
 1. Demo/Review planner
 1. Export holidays in excel report
 1. Add load in excel report, it's difficult to see free days/availability in the excel file
+1. Update detection (download and install?)
 1. Fix crash caused by updating boards
 1. Better excel library, nicer excel reports
 1. Re-check: User name and picture are read from server in each request

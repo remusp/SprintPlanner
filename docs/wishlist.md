@@ -2,7 +2,6 @@
 Features you might see in the (near?) future are listed below, roughly in order of priority. Pull requests on any of the issues below will be really appreciated! If you see an @ next to an issue it means that someone is working on it.
 ### Wishlist:
 1. Dev / QA / doc task / other capacity
-1. Sign installer to prevent Windows from bocking it
 1. Multiselect combo for sprint list, merge data from more sprints
 1. Export to confluence table
 1. Team capacity view: rename refresh btn (it adds users from the current sprint)

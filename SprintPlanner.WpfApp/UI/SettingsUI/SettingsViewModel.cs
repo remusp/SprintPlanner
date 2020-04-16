@@ -1,6 +1,5 @@
-﻿using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
+using SprintPlanner.FrameworkWPF;
 using SprintPlanner.WpfApp.Properties;
 using System.IO;
 using System.Windows.Input;
@@ -9,58 +8,29 @@ namespace SprintPlanner.WpfApp.UI.SettingsUI
 {
     public class SettingsViewModel : ViewModelBase, IStorageManipulator
     {
-        private string _serverAddress;
+        public SettingsViewModel()
+        {
+            BrowseCommand = new DelegateCommand(BrowseCommandExecute);
+        }
+
+        public ICommand BrowseCommand { get; }
 
         public string ServerAddress
         {
-            get { return _serverAddress; }
-            set
-            {
-                _serverAddress = value;
-                RaisePropertyChanged();
-            }
+            get { return Get(() => ServerAddress); }
+            set { Set(() => ServerAddress, value); }
         }
-
-        private string _storyPointsField;
-
-        public string StoryPointsField
-        {
-            get { return _storyPointsField; }
-            set
-            {
-                _storyPointsField = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        private string _sprintDataPath;
 
         public string SprintDataPath
         {
-            get { return _sprintDataPath; }
-            set
-            {
-                _sprintDataPath = value;
-                RaisePropertyChanged();
-            }
+            get { return Get(() => SprintDataPath); }
+            set { Set(() => SprintDataPath, value); }
         }
 
-        private ICommand _browseCommand;
-
-        public ICommand BrowseCommand
+        public string StoryPointsField
         {
-            get
-            {
-                return _browseCommand ?? (_browseCommand = new RelayCommand(BrowseCommandExecute));
-            }
-        }
-
-
-        public void Pull()
-        {
-            ServerAddress = Settings.Default.Server;
-            StoryPointsField = Settings.Default.StoryPointsField;
-            SprintDataPath = Settings.Default.SprintDataFolder;
+            get { return Get(() => StoryPointsField); }
+            set { Set(() => StoryPointsField, value); }
         }
 
         public void Flush()
@@ -69,6 +39,13 @@ namespace SprintPlanner.WpfApp.UI.SettingsUI
             Settings.Default.StoryPointsField = StoryPointsField;
             Settings.Default.SprintDataFolder = SprintDataPath;
             Settings.Default.Save();
+        }
+
+        public void Pull()
+        {
+            ServerAddress = Settings.Default.Server;
+            StoryPointsField = Settings.Default.StoryPointsField;
+            SprintDataPath = Settings.Default.SprintDataFolder;
         }
 
         private void BrowseCommandExecute()
@@ -81,7 +58,7 @@ namespace SprintPlanner.WpfApp.UI.SettingsUI
             // Always default to Folder Selection.
             ofd.FileName = "Folder Selection.";
 
-            if (ofd.ShowDialog() == true) 
+            if (ofd.ShowDialog() == true)
             {
                 SprintDataPath = Path.GetDirectoryName(ofd.FileName);
             }

@@ -1,8 +1,7 @@
-﻿using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using MahApps.Metro.Controls;
+﻿using MahApps.Metro.Controls;
 using Newtonsoft.Json;
 using SprintPlanner.Core.Logic;
+using SprintPlanner.FrameworkWPF;
 using SprintPlanner.WpfApp.Properties;
 using SprintPlanner.WpfApp.UI.About;
 using SprintPlanner.WpfApp.UI.Capacity;
@@ -15,6 +14,7 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Security;
+using System.Text;
 using System.Windows;
 using System.Windows.Input;
 
@@ -24,14 +24,10 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
     {
         private const string sprintFileName = "Sprint.spl.json";
 
-        private readonly CapacityViewModel _capacityViewModel;
-
-        private readonly PlanningViewModel _planningViewModel;
-
-        private readonly LoginViewModel _loginViewModel;
-
         private readonly AboutViewModel _aboutViewModel;
-
+        private readonly CapacityViewModel _capacityViewModel;
+        private readonly LoginViewModel _loginViewModel;
+        private readonly PlanningViewModel _planningViewModel;
         private readonly SettingsViewModel _settingsViewModel;
 
         private readonly MetroWindow _window;
@@ -39,6 +35,13 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         public MainPlannerWindowViewModel(MetroWindow w)
         {
             _window = w;
+
+            CapacityViewCommand = new DelegateCommand(() => SetView(_capacityViewModel));
+            AboutViewCommand = new DelegateCommand(() => SetView(_aboutViewModel));
+            SettingsViewCommand = new DelegateCommand(() => SetView(_settingsViewModel));
+            PlanningViewCommand = new DelegateCommand(() => SetView(_planningViewModel));
+            LoginViewCommand = new DelegateCommand(() => SetView(_loginViewModel));
+            LogoutCommand = new DelegateCommand(LogoutExecute);
 
             LogoutVisibility = Visibility.Collapsed;
 
@@ -55,132 +58,45 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             };
         }
 
-        private bool _isEnabledPlanning;
+        public ICommand AboutViewCommand { get; }
 
-        public bool IsEnabledPlanning
-        {
-            get { return _isEnabledPlanning; }
-            set
-            {
-                _isEnabledPlanning = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        private bool _isEnabledCapacity;
+        public ICommand CapacityViewCommand { get; }
 
         public bool IsEnabledCapacity
         {
-            get { return _isEnabledCapacity; }
-            set
-            {
-                _isEnabledCapacity = value;
-                RaisePropertyChanged();
-            }
+            get { return Get(() => IsEnabledCapacity); }
+            set { Set(() => IsEnabledCapacity, value); }
         }
 
-
-
-
-        private ICommand _capacityViewCommand;
-
-        public ICommand CapacityViewCommand
+        public bool IsEnabledPlanning
         {
-            get
-            {
-                return _capacityViewCommand ?? (_capacityViewCommand = new RelayCommand(CapacityViewCommandExecute));
-            }
+            get { return Get(() => IsEnabledPlanning); }
+            set { Set(() => IsEnabledPlanning, value); }
         }
 
-        private ICommand _aboutViewCommand;
-
-        public ICommand AboutViewCommand
-        {
-            get
-            {
-                return _aboutViewCommand ?? (_aboutViewCommand = new RelayCommand(AboutViewCommandExecute));
-            }
-        }
-
-        private ICommand _settingsViewCommand;
-
-        public ICommand SettingsViewCommand
-        {
-            get
-            {
-                return _settingsViewCommand ?? (_settingsViewCommand = new RelayCommand(SettingsViewCommandExecute));
-            }
-        }
-
-        public void Load()
-        {
-            var dataFolder = Settings.Default.SprintDataFolder;
-
-            var assembly = Assembly.GetExecutingAssembly();
-            var appName = ((AssemblyTitleAttribute)assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute))).Title;
-            if (string.IsNullOrWhiteSpace(dataFolder))
-            {
-                dataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), appName);
-                Settings.Default.SprintDataFolder = dataFolder;
-                Settings.Default.Save();
-
-                Directory.CreateDirectory(dataFolder);
-            }
-
-            var sprintFilePath = Path.Combine(dataFolder, sprintFileName);
-
-            if (File.Exists(sprintFilePath))
-            {
-                Business.Data = JsonConvert.DeserializeObject<DataStorageModel>(File.ReadAllText(sprintFilePath));
-            }
-            else
-            {
-                Business.Data = new DataStorageModel()
-                {
-                    Sprint = new SprintStorageModel(),
-                    Capacity = new CapacityStorageModel()
-                };
-            }
-        }
-
-        #region LoggedInUserPictureData Property
-
-        private byte[] _loggedInUserPictureData;
         public byte[] LoggedInUserPictureData
         {
-            get
-            {
-                return _loggedInUserPictureData;
-            }
-
-            set
-            {
-                _loggedInUserPictureData = value;
-                RaisePropertyChanged();
-            }
+            get { return Get(() => LoggedInUserPictureData); }
+            set { Set(() => LoggedInUserPictureData, value); }
         }
 
-        #endregion LoggedInUserPictureData Property
+        public ICommand LoginViewCommand { get; }
+        public ICommand LogoutCommand { get; }
 
-        private ViewModelBase _mainViewModel;
+        public Visibility LogoutVisibility
+        {
+            get { return Get(() => LogoutVisibility); }
+            set { Set(() => LogoutVisibility, value); }
+        }
 
         public ViewModelBase MainViewModel
         {
-            get { return _mainViewModel; }
-            set
-            {
-                _mainViewModel = value;
-                RaisePropertyChanged();
-            }
+            get { return Get(() => MainViewModel); }
+            set { Set(() => MainViewModel, value); }
         }
 
-        public void Persist()
-        {
-            string serialized = JsonConvert.SerializeObject(Business.Data, Formatting.Indented);
-
-            var sprintFilePath = Path.Combine(Settings.Default.SprintDataFolder, sprintFileName);
-            File.WriteAllText(sprintFilePath, serialized);
-        }
+        public ICommand PlanningViewCommand { get; }
+        public ICommand SettingsViewCommand { get; }
 
         public void EnsureLoggedIn()
         {
@@ -223,16 +139,52 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
                     IsEnabledPlanning = false;
                     IsEnabledCapacity = false;
                 }
-
-
-
             }
         }
 
-        public static string Base64Decode(string base64EncodedData)
+        public void Load()
         {
-            var base64EncodedBytes = System.Convert.FromBase64String(base64EncodedData);
-            return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
+            var dataFolder = Settings.Default.SprintDataFolder;
+
+            var assembly = Assembly.GetExecutingAssembly();
+            var appName = ((AssemblyTitleAttribute)assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute))).Title;
+            if (string.IsNullOrWhiteSpace(dataFolder))
+            {
+                dataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), appName);
+                Settings.Default.SprintDataFolder = dataFolder;
+                Settings.Default.Save();
+
+                Directory.CreateDirectory(dataFolder);
+            }
+
+            var sprintFilePath = Path.Combine(dataFolder, sprintFileName);
+
+            if (File.Exists(sprintFilePath))
+            {
+                Business.Data = JsonConvert.DeserializeObject<DataStorageModel>(File.ReadAllText(sprintFilePath));
+            }
+            else
+            {
+                Business.Data = new DataStorageModel()
+                {
+                    Sprint = new SprintStorageModel(),
+                    Capacity = new CapacityStorageModel()
+                };
+            }
+        }
+
+        public void Persist()
+        {
+            string serialized = JsonConvert.SerializeObject(Business.Data, Formatting.Indented);
+
+            var sprintFilePath = Path.Combine(Settings.Default.SprintDataFolder, sprintFileName);
+            File.WriteAllText(sprintFilePath, serialized);
+        }
+
+        private static string Base64Decode(string base64EncodedData)
+        {
+            var base64EncodedBytes = Convert.FromBase64String(base64EncodedData);
+            return Encoding.UTF8.GetString(base64EncodedBytes);
         }
 
         private void LoginSucceededHandler()
@@ -264,73 +216,6 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             }
         }
 
-        private void CapacityViewCommandExecute()
-        {
-            SetView(_capacityViewModel);
-        }
-
-        private void AboutViewCommandExecute()
-        {
-            SetView(_aboutViewModel);
-        }
-
-        private void SettingsViewCommandExecute()
-        {
-            SetView(_settingsViewModel);
-        }
-
-        private ICommand _logoutCommand;
-
-        public ICommand LogoutCommand
-        {
-            get
-            {
-                return _logoutCommand ?? (_logoutCommand = new RelayCommand(LogoutExecute));
-            }
-        }
-
-        private ICommand _planningViewCommand;
-
-        public ICommand PlanningViewCommand
-        {
-            get
-            {
-                return _planningViewCommand ?? (_planningViewCommand = new RelayCommand(PlanningViewCommandExecute));
-            }
-        }
-
-        private ICommand _loginViewCommand;
-
-        public ICommand LoginViewCommand
-        {
-            get
-            {
-                return _loginViewCommand ?? (_loginViewCommand = new RelayCommand(LoginViewCommandExecute));
-            }
-        }
-
-
-        #region IsLogoutVisible Property
-
-        private Visibility _logoutVisibility;
-
-        public Visibility LogoutVisibility
-        {
-            get
-            {
-                return _logoutVisibility;
-            }
-
-            set
-            {
-                _logoutVisibility = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        #endregion IsLogoutVisible Property
-
-
         private void LogoutExecute()
         {
             Settings.Default.User = string.Empty;
@@ -344,16 +229,6 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             SetView(_loginViewModel);
             IsEnabledPlanning = false;
             IsEnabledCapacity = false;
-        }
-
-        private void PlanningViewCommandExecute()
-        {
-            SetView(_planningViewModel);
-        }
-
-        private void LoginViewCommandExecute()
-        {
-            SetView(_loginViewModel);
         }
 
         private void SetView(ViewModelBase vm)

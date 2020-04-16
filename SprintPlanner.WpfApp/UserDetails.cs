@@ -6,88 +6,53 @@ namespace SprintPlanner.WpfApp
     {
         public UserDetails(UserDetailsModel model) : base(model)
         {
-
         }
 
-        public string Uid
+        [DependsUpon(nameof(HoursPerDay))]
+        [DependsUpon(nameof(DaysOff))]
+        [DependsUpon(nameof(DaysInSprint))]
+        public decimal Capacity { get { return _model.Capacity; } }
+
+        public decimal CapacityFactor
         {
-            get { return _model.Uid; }
-            set
-            {
-                _model.Uid = value;
-                RaisePropertyChanged();
-            }
+            get { return _model.CapacityFactor; }
+            set { SetBackingField(() => _model.CapacityFactor = value); }
         }
 
-        public string UserName
+        public int DaysInSprint
         {
-            get { return _model.UserName; }
-            set
-            {
-                _model.UserName = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        public decimal HoursPerDay
-        {
-            get { return _model.HoursPerDay; }
-            set
-            {
-                _model.HoursPerDay = value;
-                RaisePropertyChanged();
-                RaisePropertyChanged(nameof(Capacity));
-                RaisePropertyChanged(nameof(ScaledCapacity));
-            }
+            get { return _model.DaysInSprint; }
+            set { SetBackingField(() => _model.DaysInSprint = value); }
         }
 
         public int DaysOff
         {
             get { return _model.DaysOff; }
-            set
-            {
-                _model.DaysOff = value;
-                RaisePropertyChanged();
-                RaisePropertyChanged(nameof(Capacity));
-                RaisePropertyChanged(nameof(ScaledCapacity));
-            }
+            set { SetBackingField(() => _model.DaysOff = value); }
         }
 
-
-        public int DaysInSprint
+        public decimal HoursPerDay
         {
-            get { return _model.DaysInSprint; }
-            set
-            {
-                _model.DaysInSprint = value;
-                RaisePropertyChanged();
-                RaisePropertyChanged(nameof(Capacity));
-                RaisePropertyChanged(nameof(ScaledCapacity));
-            }
+            get { return _model.HoursPerDay; }
+            set { SetBackingField(() => _model.HoursPerDay = value); }
         }
 
-        public decimal CapacityFactor
+        [DependsUpon(nameof(HoursPerDay))]
+        [DependsUpon(nameof(DaysOff))]
+        [DependsUpon(nameof(DaysInSprint))]
+        [DependsUpon(nameof(CapacityFactor))]
+        public decimal ScaledCapacity { get { return _model.ScaledCapacity; } }
+
+        public string Uid
         {
-            get { return _model.CapacityFactor; }
-            set
-            {
-                _model.CapacityFactor = value;
-                RaisePropertyChanged();
-                RaisePropertyChanged(nameof(ScaledCapacity));
-            }
+            get { return _model.Uid; }
+            set { SetBackingField(() => _model.Uid = value); }
         }
 
-        public decimal Capacity
+        public string UserName
         {
-            get
-            {
-                return _model.Capacity;
-            }
-        }
-
-        public decimal ScaledCapacity
-        {
-            get { return _model.ScaledCapacity; }
+            get { return _model.UserName; }
+            set { SetBackingField(() => _model.UserName = value); }
         }
     }
 }

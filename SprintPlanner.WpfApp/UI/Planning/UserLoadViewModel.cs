@@ -11,9 +11,89 @@ namespace SprintPlanner.WpfApp.UI.Planning
     {
         public UserLoadViewModel(UserLoadModel model) : base(model)
         {
-            _issues = new ObservableCollection<IssueViewModel>(model.Issues.Select(i => new IssueViewModel(i)));
-            _issues.CollectionChanged += Issues_CollectionChanged;
-            _isExpanded = true;
+            Issues = new ObservableCollection<IssueViewModel>(model.Issues.Select(i => new IssueViewModel(i)));
+            Issues.CollectionChanged += Issues_CollectionChanged;
+            IsExpanded = true;
+        }
+
+        [DependsUpon(nameof(Load))]
+        public decimal Availability
+        {
+            get { return ScaledCapacity - _model.Load; }
+        }
+
+        [DependsUpon(nameof(Load))]
+        public decimal BookingPercent
+        {
+            get
+            {
+                decimal bp = 0;
+                if (_model.UserDetails.Capacity != 0)
+                {
+                    bp = _model.Load / _model.UserDetails.Capacity;
+                }
+
+                return bp;
+            }
+        }
+
+        public decimal Capacity
+        {
+            get { return _model.UserDetails.Capacity; }
+        }
+
+        public decimal CapacityFactor
+        {
+            get { return _model.UserDetails.CapacityFactor; }
+            set { SetBackingField(() => _model.UserDetails.CapacityFactor = value); }
+        }
+
+        public bool IsExpanded
+        {
+            get { return Get(() => IsExpanded); }
+            set { Set(() => IsExpanded, value); }
+        }
+
+        public ObservableCollection<IssueViewModel> Issues
+        {
+            get { return Get(() => Issues); }
+            set { Set(() => Issues, value); }
+        }
+
+        public decimal Load
+        {
+            get { return _model.Load; }
+            set { SetBackingField(() => _model.Load = value); }
+        }
+
+        public string Name
+        {
+            get { return _model.UserDetails.UserName; }
+            set { SetBackingField(() => _model.UserDetails.UserName = value); }
+        }
+
+        public byte[] PictureData
+        {
+            get { return _model.PictureData; }
+            set { SetBackingField(() => _model.PictureData = value); }
+        }
+
+        [DependsUpon(nameof(CapacityFactor))]
+        public decimal ScaledCapacity
+        {
+            get { return _model.UserDetails.ScaledCapacity; }
+        }
+
+        public UserStatus Status
+        {
+            get { return Get(() => Status); }
+            set { Set(() => Status, value); }
+        }
+
+        public string Uid
+        {
+            get { return _model.UserDetails.Uid; }
+            set { SetBackingField(() => _model.UserDetails.Uid = value); }
         }
 
         private void Issues_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -40,122 +120,5 @@ namespace SprintPlanner.WpfApp.UI.Planning
                     throw new NotImplementedException("Not supported yet!");
             }
         }
-
-        public string Uid
-        {
-            get { return _model.UserDetails.Uid; }
-            set
-            {
-                _model.UserDetails.Uid = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        public string Name
-        {
-            get { return _model.UserDetails.UserName; }
-            set
-            {
-                _model.UserDetails.UserName = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        public decimal Capacity
-        {
-            get { return _model.UserDetails.Capacity; }
-        }
-
-        public decimal ScaledCapacity
-        {
-            get { return _model.UserDetails.ScaledCapacity; }
-        }
-
-        public decimal CapacityFactor
-        {
-            get { return _model.UserDetails.CapacityFactor; }
-            set
-            {
-                _model.UserDetails.CapacityFactor = value;
-                RaisePropertyChanged();
-                RaisePropertyChanged(nameof(ScaledCapacity));
-            }
-        }
-
-        public decimal Load
-        {
-            get { return _model.Load; }
-            set
-            {
-                _model.Load = value;
-                RaisePropertyChanged();
-                RaisePropertyChanged(nameof(BookingPercent));
-                RaisePropertyChanged(nameof(Availability));
-            }
-        }
-
-        public decimal BookingPercent
-        {
-            get
-            {
-                decimal bp = 0;
-                if (_model.UserDetails.Capacity != 0)
-                {
-                    bp = _model.Load / _model.UserDetails.Capacity;
-                }
-
-                return bp;
-            }
-        }
-
-        public decimal Availability
-        {
-            get { return ScaledCapacity - _model.Load; }
-        }
-
-        private ObservableCollection<IssueViewModel> _issues;
-
-        public ObservableCollection<IssueViewModel> Issues
-        {
-            get { return _issues; }
-            set
-            {
-                _issues = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        public byte[] PictureData
-        {
-            get
-            {
-                return _model.PictureData;
-            }
-
-            set
-            {
-                _model.PictureData = value;
-                RaisePropertyChanged();
-            }
-        }
-
-
-        private UserStatus _status;
-
-        public UserStatus Status
-        {
-            get { return _status; }
-            set => Set(ref _status, value);
-        }
-
-        private bool _isExpanded;
-
-        public bool IsExpanded
-        {
-            get => _isExpanded;
-            set => Set(ref _isExpanded, value);
-        }
-
-
     }
 }

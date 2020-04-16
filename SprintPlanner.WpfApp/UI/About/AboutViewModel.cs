@@ -1,33 +1,19 @@
-﻿using GalaSoft.MvvmLight;
+﻿using SprintPlanner.FrameworkWPF;
 
 namespace SprintPlanner.WpfApp.UI.About
 {
     public class AboutViewModel : ViewModelBase
     {
-        private string _productName;
-
         public string ProductName
         {
-            get { return _productName; }
-            set
-            {
-                _productName = value;
-                RaisePropertyChanged();
-            }
+            get { return Get(() => ProductName); }
+            set { Set(() => ProductName, value); }
         }
-
-        private string _productVersion;
 
         public string ProductVersion
         {
-            get { return _productVersion; }
-            set
-            {
-                _productVersion = value;
-                RaisePropertyChanged();
-            }
+            get { return Get(() => ProductVersion); }
+            set { Set(() => ProductVersion, value); }
         }
-
-
     }
 }

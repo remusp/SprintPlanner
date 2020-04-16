@@ -1,4 +1,4 @@
-﻿using GalaSoft.MvvmLight;
+﻿using SprintPlanner.FrameworkWPF;
 
 namespace SprintPlanner.WpfApp
 {

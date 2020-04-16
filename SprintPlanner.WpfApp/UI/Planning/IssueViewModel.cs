@@ -9,82 +9,16 @@ namespace SprintPlanner.WpfApp.UI.Planning
         {
         }
 
+        public List<Assignation> Assignables
+        {
+            get { return Get(() => Assignables); }
+            set { Set(() => Assignables, value); }
+        }
+
         public decimal Hours
         {
             get { return _model.Hours; }
-            set
-            {
-                _model.Hours = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        public string Name
-        {
-            get { return _model.Name; }
-            set
-            {
-                _model.Name = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        public string ParentName
-        {
-            get { return _model.ParentName; }
-            set
-            {
-                _model.ParentName = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        public string StoryId
-        {
-            get { return _model.StoryId; }
-            set
-            {
-                _model.StoryId = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        public string StoryLink
-        {
-            get { return _model.StoryLink; }
-            set
-            {
-                _model.StoryLink = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        public string TaskId
-        {
-            get { return _model.TaskId; }
-            set
-            {
-                _model.TaskId = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        public string TaskLink
-        {
-            get { return _model.TaskLink; }
-            set
-            {
-                _model.TaskLink = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        private List<Assignation> _assignables;
-
-        public List<Assignation> Assignables
-        {
-            get => _assignables;
-            set => Set(ref _assignables, value);
+            set { SetBackingField(() => _model.Hours = value); }
         }
 
         public string Id
@@ -92,5 +26,40 @@ namespace SprintPlanner.WpfApp.UI.Planning
             get => $"{StoryId}+{TaskId}";
         }
 
+        public string Name
+        {
+            get { return _model.Name; }
+            set { SetBackingField(() => _model.Name = value); }
+        }
+
+        public string ParentName
+        {
+            get { return _model.ParentName; }
+            set { SetBackingField(() => _model.ParentName = value); }
+        }
+
+        public string StoryId
+        {
+            get { return _model.StoryId; }
+            set { SetBackingField(() => _model.StoryId = value); }
+        }
+
+        public string StoryLink
+        {
+            get { return _model.StoryLink; }
+            set { SetBackingField(() => _model.StoryLink = value); }
+        }
+
+        public string TaskId
+        {
+            get { return _model.TaskId; }
+            set { SetBackingField(() => _model.TaskId = value); }
+        }
+
+        public string TaskLink
+        {
+            get { return _model.TaskLink; }
+            set { SetBackingField(() => _model.TaskLink = value); }
+        }
     }
 }

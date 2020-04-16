@@ -1,9 +1,8 @@
-﻿using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using MahApps.Metro.Controls;
+﻿using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using SprintPlanner.Core.Extensions;
 using SprintPlanner.Core.Logic;
+using SprintPlanner.FrameworkWPF;
 using SprintPlanner.WpfApp.Infrastructure;
 using SprintPlanner.WpfApp.Properties;
 using System;
@@ -15,66 +14,33 @@ namespace SprintPlanner.WpfApp.UI.Login
     {
         private readonly MetroWindow _window;
 
-        private ICommand _loginCommand;
-
-        private bool _storeCredentials;
-
-        private string _userName;
-
         public LoginViewModel(MetroWindow w)
         {
             _window = w;
+            LoginCommand = new DelegateCommand<object>((parameter) => LoginCommandExecute(parameter));
         }
 
         public event Action LoginSucceeded;
 
-        public ICommand LoginCommand
-        {
-            get
-            {
-                return _loginCommand ?? (_loginCommand = new RelayCommand<object>((parameter) => LoginCommandExecute(parameter)));
-            }
-        }
+        public ICommand LoginCommand { get; }
 
         public bool StoreCredentials
         {
-            get { return _storeCredentials; }
-            set
-            {
-                _storeCredentials = value;
-                RaisePropertyChanged();
-            }
+            get { return Get(() => StoreCredentials); }
+            set { Set(() => StoreCredentials, value); }
         }
 
         public string UserName
         {
-            get { return _userName; }
-            set
-            {
-                _userName = value;
-                RaisePropertyChanged();
-            }
+            get { return Get(() => UserName); }
+            set { Set(() => UserName, value); }
         }
-
-        #region IsLoggedIn Property
-
-        private bool _isLoggedIn;
 
         public bool IsLoggedIn
         {
-            get
-            {
-                return _isLoggedIn;
-            }
-
-            set
-            {
-                _isLoggedIn = value;
-                RaisePropertyChanged();
-            }
+            get { return Get(() => IsLoggedIn); }
+            set { Set(() => IsLoggedIn, value); }
         }
-
-        #endregion IsLoggedIn Property
 
         public void Flush()
         {
@@ -121,10 +87,10 @@ namespace SprintPlanner.WpfApp.UI.Login
             }
         }
 
-        public static string Base64Encode(string plainText)
+        private static string Base64Encode(string plainText)
         {
             var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
-            return System.Convert.ToBase64String(plainTextBytes);
+            return Convert.ToBase64String(plainTextBytes);
         }
     }
 }

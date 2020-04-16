@@ -1,12 +1,12 @@
-﻿using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using MahApps.Metro.Controls;
+﻿using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using SprintPlanner.Core;
 using SprintPlanner.Core.Logic;
+using SprintPlanner.FrameworkWPF;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -15,18 +15,71 @@ namespace SprintPlanner.WpfApp.UI.Capacity
 {
     public class CapacityViewModel : ViewModelBase, IStorageManipulator
     {
-        private int _sprintId;
         private readonly MetroWindow _window;
+        private int _sprintId;
 
         public CapacityViewModel(MetroWindow w)
         {
+            RefreshCommand = new DelegateCommand(RefreshCommandExecute);
             Users = new ObservableCollection<UserDetails>();
             CapacityFactor = 1;
             _window = w;
             PropertyChanged += CapacityWindowViewModel_PropertyChanged;
         }
 
-        private void CapacityWindowViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        public string BusyReason
+        {
+            get { return Get(() => BusyReason); }
+            set { Set(() => BusyReason, value); }
+        }
+
+        public decimal CapacityFactor
+        {
+            get { return Get(() => CapacityFactor); }
+            set { Set(() => CapacityFactor, value); }
+        }
+
+        public int DaysInSprint
+        {
+            get { return Get(() => DaysInSprint); }
+            set { Set(() => DaysInSprint, value); }
+        }
+
+        public bool IsBusy
+        {
+            get { return Get(() => IsBusy); }
+            set { Set(() => IsBusy, value); }
+        }
+
+        public ICommand RefreshCommand { get; private set; }
+
+        public ObservableCollection<UserDetails> Users
+        {
+            get { return Get(() => Users); }
+            set { Set(() => Users, value); }
+        }
+
+        public void Flush()
+        {
+            Business.Data.Capacity.DaysInSprint = DaysInSprint;
+            Business.Data.Capacity.CapacityFactor = CapacityFactor;
+            Business.Data.Capacity.Users = Users.Select(u => u.GetModel()).ToList();
+        }
+
+        public void Pull()
+        {
+            DaysInSprint = Business.Data.Capacity.DaysInSprint;
+            if (Business.Data?.Capacity?.Users != null)
+            {
+                Users = new ObservableCollection<UserDetails>(Business.Data.Capacity.Users?.Select(u => new UserDetails(u)));
+            }
+
+            CapacityFactor = Business.Data.Capacity.CapacityFactor;
+
+            _sprintId = Business.Data.Sprint.SelectedSprint;
+        }
+
+        private void CapacityWindowViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {
@@ -47,87 +100,6 @@ namespace SprintPlanner.WpfApp.UI.Capacity
                     break;
             }
         }
-
-
-
-        private decimal _capacityFactor;
-
-        public decimal CapacityFactor
-        {
-            get { return _capacityFactor; }
-            set
-            {
-                _capacityFactor = value;
-                RaisePropertyChanged();
-            }
-        }
-
-
-        private int _daysInSprint;
-
-        public int DaysInSprint
-        {
-            get { return _daysInSprint; }
-            set
-            {
-                _daysInSprint = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        private ObservableCollection<UserDetails> _users;
-
-        public ObservableCollection<UserDetails> Users
-        {
-            get { return _users; }
-            set
-            {
-                _users = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        private ICommand _refreshCommand;
-
-        public ICommand RefreshCommand
-        {
-            get
-            {
-                if (_refreshCommand == null)
-                {
-                    _refreshCommand = new RelayCommand(RefreshCommandExecute);
-                }
-
-                return _refreshCommand;
-            }
-        }
-
-        private bool _isBusy;
-
-        public bool IsBusy
-        {
-            get { return _isBusy; }
-            set
-            {
-                _isBusy = value;
-                RaisePropertyChanged();
-            }
-        }
-
-
-        private string _busyReason;
-
-        public string BusyReason
-        {
-            get { return _busyReason; }
-            set
-            {
-                _busyReason = value;
-                RaisePropertyChanged();
-            }
-        }
-
-
 
         private void RefreshCommandExecute()
         {
@@ -158,35 +130,12 @@ namespace SprintPlanner.WpfApp.UI.Capacity
                         var flatException = t.Exception.Flatten();
                         _window.ShowMessageAsync("Error fetching users", $"{message}{Environment.NewLine}{stackTraces}");
                     }
-
                 }
                 finally
                 {
                     IsBusy = false;
                 }
-
             }, TaskScheduler.FromCurrentSynchronizationContext());
-
-        }
-
-        public void Flush()
-        {
-            Business.Data.Capacity.DaysInSprint = DaysInSprint;
-            Business.Data.Capacity.CapacityFactor = CapacityFactor;
-            Business.Data.Capacity.Users = Users.Select(u => u.GetModel()).ToList();
-        }
-
-        public void Pull()
-        {
-            DaysInSprint = Business.Data.Capacity.DaysInSprint;
-            if (Business.Data?.Capacity?.Users != null)
-            {
-                Users = new ObservableCollection<UserDetails>(Business.Data.Capacity.Users?.Select(u => new UserDetails(u)));
-            }
-
-            CapacityFactor = Business.Data.Capacity.CapacityFactor;
-
-            _sprintId = Business.Data.Sprint.SelectedSprint;
         }
     }
 }

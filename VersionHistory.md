@@ -4,7 +4,7 @@
 ### Version 0.0.7 (2020-04-xx)
  * JIRA Cloud support
 
-### Version 0.0.6 (2019-xx-xx)
+### Version 0.0.6 (2019-11-18)
  * Issues can now be reassigned using context menu
  * Fixed Export to excel crash for story with no SP
  * Sprint data path default to MyDocuments, selectable sprint data path

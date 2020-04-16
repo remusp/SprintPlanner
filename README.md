@@ -11,8 +11,11 @@
 - Excel reports
 - Installer
 ## Get started
-- Quick start
+- [Download installer](https://github.com/remusp/SprintPlanner/releases/download/v0.0.7-beta/SprintPlanner.zip)
+- [Quick start](https://github.com/remusp/SprintPlanner/wiki/Quick-Start) 
+- Useful tips [WIP]
 - [Contributing and upcoming features](./docs/wishlist.md)
+- [Known issues](./docs/issues.md)
 
 ## Version History
 See [Version History](VersionHistory.md)

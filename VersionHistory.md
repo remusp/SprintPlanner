@@ -1,3 +1,5 @@
+### Version 0.0.8 (2020-xx-xx)
+ * MVVM infrastructure refactoring
 
 ### Version 0.0.7 (2020-04-13)
  * JIRA Cloud support

@@ -20,6 +20,7 @@ Features you might see in the (near?) future are listed below, roughly in order 
 1. Re-check: User name and picture are read from server in each request
 1. Read unassigned icon from server instead of assuming it
 1. Hardcoded and duplicated styling properties
+1. Unit/integration tests
 1. Logging support: nlog vs log4net
 
 

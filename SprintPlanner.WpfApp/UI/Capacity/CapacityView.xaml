@@ -32,7 +32,7 @@
                    Style="{StaticResource TextBlockStyle}" />
         <mh:NumericUpDown Value="{Binding DaysInSprint}"
                           Style="{StaticResource UpDownStyle}"
-                          Minimum="1"
+                          Minimum="0"
                           Grid.Row="0"
                           Grid.Column="1" />
         <Button Content="Refresh (F5)"

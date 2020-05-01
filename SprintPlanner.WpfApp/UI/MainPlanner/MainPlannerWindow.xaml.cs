@@ -28,7 +28,8 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
         private void MetroWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            AutoUpdater.Start();
+            AutoUpdater.ReportErrors = true;
+            AutoUpdater.Start("https://github.com/remusp/SprintPlanner/raw/master_features008/AppCast.xml");
             if (_webRequester is CachingHttpRequester cr)
             {
                 try

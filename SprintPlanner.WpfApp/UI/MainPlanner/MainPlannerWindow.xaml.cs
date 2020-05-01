@@ -3,6 +3,7 @@ using MahApps.Metro.Controls;
 using SprintPlanner.Core;
 using SprintPlanner.Core.Logic;
 using SprintPlanner.WpfApp.Properties;
+using System;
 using System.IO;
 using System.Windows;
 
@@ -28,8 +29,9 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
         private void MetroWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            AutoUpdater.ReportErrors = true;
+            AutoUpdater.InstallationPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             AutoUpdater.Start("https://github.com/remusp/SprintPlanner/raw/master_features008/AppCast.xml");
+            //AutoUpdater.Start("https://github.com/remusp/SprintPlanner/raw/master/AppCast.xml");
             if (_webRequester is CachingHttpRequester cr)
             {
                 try

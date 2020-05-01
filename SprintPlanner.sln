@@ -19,6 +19,8 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "SprintPlanner.Installer", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprintPlanner.FrameworkWPF", "SprintPlanner.FrameworkWPF\SprintPlanner.FrameworkWPF.csproj", "{3AD05319-C815-4206-AC7A-3E844911A6EE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoUpdater.NET", "AutoUpdater.NET\AutoUpdater.NET.csproj", "{FB9E7E6B-B19F-4F37-A708-2996190CEF13}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug OFFLINE|Any CPU = Debug OFFLINE|Any CPU
@@ -97,6 +99,20 @@ Global
 		{3AD05319-C815-4206-AC7A-3E844911A6EE}.Release-NET35|Any CPU.Build.0 = Release|Any CPU
 		{3AD05319-C815-4206-AC7A-3E844911A6EE}.Release-NET40|Any CPU.ActiveCfg = Release|Any CPU
 		{3AD05319-C815-4206-AC7A-3E844911A6EE}.Release-NET40|Any CPU.Build.0 = Release|Any CPU
+		{FB9E7E6B-B19F-4F37-A708-2996190CEF13}.Debug OFFLINE|Any CPU.ActiveCfg = Debug-NET40|Any CPU
+		{FB9E7E6B-B19F-4F37-A708-2996190CEF13}.Debug OFFLINE|Any CPU.Build.0 = Debug-NET40|Any CPU
+		{FB9E7E6B-B19F-4F37-A708-2996190CEF13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB9E7E6B-B19F-4F37-A708-2996190CEF13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB9E7E6B-B19F-4F37-A708-2996190CEF13}.Debug-NET35|Any CPU.ActiveCfg = Debug-NET35|Any CPU
+		{FB9E7E6B-B19F-4F37-A708-2996190CEF13}.Debug-NET35|Any CPU.Build.0 = Debug-NET35|Any CPU
+		{FB9E7E6B-B19F-4F37-A708-2996190CEF13}.Debug-NET40|Any CPU.ActiveCfg = Debug-NET40|Any CPU
+		{FB9E7E6B-B19F-4F37-A708-2996190CEF13}.Debug-NET40|Any CPU.Build.0 = Debug-NET40|Any CPU
+		{FB9E7E6B-B19F-4F37-A708-2996190CEF13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB9E7E6B-B19F-4F37-A708-2996190CEF13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB9E7E6B-B19F-4F37-A708-2996190CEF13}.Release-NET35|Any CPU.ActiveCfg = Release-NET35|Any CPU
+		{FB9E7E6B-B19F-4F37-A708-2996190CEF13}.Release-NET35|Any CPU.Build.0 = Release-NET35|Any CPU
+		{FB9E7E6B-B19F-4F37-A708-2996190CEF13}.Release-NET40|Any CPU.ActiveCfg = Release-NET40|Any CPU
+		{FB9E7E6B-B19F-4F37-A708-2996190CEF13}.Release-NET40|Any CPU.Build.0 = Release-NET40|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

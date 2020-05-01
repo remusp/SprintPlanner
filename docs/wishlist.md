@@ -14,7 +14,6 @@ Features you might see in the (near?) future are listed below, roughly in order 
 1. Export holidays in excel report
 1. Add load in excel report, it's difficult to see free days/availability in the excel file
 1. Remove self from Assign context menu. No sense in assigning a task to the same assignee.
-1. Update detection (download and install?)
 1. Fix crash caused by updating boards
 1. Better excel library, nicer excel reports
 1. Re-check: User name and picture are read from server in each request

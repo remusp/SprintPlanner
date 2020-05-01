@@ -1,4 +1,5 @@
-﻿using MahApps.Metro.Controls;
+﻿using AutoUpdaterDotNET;
+using MahApps.Metro.Controls;
 using SprintPlanner.Core;
 using SprintPlanner.Core.Logic;
 using SprintPlanner.WpfApp.Properties;
@@ -27,6 +28,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
         private void MetroWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            AutoUpdater.Start();
             if (_webRequester is CachingHttpRequester cr)
             {
                 try

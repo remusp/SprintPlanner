@@ -11,6 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SprintPlanner.WpfApp", "Spr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1C054831-7EDC-4320-9460-8A8EADDC3DF3}"
 	ProjectSection(SolutionItems) = preProject
+		AppCast.xml = AppCast.xml
 		VersionHistory.md = VersionHistory.md
 	EndProjectSection
 EndProject

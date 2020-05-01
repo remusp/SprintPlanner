@@ -51,7 +51,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             _loginViewModel = new LoginViewModel(w);
             _loginViewModel.LoginSucceeded += LoginSucceededHandler;
             var assembly = Assembly.GetExecutingAssembly();
-            _aboutViewModel = new AboutViewModel()
+            _aboutViewModel = new AboutViewModel(w)
             {
                 ProductName = ((AssemblyTitleAttribute)assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute))).Title,
                 ProductVersion = assembly.GetName().Version.ToString()

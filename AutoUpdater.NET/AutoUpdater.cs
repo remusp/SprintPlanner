@@ -1,3 +1,4 @@
+using AutoUpdaterDotNET.Properties;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -11,7 +12,6 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Serialization;
-using AutoUpdaterDotNET.Properties;
 
 namespace AutoUpdaterDotNET
 {
@@ -248,8 +248,8 @@ namespace AutoUpdaterDotNET
         {
             try
             {
-                ServicePointManager.SecurityProtocol |= (SecurityProtocolType) 192 |
-                                                        (SecurityProtocolType) 768 | (SecurityProtocolType) 3072;
+                ServicePointManager.SecurityProtocol |= (SecurityProtocolType)192 |
+                                                        (SecurityProtocolType)768 | (SecurityProtocolType)3072;
             }
             catch (NotSupportedException)
             {
@@ -330,13 +330,13 @@ namespace AutoUpdaterDotNET
         private static object CheckUpdate(Assembly mainAssembly)
         {
             var companyAttribute =
-                (AssemblyCompanyAttribute) GetAttribute(mainAssembly, typeof(AssemblyCompanyAttribute));
+                (AssemblyCompanyAttribute)GetAttribute(mainAssembly, typeof(AssemblyCompanyAttribute));
             string appCompany = companyAttribute != null ? companyAttribute.Company : "";
 
             if (string.IsNullOrEmpty(AppTitle))
             {
                 var titleAttribute =
-                    (AssemblyTitleAttribute) GetAttribute(mainAssembly, typeof(AssemblyTitleAttribute));
+                    (AssemblyTitleAttribute)GetAttribute(mainAssembly, typeof(AssemblyTitleAttribute));
                 AppTitle = titleAttribute != null ? titleAttribute.Title : mainAssembly.GetName().Name;
             }
 
@@ -359,8 +359,8 @@ namespace AutoUpdaterDotNET
                 if (ParseUpdateInfoEvent == null)
                 {
                     XmlSerializer xmlSerializer = new XmlSerializer(typeof(UpdateInfoEventArgs));
-                    XmlTextReader xmlTextReader = new XmlTextReader(new StringReader(xml)) {XmlResolver = null};
-                    args = (UpdateInfoEventArgs) xmlSerializer.Deserialize(xmlTextReader);
+                    XmlTextReader xmlTextReader = new XmlTextReader(new StringReader(xml)) { XmlResolver = null };
+                    args = (UpdateInfoEventArgs)xmlSerializer.Deserialize(xmlTextReader);
                 }
                 else
                 {
@@ -436,46 +436,42 @@ namespace AutoUpdaterDotNET
             {
                 if (result is UpdateInfoEventArgs args)
                 {
-                    if (CheckForUpdateEvent != null)
+                    CheckForUpdateEvent?.Invoke(args);
+
+                    if (args.IsUpdateAvailable)
                     {
-                        CheckForUpdateEvent(args);
-                    }
-                    else
-                    {
-                        if (args.IsUpdateAvailable)
+                        if (Mandatory && UpdateMode == Mode.ForcedDownload)
                         {
-                            if (Mandatory && UpdateMode == Mode.ForcedDownload)
+                            DownloadUpdate(args);
+                            Exit();
+                        }
+                        else
+                        {
+                            if (Thread.CurrentThread.GetApartmentState().Equals(ApartmentState.STA))
                             {
-                                DownloadUpdate(args);
-                                Exit();
+                                ShowUpdateForm(args);
                             }
                             else
                             {
-                                if (Thread.CurrentThread.GetApartmentState().Equals(ApartmentState.STA))
-                                {
-                                    ShowUpdateForm(args);
-                                }
-                                else
-                                {
-                                    Thread thread = new Thread(new ThreadStart(delegate { ShowUpdateForm(args); }));
-                                    thread.CurrentCulture =
-                                        thread.CurrentUICulture = CultureInfo.CurrentCulture;
-                                    thread.SetApartmentState(ApartmentState.STA);
-                                    thread.Start();
-                                    thread.Join();
-                                }
+                                Thread thread = new Thread(new ThreadStart(delegate { ShowUpdateForm(args); }));
+                                thread.CurrentCulture =
+                                    thread.CurrentUICulture = CultureInfo.CurrentCulture;
+                                thread.SetApartmentState(ApartmentState.STA);
+                                thread.Start();
+                                thread.Join();
                             }
-
-                            return true;
                         }
 
-                        if (ReportErrors)
-                        {
-                            MessageBox.Show(Resources.UpdateUnavailableMessage,
-                                Resources.UpdateUnavailableCaption,
-                                MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        }
+                        return true;
                     }
+
+                    if (ReportErrors)
+                    {
+                        MessageBox.Show(Resources.UpdateUnavailableMessage,
+                            Resources.UpdateUnavailableCaption,
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+
                 }
             }
 
@@ -533,7 +529,7 @@ namespace AutoUpdaterDotNET
                     {
                         if (process.CloseMainWindow())
                         {
-                            process.WaitForExit((int) TimeSpan.FromSeconds(10)
+                            process.WaitForExit((int)TimeSpan.FromSeconds(10)
                                 .TotalMilliseconds); //give some time to process message
                         }
 
@@ -571,7 +567,7 @@ namespace AutoUpdaterDotNET
                 return null;
             }
 
-            return (Attribute) attributes[0];
+            return (Attribute)attributes[0];
         }
 
         internal static string GetUserAgent()
@@ -587,7 +583,7 @@ namespace AutoUpdaterDotNET
 
             _remindLaterTimer = new System.Timers.Timer
             {
-                Interval = (int) timeSpan.TotalMilliseconds,
+                Interval = (int)timeSpan.TotalMilliseconds,
                 AutoReset = false
             };
 

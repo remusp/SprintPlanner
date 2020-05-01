@@ -1,7 +1,8 @@
-### Version 0.0.8 (2020-xx-xx)
+### Version 0.0.8 (2020-05-01)
+ * Update notifications
  * MVVM infrastructure refactoring
 
-### Version 0.0.7 (2020-04-xx)
+### Version 0.0.7 (2020-04-13)
  * JIRA Cloud support
 
 ### Version 0.0.6 (2019-11-18)
@@ -20,10 +21,10 @@
  * Application icon
  * Fixed hardcoded links to JIRA 
  * Progress spinner for planning data
- * Optimied sprint data fetching 
- * Fixed board and sprint selection issues in combos
+ * Optimized sprint data fetching 
+ * Fixed some board and sprint selection issues in combos
  * Added story points
- * Logged in user displayed in title bar
+ * Logged-in user displayed in title bar
  * Logout button in title bar
  * Fixed bug causing user data to not be loaded when there is no team configured
  * Switched to tabbed views instead of windows
@@ -46,5 +47,6 @@
    * Light Yellow: Low or high load
    * Light Red: Very high load
  * Added Hyperlinks for story and task
+
 ### Version 0.0.2 (2019-05-14)
  * MVP

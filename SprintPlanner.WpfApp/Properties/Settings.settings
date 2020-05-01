@@ -20,5 +20,8 @@
     <Setting Name="SprintDataFolder" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="AppcastUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://github.com/remusp/SprintPlanner/raw/master/AppCast.xml</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

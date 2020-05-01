@@ -3,7 +3,6 @@ using MahApps.Metro.Controls;
 using SprintPlanner.Core;
 using SprintPlanner.Core.Logic;
 using SprintPlanner.WpfApp.Properties;
-using System;
 using System.IO;
 using System.Windows;
 
@@ -29,9 +28,8 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
         private void MetroWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            AutoUpdater.InstallationPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            AutoUpdater.Start("https://github.com/remusp/SprintPlanner/raw/master_features008/AppCast.xml");
-            //AutoUpdater.Start("https://github.com/remusp/SprintPlanner/raw/master/AppCast.xml");
+            AutoUpdater.Start(Settings.Default.AppcastUrl);
+
             if (_webRequester is CachingHttpRequester cr)
             {
                 try
@@ -47,12 +45,10 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
             Business.Jira = new JiraWrapper(_webRequester) { ServerAddress = Settings.Default.Server };
 
-
             var vm = new MainPlannerWindowViewModel(this);
             vm.Load();
             DataContext = vm;
             vm.EnsureLoggedIn();
-
         }
 
         private void MetroWindow_Closed(object sender, System.EventArgs e)

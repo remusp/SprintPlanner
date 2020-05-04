@@ -10,6 +10,7 @@
 - Support for **JIRA Server** and **JIRA Cloud**
 - Excel reports
 - Installer
+- Update notifications
 ## Get started
 - [Download installer](https://github.com/remusp/SprintPlanner/releases/download/v0.0.8-beta/SprintPlanner.zip)
 - [Quick start](https://github.com/remusp/SprintPlanner/wiki/Quick-Start) 

@@ -16,7 +16,7 @@
 - [Quick start](https://github.com/remusp/SprintPlanner/wiki/Quick-Start) 
 - Useful tips [WIP]
 - [Upcoming features](https://github.com/remusp/SprintPlanner/projects/1)
-- [Known issues](./docs/issues.md)
+- [Known issues](https://github.com/remusp/SprintPlanner/projects/1?card_filter_query=label%3Abug)
 
 ## Version History
 See [Version History](VersionHistory.md)

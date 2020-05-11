@@ -15,7 +15,7 @@
 - [Download installer](https://github.com/remusp/SprintPlanner/releases/download/v0.0.8-beta/SprintPlanner.zip)
 - [Quick start](https://github.com/remusp/SprintPlanner/wiki/Quick-Start) 
 - Useful tips [WIP]
-- [Contributing and upcoming features](./docs/wishlist.md)
+- [Upcoming features](https://github.com/remusp/SprintPlanner/projects/1)
 - [Known issues](./docs/issues.md)
 
 ## Version History

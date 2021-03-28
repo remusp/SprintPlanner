@@ -29,6 +29,7 @@ namespace SprintPlanner.WpfApp.UI.Planning
         public PlanningViewModel(MetroWindow w)
         {
             ReloadCommand = new DelegateCommand(ReloadComandExecute);
+            RefreshSprintsCommand = new DelegateCommand(RefreshSprintsComandExecute);
             SyncLoadCommand = new DelegateCommand(SyncLoadComandExecute);
             ExportCommand = new DelegateCommand(ExportComandExecute);
             SelectedBoardChangedCommand = new DelegateCommand(SelectedBoardChangedComandExecute);
@@ -61,6 +62,9 @@ namespace SprintPlanner.WpfApp.UI.Planning
         public bool IsNotBusy => !IsBusy;
 
         public ICommand ReloadCommand { get; }
+
+        public ICommand RefreshSprintsCommand { get; }
+
 
         public ICommand SelectedBoardChangedCommand { get; }
 
@@ -285,6 +289,48 @@ namespace SprintPlanner.WpfApp.UI.Planning
                 t.Result.Select(b => new Tuple<int, string>(b.Key, b.Value)).ToList().ForEach(i => Boards.Add(i));
                 IsBusy = false;
             }, TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        private void RefreshSprintsComandExecute()
+        {
+            try
+            {
+                int board = -1;
+                var boardTuple = SelectedBoards.FirstOrDefault();
+                if (boardTuple != null)
+                {
+                    board = boardTuple.Item1;
+                }
+
+                if (board >= 0)
+                {
+                    IsBusy = true;
+                    Task.Factory.StartNew(() => Business.Jira.GetOpenSprints(board)).ContinueWith(t =>
+                    {
+                        Business.Data.Sprint.SelectedBoard = board;
+                        if (!t.IsFaulted)
+                        {
+                            Sprints = new ObservableCollection<Tuple<int, string>>(t.Result);
+                            var sprint = Sprints.FirstOrDefault(i => i.Item1 == Business.Data.Sprint.SelectedSprint);
+                            SelectedSprint = sprint ?? Sprints.FirstOrDefault();
+                        }
+                        else
+                        {
+                            _window.ShowMessageAsync("Error fetching open sprints", t.Exception.Flatten().Message + Environment.NewLine + t.Exception.Flatten().StackTrace);
+                        }
+
+                        IsBusy = false;
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                }
+                else
+                {
+                    _window.ShowMessageAsync("Error fetching open sprints", "Invalid board");
+                }
+            }
+            catch (Exception ex)
+            {
+                _window.ShowMessageAsync("Error fetching open sprints", ex.Message + Environment.NewLine + ex.StackTrace);
+            }
         }
 
         private void SelectedBoardChangedComandExecute()

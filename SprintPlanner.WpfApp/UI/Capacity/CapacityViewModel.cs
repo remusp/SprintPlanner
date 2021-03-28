@@ -20,7 +20,8 @@ namespace SprintPlanner.WpfApp.UI.Capacity
 
         public CapacityViewModel(MetroWindow w)
         {
-            RefreshCommand = new DelegateCommand(RefreshCommandExecute);
+            AddAllInCurrentSprintCommand = new DelegateCommand(AddAllInCurrentSprintCommandExecute);
+            AddFromComboSprintCommand = new DelegateCommand(AddFromComboSprintCommandExecute);
             Users = new ObservableCollection<UserDetails>();
             CapacityFactor = 1;
             _window = w;
@@ -51,13 +52,27 @@ namespace SprintPlanner.WpfApp.UI.Capacity
             set { Set(() => IsBusy, value); }
         }
 
-        public ICommand RefreshCommand { get; private set; }
+        public List<Tuple<int, string>> Sprints
+        {
+            get { return Get(() => Sprints); }
+            set { Set(() => Sprints, value); }
+        }
 
         public ObservableCollection<UserDetails> Users
         {
             get { return Get(() => Users); }
             set { Set(() => Users, value); }
         }
+
+        public Tuple<int, string> SelectedSprint
+        {
+            get { return Get(() => SelectedSprint); }
+            set { Set(() => SelectedSprint, value); }
+        }
+
+        public ICommand AddAllInCurrentSprintCommand { get; private set; }
+
+        public ICommand AddFromComboSprintCommand { get; private set; }
 
         public void Flush()
         {
@@ -77,6 +92,11 @@ namespace SprintPlanner.WpfApp.UI.Capacity
             CapacityFactor = Business.Data.Capacity.CapacityFactor;
 
             _sprintId = Business.Data.Sprint.SelectedSprint;
+
+            if (Business.Data?.Sprint?.Sprints != null)
+            {
+                Sprints = new List<Tuple<int, string>>(Business.Data.Sprint.Sprints);
+            }
         }
 
         private void CapacityWindowViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -101,26 +121,39 @@ namespace SprintPlanner.WpfApp.UI.Capacity
             }
         }
 
-        private void RefreshCommandExecute()
+        private void AddAllInCurrentSprintCommandExecute()
+        {
+            AddAssigneesFromSprint(_sprintId);
+        }
+
+        private void AddFromComboSprintCommandExecute()
+        {
+            AddAssigneesFromSprint(SelectedSprint.Item1);
+        }
+
+        private void AddAssigneesFromSprint(int sprintId)
         {
             IsBusy = true;
             BusyReason = "Fetching users...";
-            Users.Clear();
-            Task<List<Assignee>>.Factory.StartNew(() => Business.Jira.GetAllAssigneesInSprint(_sprintId)).ContinueWith((t) =>
+            Task<List<Assignee>>.Factory.StartNew(() => Business.Jira.GetAllAssigneesInSprint(sprintId)).ContinueWith((t) =>
             {
                 try
                 {
                     if (!t.IsFaulted)
                     {
+                        var existingUsers = Users.Select(u => u.Uid).ToList();
                         foreach (var assignee in t.Result)
                         {
-                            Users.Add(new UserDetails(new UserDetailsModel
+                            if (!existingUsers.Contains(assignee.name))
                             {
-                                Uid = assignee.name,
-                                UserName = assignee.displayName,
-                                DaysInSprint = DaysInSprint,
-                                CapacityFactor = CapacityFactor
-                            }));
+                                Users.Add(new UserDetails(new UserDetailsModel
+                                {
+                                    Uid = assignee.name,
+                                    UserName = assignee.displayName,
+                                    DaysInSprint = DaysInSprint,
+                                    CapacityFactor = CapacityFactor
+                                }));
+                            }
                         }
                     }
                     else

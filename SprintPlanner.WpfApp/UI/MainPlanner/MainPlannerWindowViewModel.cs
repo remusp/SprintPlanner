@@ -7,6 +7,7 @@ using SprintPlanner.WpfApp.UI.About;
 using SprintPlanner.WpfApp.UI.Capacity;
 using SprintPlanner.WpfApp.UI.Login;
 using SprintPlanner.WpfApp.UI.Planning;
+using SprintPlanner.WpfApp.UI.Servers;
 using SprintPlanner.WpfApp.UI.SettingsUI;
 using System;
 using System.Diagnostics;
@@ -29,6 +30,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         private readonly LoginViewModel _loginViewModel;
         private readonly PlanningViewModel _planningViewModel;
         private readonly SettingsViewModel _settingsViewModel;
+        private readonly ServersViewModel _serversViewModel;
 
         private readonly MetroWindow _window;
 
@@ -39,6 +41,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             CapacityViewCommand = new DelegateCommand(() => SetView(_capacityViewModel));
             AboutViewCommand = new DelegateCommand(() => SetView(_aboutViewModel));
             SettingsViewCommand = new DelegateCommand(() => SetView(_settingsViewModel));
+            ServersViewCommand = new DelegateCommand(() => SetView(_serversViewModel));
             PlanningViewCommand = new DelegateCommand(() => SetView(_planningViewModel));
             LoginViewCommand = new DelegateCommand(() => SetView(_loginViewModel));
             LogoutCommand = new DelegateCommand(LogoutExecute);
@@ -48,6 +51,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             _planningViewModel = new PlanningViewModel(w);
             _capacityViewModel = new CapacityViewModel(w);
             _settingsViewModel = new SettingsViewModel();
+            _serversViewModel = new ServersViewModel();
             _loginViewModel = new LoginViewModel(w);
             _loginViewModel.LoginSucceeded += LoginSucceededHandler;
             var assembly = Assembly.GetExecutingAssembly();
@@ -96,7 +100,10 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         }
 
         public ICommand PlanningViewCommand { get; }
+
         public ICommand SettingsViewCommand { get; }
+
+        public ICommand ServersViewCommand { get; }
 
         public void EnsureLoggedIn()
         {

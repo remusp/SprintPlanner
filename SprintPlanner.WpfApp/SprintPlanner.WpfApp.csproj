@@ -70,6 +70,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DesignTime\DesignData.cs" />
     <Compile Include="Infrastructure\IHavePassword.cs" />
     <Compile Include="IStorageManipulator.cs" />
     <Compile Include="UI\About\AboutView.xaml.cs">
@@ -77,6 +78,7 @@
     </Compile>
     <Compile Include="UI\About\AboutViewModel.cs" />
     <Compile Include="UI\Capacity\CapacityViewModel.cs" />
+    <Compile Include="UI\Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="UI\Login\LoginView.xaml.cs">
       <DependentUpon>LoginView.xaml</DependentUpon>
     </Compile>
@@ -100,6 +102,14 @@
       <DependentUpon>PlanningView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Planning\PlanningViewModel.cs" />
+    <Compile Include="UI\Servers\ServerItemView.xaml.cs">
+      <DependentUpon>ServerItemView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Servers\ServerItemViewModel.cs" />
+    <Compile Include="UI\Servers\ServersView.xaml.cs">
+      <DependentUpon>ServersView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Servers\ServersViewModel.cs" />
     <Compile Include="UI\SettingsUI\SettingsView.xaml.cs">
       <DependentUpon>SettingsView.xaml</DependentUpon>
     </Compile>
@@ -143,6 +153,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Planning\PlanningView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Servers\ServerItemView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Servers\ServersView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -201,5 +219,6 @@
   <ItemGroup>
     <Resource Include="AppIcon.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

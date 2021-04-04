@@ -10,6 +10,7 @@
                 xmlns:lg="clr-namespace:SprintPlanner.WpfApp.UI.Login"
                 xmlns:ab="clr-namespace:SprintPlanner.WpfApp.UI.About"
                 xmlns:sui="clr-namespace:SprintPlanner.WpfApp.UI.SettingsUI"
+                xmlns:sv="clr-namespace:SprintPlanner.WpfApp.UI.Servers"
                 mc:Ignorable="d"
                 Title="Sprint Planner"
                 Loaded="MetroWindow_Loaded"
@@ -88,6 +89,9 @@
                     <mh:HamburgerMenuIconItem Icon="{ip:Octicons Kind=SignIn, Width=48, Height=48}"
                                               Command="{Binding LoginViewCommand}"
                                               Label="Login" />
+                    <mh:HamburgerMenuIconItem Icon="{ip:FontAwesome Kind=ServerSolid, Width=48, Height=48}"
+                                              Command="{Binding ServersViewCommand}"
+                                              Label="Servers" />
                     <mh:HamburgerMenuIconItem Icon="{ip:Material Kind=Settings, Width=48, Height=48}"
                                               Command="{Binding SettingsViewCommand}"
                                               Label="Settings" />
@@ -125,6 +129,9 @@
                     <DataTemplate DataType="{x:Type sui:SettingsViewModel}">
                         <sui:SettingsView HorizontalAlignment="Left"
                                           VerticalAlignment="Top"/>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type sv:ServersViewModel}">
+                        <sv:ServersView />
                     </DataTemplate>
                 </ResourceDictionary>
             </ContentControl.Resources>

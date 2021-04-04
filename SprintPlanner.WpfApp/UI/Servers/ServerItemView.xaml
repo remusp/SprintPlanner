@@ -5,9 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:SprintPlanner.WpfApp.UI.Servers"
              xmlns:cnv="clr-namespace:SprintPlanner.WpfApp.UI.Converters"
-             xmlns:dsgn="clr-namespace:SprintPlanner.WpfApp.DesignTime"
+             xmlns:dt="clr-namespace:SprintPlanner.WpfApp.DesignTime"
              mc:Ignorable="d"
-             d:DataContext="{x:Static dsgn:DesignData.ServerItemViewModelDesign}">
+             d:DataContext="{x:Static dt:DesignData.ServerItemViewModelDesign}">
     <UserControl.Resources>
         <cnv:BoolToVisibilityConverter x:Key="btv"
                                        FalseValue="Hidden" />

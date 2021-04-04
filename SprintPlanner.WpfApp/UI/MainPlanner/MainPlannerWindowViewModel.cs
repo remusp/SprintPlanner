@@ -6,6 +6,7 @@ using SprintPlanner.WpfApp.UI.About;
 using SprintPlanner.WpfApp.UI.Capacity;
 using SprintPlanner.WpfApp.UI.Login;
 using SprintPlanner.WpfApp.UI.Planning;
+using SprintPlanner.WpfApp.UI.Servers;
 using SprintPlanner.WpfApp.UI.SettingsUI;
 using SprintPlanner.WpfApp.UI.SprintCrud;
 using SprintPlanner.WpfApp.UI.Stats;
@@ -32,6 +33,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         private readonly PlanningViewModel _planningViewModel;
         private readonly SettingsViewModel _settingsViewModel;
         private readonly SprintCrudViewModel _sprintCrudViewModel;
+        private readonly ServersViewModel _serversViewModel;
 
         private readonly MetroWindow _window;
 
@@ -43,6 +45,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             StatsViewCommand = new DelegateCommand(() => SetView(_statsViewModel));
             AboutViewCommand = new DelegateCommand(() => SetView(_aboutViewModel));
             SettingsViewCommand = new DelegateCommand(() => SetView(_settingsViewModel));
+            ServersViewCommand = new DelegateCommand(() => SetView(_serversViewModel));
             PlanningViewCommand = new DelegateCommand(() => SetView(_planningViewModel));
             LoginViewCommand = new DelegateCommand(() => SetView(_loginViewModel));
             SprintCrudViewCommand = new DelegateCommand(() => SetView(_sprintCrudViewModel));
@@ -56,6 +59,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             _settingsViewModel = new SettingsViewModel();
             _sprintCrudViewModel = new SprintCrudViewModel(w, PlanningViewCommand);
 
+            _serversViewModel = new ServersViewModel();
             _loginViewModel = new LoginViewModel(w);
             _loginViewModel.LoginSucceeded += LoginSucceededHandler;
             var assembly = Assembly.GetExecutingAssembly();
@@ -102,8 +106,11 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         public ICommand LoginViewCommand { get; }
         public ICommand LogoutCommand { get; }
         public ICommand PlanningViewCommand { get; }
+
         public ICommand SettingsViewCommand { get; }
         public ICommand SprintCrudViewCommand { get; }
+
+        public ICommand ServersViewCommand { get; }
 
         public void EnsureLoggedIn()
         {

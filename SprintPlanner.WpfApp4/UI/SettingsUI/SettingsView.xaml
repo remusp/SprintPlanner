@@ -1,0 +1,50 @@
+﻿<UserControl x:Class="SprintPlanner.WpfApp.UI.SettingsUI.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="450"
+             d:DesignWidth="550"
+             Width="550">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <!--Server address-->
+        <TextBlock Text="Server Address"
+                   Style="{StaticResource TextBlockStyle}"/>
+        <TextBox Text="{Binding ServerAddress}"
+                 Style="{StaticResource TextBoxStyle}"
+                 Grid.Column="1" />
+        <!--Story points-->
+        <TextBlock Text="Story points field"
+                   Style="{StaticResource TextBlockStyle}"
+                   Grid.Row="1" />
+        <TextBox Text="{Binding StoryPointsField}"
+                 Style="{StaticResource TextBoxStyle}"
+                 Grid.Row="1"
+                 Grid.Column="1" />
+        <!--Sprint data path-->
+        <TextBlock Text="Sprint data path"
+                   Style="{StaticResource TextBlockStyle}"
+                   Grid.Row="2"/>
+        <TextBox Text="{Binding SprintDataPath}"
+                 Style="{StaticResource TextBoxStyle}"
+                 Grid.Row="2"
+                 Grid.Column="1" />
+        <Button Content="..."
+                Style="{StaticResource ButtonStyle}"
+                Command="{Binding BrowseCommand}"
+                Grid.Row="2"
+                Grid.Column="2"/>
+
+    </Grid>
+</UserControl>

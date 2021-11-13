@@ -1,13 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="ExcelLibrary" Version="1.2011.7.31" />
-    <PackageReference Include="morelinq" Version="3.3.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
 </Project>

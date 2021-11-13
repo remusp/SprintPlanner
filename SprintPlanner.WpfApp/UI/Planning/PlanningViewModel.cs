@@ -6,7 +6,6 @@ using SprintPlanner.Core;
 using SprintPlanner.Core.Logic;
 using SprintPlanner.Core.Reporting;
 using SprintPlanner.FrameworkWPF;
-using SprintPlanner.WpfApp.Properties;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

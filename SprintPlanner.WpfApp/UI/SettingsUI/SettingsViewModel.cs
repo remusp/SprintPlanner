@@ -1,6 +1,5 @@
 ﻿using Microsoft.Win32;
 using SprintPlanner.FrameworkWPF;
-using SprintPlanner.WpfApp.Properties;
 using System.IO;
 using System.Windows.Input;
 

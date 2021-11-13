@@ -1,0 +1,133 @@
+﻿<mh:MetroWindow x:Class="SprintPlanner.WpfApp.UI.MainPlanner.MainPlannerWindow"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:mh="http://metro.mahapps.com/winfx/xaml/controls"
+                xmlns:ip="http://metro.mahapps.com/winfx/xaml/iconpacks"
+                xmlns:plan="clr-namespace:SprintPlanner.WpfApp.UI.Planning"
+                xmlns:cp="clr-namespace:SprintPlanner.WpfApp.UI.Capacity"
+                xmlns:lg="clr-namespace:SprintPlanner.WpfApp.UI.Login"
+                xmlns:ab="clr-namespace:SprintPlanner.WpfApp.UI.About"
+                xmlns:sui="clr-namespace:SprintPlanner.WpfApp.UI.SettingsUI"
+                mc:Ignorable="d"
+                Title="Sprint Planner"
+                Loaded="MetroWindow_Loaded"
+                Closed="MetroWindow_Closed"
+                d:DesignHeight="450"
+                d:DesignWidth="800">
+    <Window.Resources>
+        <ResourceDictionary>
+            <Style TargetType="{x:Type mh:HamburgerMenu}"
+                   x:Key="DefaultHamburgerStyle">
+                <Setter Property="OpenPaneLength"
+                        Value="200" />
+                <Style.Triggers>
+                    <Trigger Property="IsPaneOpen"
+                             Value="False">
+                        <Setter Property="OpenPaneLength"
+                                Value="64" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <DataTemplate x:Key="MenuItemTemplate">
+                <DockPanel Height="64"
+                           LastChildFill="True">
+                    <Grid Width="64"
+                          DockPanel.Dock="Left">
+                        <ContentControl Grid.Column="0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Content="{Binding Icon}"
+                                        Focusable="False"
+                                        IsTabStop="False" />
+                    </Grid>
+                    <TextBlock VerticalAlignment="Center"
+                               FontSize="16"
+                               Text="{Binding Label}" />
+                </DockPanel>
+            </DataTemplate>
+        </ResourceDictionary>
+    </Window.Resources>
+    <mh:MetroWindow.RightWindowCommands>
+        <mh:WindowCommands>
+            <Image Source="{Binding LoggedInUserPictureData}" />
+            <Button Content="Logout"
+                    Visibility="{Binding LogoutVisibility}"
+                    Command="{Binding LogoutCommand}" />
+        </mh:WindowCommands>
+    </mh:MetroWindow.RightWindowCommands>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <mh:HamburgerMenu DisplayMode="CompactOverlay"
+                          HamburgerWidth="64"
+                          CompactPaneLength="64"
+                          PanePlacement="Left"
+                          ItemTemplate="{StaticResource MenuItemTemplate}"
+                          OptionsItemTemplate="{StaticResource MenuItemTemplate}"
+                          Grid.Column="0">
+            <mh:HamburgerMenu.ItemsSource>
+                <mh:HamburgerMenuItemCollection>
+                    <mh:HamburgerMenuIconItem Icon="{ip:Entypo Kind=PaperPlane, Width=48, Height=48}"
+                                              Command="{Binding PlanningViewCommand}"
+                                              IsEnabled="{Binding IsEnabledPlanning}"
+                                              Label="Planning" />
+                    <mh:HamburgerMenuIconItem Icon="{ip:Modern Kind=ScaleUnbalanced, Width=48, Height=48}"
+                                              Command="{Binding CapacityViewCommand}"
+                                              IsEnabled="{Binding IsEnabledCapacity}"
+                                              Label="Team Capacity" />
+                </mh:HamburgerMenuItemCollection>
+
+            </mh:HamburgerMenu.ItemsSource>
+            <mh:HamburgerMenu.OptionsItemsSource>
+                <mh:HamburgerMenuItemCollection>
+
+                    <mh:HamburgerMenuIconItem Icon="{ip:Octicons Kind=SignIn, Width=48, Height=48}"
+                                              Command="{Binding LoginViewCommand}"
+                                              Label="Login" />
+                    <mh:HamburgerMenuIconItem Icon="{ip:Material Kind=Settings, Width=48, Height=48}"
+                                              Command="{Binding SettingsViewCommand}"
+                                              Label="Settings" />
+                    <mh:HamburgerMenuIconItem Icon="{ip:Material Kind=Information, Width=48, Height=48}"
+                                              Command="{Binding AboutViewCommand}"
+                                              Label="About" />
+                </mh:HamburgerMenuItemCollection>
+            </mh:HamburgerMenu.OptionsItemsSource>
+            <mh:HamburgerMenu.Style>
+                <Style TargetType="{x:Type mh:HamburgerMenu}"
+                       BasedOn="{StaticResource DefaultHamburgerStyle}">
+                    <Setter Property="OpenPaneLength"
+                            Value="200" />
+                </Style>
+            </mh:HamburgerMenu.Style>
+
+        </mh:HamburgerMenu>
+        <ContentControl Grid.Column="1"
+                        Content="{Binding MainViewModel}">
+            <ContentControl.Resources>
+                <ResourceDictionary>
+                    <DataTemplate DataType="{x:Type plan:PlanningViewModel}">
+                        <plan:PlanningView />
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type cp:CapacityViewModel}">
+                        <cp:CapacityView HorizontalAlignment="Left" />
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type lg:LoginViewModel}">
+                        <lg:LoginView HorizontalAlignment="Left"
+                                      VerticalAlignment="Top" />
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type ab:AboutViewModel}">
+                        <ab:AboutView />
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type sui:SettingsViewModel}">
+                        <sui:SettingsView HorizontalAlignment="Left"
+                                          VerticalAlignment="Top"/>
+                    </DataTemplate>
+                </ResourceDictionary>
+            </ContentControl.Resources>
+        </ContentControl>
+    </Grid>
+</mh:MetroWindow>

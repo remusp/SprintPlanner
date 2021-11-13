@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using SprintPlanner.Core.Logic;
 using SprintPlanner.FrameworkWPF;
-using SprintPlanner.WpfApp.Properties;
 using SprintPlanner.WpfApp.UI.About;
 using SprintPlanner.WpfApp.UI.Capacity;
 using SprintPlanner.WpfApp.UI.Login;

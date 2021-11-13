@@ -1,0 +1,106 @@
+﻿<UserControl x:Class="SprintPlanner.WpfApp.UI.Capacity.CapacityView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:mh="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             mc:Ignorable="d"
+             d:DesignHeight="450"
+             d:DesignWidth="800"
+             MinWidth="200"
+             MinHeight="200"
+             Width="670">
+    <UserControl.InputBindings>
+        <KeyBinding Key="F5"
+                    Command="{Binding RefreshCommand}" />
+    </UserControl.InputBindings>
+
+    <Grid Style="{StaticResource LayoutGrid}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Text="Days in sprint"
+                   VerticalAlignment="Center"
+                   Style="{StaticResource TextBlockStyle}" />
+        <mh:NumericUpDown Value="{Binding DaysInSprint}"
+                          Style="{StaticResource UpDownStyle}"
+                          Minimum="0"
+                          Grid.Row="0"
+                          Grid.Column="1" />
+        <Button Content="Refresh (F5)"
+                Style="{StaticResource ButtonStyle}"
+                Command="{Binding RefreshCommand}"
+                Grid.Row="0"
+                Grid.Column="2" />
+        <TextBlock Text="Target availability [%]"
+                   Style="{StaticResource TextBlockStyle}"
+                   VerticalAlignment="Center"
+                   Grid.Row="1" />
+        <mh:NumericUpDown Value="{Binding CapacityFactor}"
+                          Style="{StaticResource UpDownStyle}"
+                          Minimum="0"
+                          Maximum="100"
+                          Grid.Row="1"
+                          Grid.Column="1" />
+        <DataGrid AutoGenerateColumns="False"
+                  ItemsSource="{Binding Users}"
+                  CanUserAddRows="False"
+                  Grid.Row="2"
+                  Grid.Column="0"
+                  Grid.ColumnSpan="3">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Name"
+                                    Binding="{Binding UserName}" />
+                <DataGridTemplateColumn Header="Hours/Day">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <mh:NumericUpDown Value="{Binding HoursPerDay, UpdateSourceTrigger=PropertyChanged}"
+                                              Interval="0.1"
+                                              Minimum="0" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Days off">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <mh:NumericUpDown Value="{Binding DaysOff, UpdateSourceTrigger=PropertyChanged}"
+                                              Minimum="0" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="100% Availability (h)">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <mh:NumericUpDown Value="{Binding Capacity,  Mode=OneWay}"
+                                              Minimum="0"
+                                              IsReadOnly="True"
+                                              HideUpDownButtons="True" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Target Availability (h)">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <mh:NumericUpDown Value="{Binding ScaledCapacity,  Mode=OneWay}"
+                                              Minimum="0"
+                                              IsReadOnly="True"
+                                              HideUpDownButtons="True" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <mh:ProgressRing Grid.RowSpan="3"
+                         Grid.ColumnSpan="3"
+                         VerticalAlignment="Center"
+                         Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}" />
+    </Grid>
+</UserControl>

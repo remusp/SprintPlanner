@@ -6,6 +6,11 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>AppIcon.ico</ApplicationIcon>
+    <Configurations>Debug;Release;Debug OFFLINE</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug OFFLINE|AnyCPU'">
+    <DefineConstants>$(DefineConstants)TRACE;OFFLINE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

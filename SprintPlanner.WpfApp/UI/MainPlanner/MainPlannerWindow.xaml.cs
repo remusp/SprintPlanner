@@ -1,7 +1,8 @@
-﻿//using AutoUpdaterDotNET;
+﻿using AutoUpdaterDotNET;
 using MahApps.Metro.Controls;
 using SprintPlanner.Core;
 using SprintPlanner.Core.Logic;
+using UtilsSpecialFolder = SprintPlanner.WpfApp.Utils.SpecialFolder;
 using System.IO;
 using System.Windows;
 
@@ -27,7 +28,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
         private void MetroWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            // AutoUpdater.Start(Settings.Default.AppcastUrl);
+            AutoUpdater.Start(Settings.Default.AppcastUrl);
 
             if (_webRequester is CachingHttpRequester cr)
             {

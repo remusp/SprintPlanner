@@ -1,3 +1,6 @@
+### Version 0.0.9 (2021-03-28)
+ * Refresh button for sprint list
+
 ### Version 0.0.8 (2020-05-01)
  * Update notifications
  * MVVM infrastructure refactoring

@@ -30,6 +30,7 @@
                     <ColumnDefinition />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Board"
                            VerticalAlignment="Center"
@@ -66,6 +67,11 @@
                           VerticalAlignment="Stretch"
                           Grid.Column="3"
                           Style="{StaticResource ComboStyle}" />
+                <Button Grid.Column="4"
+                        Content="{ip:Material Kind=Refresh}"
+                        Padding="10, 2"
+                        Style="{StaticResource ButtonStyle}"
+                        Command="{Binding RefreshSprintsCommand}" />
             </Grid>
 
             <ScrollViewer PreviewMouseWheel="ListBox_PreviewMouseWheel"

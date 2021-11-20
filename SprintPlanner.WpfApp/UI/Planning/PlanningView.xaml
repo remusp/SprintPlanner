@@ -137,8 +137,8 @@
                           HamburgerWidth="64"
                           CompactPaneLength="64"
                           PanePlacement="Right"
-                          PaneBackground="{StaticResource WhiteBrush}"
-                          PaneForeground="{StaticResource TextBrush}"
+                          PaneBackground="{StaticResource MahApps.Brushes.ThemeBackground}"
+                          PaneForeground="{StaticResource MahApps.Brushes.Text}"
                           Style="{DynamicResource DefaultHamburgerStyle}"
                           Grid.Column="1">
             <mh:HamburgerMenu.ItemsSource>

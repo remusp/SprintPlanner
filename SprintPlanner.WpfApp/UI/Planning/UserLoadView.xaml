@@ -16,7 +16,7 @@
             <Style TargetType="Expander"
                    BasedOn="{StaticResource {x:Type Expander}}">
                 <Setter Property="Background"
-                        Value="{StaticResource AccentColorBrush4}" />
+                        Value="{StaticResource MahApps.Brushes.Accent4}" />
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding Status}"
                                  Value="{x:Static l:UserStatus.External}">
@@ -126,7 +126,7 @@
                   CanUserAddRows="False">
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow"
-                       BasedOn="{StaticResource MetroDataGridRow}">
+                       BasedOn="{StaticResource MahApps.Styles.DataGridRow}">
                     <Setter Property="ContextMenu">
                         <Setter.Value>
                             <ContextMenu ItemsSource="{Binding Assignables}">

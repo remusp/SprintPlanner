@@ -39,7 +39,7 @@
                      mh:TextBoxHelper.ClearTextButton="True"
                      Grid.Row="1"
                      Grid.Column="1"
-                     Style="{StaticResource MetroButtonRevealedPasswordBox}" />
+                     Style="{StaticResource MahApps.Styles.PasswordBox.Button.Revealed}" />
         <CheckBox Content="Keep me logged in"
                   Margin="5"
                   IsChecked="{Binding StoreCredentials}"

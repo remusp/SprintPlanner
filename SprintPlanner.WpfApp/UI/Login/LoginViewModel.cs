@@ -4,7 +4,6 @@ using SprintPlanner.Core.Extensions;
 using SprintPlanner.Core.Logic;
 using SprintPlanner.FrameworkWPF;
 using SprintPlanner.WpfApp.Infrastructure;
-using SprintPlanner.WpfApp.Properties;
 using System;
 using System.Windows.Input;
 

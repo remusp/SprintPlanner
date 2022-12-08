@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="ExcelLibrary" Version="1.2011.7.31" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
   </ItemGroup>
 
 </Project>

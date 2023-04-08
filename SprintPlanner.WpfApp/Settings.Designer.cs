@@ -12,7 +12,7 @@ namespace SprintPlanner.WpfApp {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.0.3.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.5.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -104,6 +104,42 @@ namespace SprintPlanner.WpfApp {
             }
             set {
                 this["AppcastUrl"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("6")]
+        public string STATUS_DONE {
+            get {
+                return ((string)(this["STATUS_DONE"]));
+            }
+            set {
+                this["STATUS_DONE"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("12")]
+        public string ISSUETYPE_DEV {
+            get {
+                return ((string)(this["ISSUETYPE_DEV"]));
+            }
+            set {
+                this["ISSUETYPE_DEV"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("13")]
+        public string ISSUETYPE_QA {
+            get {
+                return ((string)(this["ISSUETYPE_QA"]));
+            }
+            set {
+                this["ISSUETYPE_QA"] = value;
             }
         }
     }

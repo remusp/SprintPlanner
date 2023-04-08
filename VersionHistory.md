@@ -1,3 +1,8 @@
+### Version 0.0.10 (2023-04-08)
+ * Moved to .NET 6
+ * Added plan statistics view
+ * Fixed TLDR Legal link (broken due to framework update)
+
 ### Version 0.0.9 (2021-03-28)
  * Refresh button for sprint list
 

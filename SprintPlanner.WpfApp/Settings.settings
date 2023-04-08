@@ -23,5 +23,14 @@
     <Setting Name="AppcastUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)">https://github.com/remusp/SprintPlanner/raw/master/AppCast.xml</Value>
     </Setting>
+    <Setting Name="STATUS_DONE" Type="System.String" Scope="User">
+      <Value Profile="(Default)">6</Value>
+    </Setting>
+    <Setting Name="ISSUETYPE_DEV" Type="System.String" Scope="User">
+      <Value Profile="(Default)">12</Value>
+    </Setting>
+    <Setting Name="ISSUETYPE_QA" Type="System.String" Scope="User">
+      <Value Profile="(Default)">13</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

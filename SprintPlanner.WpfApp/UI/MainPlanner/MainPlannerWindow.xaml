@@ -9,12 +9,13 @@
                 xmlns:cp="clr-namespace:SprintPlanner.WpfApp.UI.Capacity"
                 xmlns:lg="clr-namespace:SprintPlanner.WpfApp.UI.Login"
                 xmlns:ab="clr-namespace:SprintPlanner.WpfApp.UI.About"
+                xmlns:st="clr-namespace:SprintPlanner.WpfApp.UI.Stats"
                 xmlns:sui="clr-namespace:SprintPlanner.WpfApp.UI.SettingsUI"
                 mc:Ignorable="d"
                 Title="Sprint Planner"
                 Loaded="MetroWindow_Loaded"
                 Closed="MetroWindow_Closed"
-                d:DesignHeight="450"
+                d:DesignHeight="500"
                 d:DesignWidth="800">
     <Window.Resources>
         <ResourceDictionary>
@@ -79,6 +80,10 @@
                                               Command="{Binding CapacityViewCommand}"
                                               IsEnabled="{Binding IsEnabledCapacity}"
                                               Label="Team Capacity" />
+                    <mh:HamburgerMenuIconItem Icon="{ip:Entypo Kind=BarGraph, Width=48, Height=48}"
+                                              Command="{Binding StatsViewCommand}"
+                                              IsEnabled="{Binding IsEnabledPlanning}"
+                                              Label="Team Capacity" />
                 </mh:HamburgerMenuItemCollection>
 
             </mh:HamburgerMenu.ItemsSource>
@@ -114,6 +119,9 @@
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type cp:CapacityViewModel}">
                         <cp:CapacityView HorizontalAlignment="Left" />
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type st:StatsViewModel}">
+                        <st:StatsView />
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type lg:LoginViewModel}">
                         <lg:LoginView HorizontalAlignment="Left"

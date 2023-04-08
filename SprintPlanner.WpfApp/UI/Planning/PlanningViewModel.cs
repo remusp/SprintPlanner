@@ -20,7 +20,6 @@ namespace SprintPlanner.WpfApp.UI.Planning
 {
     public class PlanningViewModel : ViewModelBase, IStorageManipulator
     {
-        private const string STATUS_DONE = "6";
         private readonly ReportGenerator _reportGenerator;
         private readonly MetroWindow _window;
         private bool _initializing;
@@ -402,11 +401,12 @@ namespace SprintPlanner.WpfApp.UI.Planning
                 var customFields = new List<string> { Settings.Default.StoryPointsField };
 
                 var extendedIssues = Business.Jira.GetAllIssuesInSprint(SelectedSprint.Item1, mandatoryFields, customFields);
+                Business.Data.Sprint.Issues = extendedIssues.Item1;
                 var allIssues = extendedIssues.Item1;
                 query1.Stop();
                 Debug.WriteLine($"Query 1: {query1.Elapsed}");
 
-                var openIssues = allIssues.Where(i => i.fields.status.id != STATUS_DONE);
+                var openIssues = allIssues.Where(i => i.fields.status.id != Settings.Default.STATUS_DONE);
 
                 var openAssignedIssues = openIssues.Where(i => i.fields.assignee != null);
                 var openIssueKeys = openIssues.Select(i => i.key);

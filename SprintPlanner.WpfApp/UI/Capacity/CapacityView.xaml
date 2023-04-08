@@ -4,6 +4,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:mh="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             xmlns:core="clr-namespace:System;assembly=mscorlib"
+             xmlns:b="clr-namespace:SprintPlanner.Core.Logic;assembly=SprintPlanner.Core"
              mc:Ignorable="d"
              d:DesignHeight="450"
              d:DesignWidth="800"
@@ -56,6 +58,15 @@
                   Grid.Row="2"
                   Grid.Column="0"
                   Grid.ColumnSpan="3">
+            <DataGrid.Resources>
+                <ObjectDataProvider x:Key="RoleEnum"
+                                    MethodName="GetValues"
+                                    ObjectType="{x:Type core:Enum}">
+                    <ObjectDataProvider.MethodParameters>
+                        <x:Type Type="b:Role" />
+                    </ObjectDataProvider.MethodParameters>
+                </ObjectDataProvider>
+            </DataGrid.Resources>
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Name"
                                     Binding="{Binding UserName}" />
@@ -96,6 +107,10 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+                <DataGridComboBoxColumn Header="Role"
+                                        ItemsSource="{Binding Source={StaticResource RoleEnum}}"
+                                        SelectedItemBinding="{Binding Role}">
+                </DataGridComboBoxColumn>
             </DataGrid.Columns>
         </DataGrid>
         <mh:ProgressRing Grid.RowSpan="3"

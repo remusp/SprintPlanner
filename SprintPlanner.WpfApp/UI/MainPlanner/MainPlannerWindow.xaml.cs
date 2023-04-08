@@ -2,7 +2,6 @@
 using MahApps.Metro.Controls;
 using SprintPlanner.Core;
 using SprintPlanner.Core.Logic;
-using UtilsSpecialFolder = SprintPlanner.WpfApp.Utils.SpecialFolder;
 using System.IO;
 using System.Windows;
 

@@ -1,4 +1,5 @@
 ﻿//using AutoUpdaterDotNET;
+using AutoUpdaterDotNET;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using SprintPlanner.FrameworkWPF;
@@ -31,19 +32,18 @@ namespace SprintPlanner.WpfApp.UI.About
 
         private void CheckUpdatesCommandExecute()
         {
-            //AutoUpdater.CheckForUpdateEvent += AutoUpdater_CheckForUpdateEvent;
-            //AutoUpdater.Start(Settings.Default.AppcastUrl);
+            AutoUpdater.CheckForUpdateEvent += AutoUpdater_CheckForUpdateEvent;
+            AutoUpdater.Start(Settings.Default.AppcastUrl);
         }
 
-        //private void AutoUpdater_CheckForUpdateEvent(UpdateInfoEventArgs args)
-        //{
-        //    if (!args.IsUpdateAvailable)
-        //    {
-        //        _window.ShowMessageAsync("Application is up to date", "Already at latest version");
-        //    }
+        private void AutoUpdater_CheckForUpdateEvent(UpdateInfoEventArgs args)
+        {
+            if (!args.IsUpdateAvailable)
+            {
+                _window.ShowMessageAsync("Application is up to date", "Already at latest version");
+            }
 
-        //    AutoUpdater.CheckForUpdateEvent -= AutoUpdater_CheckForUpdateEvent;
-
-        //}
+            AutoUpdater.CheckForUpdateEvent -= AutoUpdater_CheckForUpdateEvent;
+        }
     }
 }

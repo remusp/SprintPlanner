@@ -7,6 +7,7 @@ using SprintPlanner.WpfApp.UI.Capacity;
 using SprintPlanner.WpfApp.UI.Login;
 using SprintPlanner.WpfApp.UI.Planning;
 using SprintPlanner.WpfApp.UI.SettingsUI;
+using SprintPlanner.WpfApp.UI.Stats;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -25,6 +26,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
         private readonly AboutViewModel _aboutViewModel;
         private readonly CapacityViewModel _capacityViewModel;
+        private readonly StatsViewModel _statsViewModel;
         private readonly LoginViewModel _loginViewModel;
         private readonly PlanningViewModel _planningViewModel;
         private readonly SettingsViewModel _settingsViewModel;
@@ -36,6 +38,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             _window = w;
 
             CapacityViewCommand = new DelegateCommand(() => SetView(_capacityViewModel));
+            StatsViewCommand = new DelegateCommand(() => SetView(_statsViewModel));
             AboutViewCommand = new DelegateCommand(() => SetView(_aboutViewModel));
             SettingsViewCommand = new DelegateCommand(() => SetView(_settingsViewModel));
             PlanningViewCommand = new DelegateCommand(() => SetView(_planningViewModel));
@@ -46,6 +49,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
             _planningViewModel = new PlanningViewModel(w);
             _capacityViewModel = new CapacityViewModel(w);
+            _statsViewModel = new StatsViewModel();
             _settingsViewModel = new SettingsViewModel();
             _loginViewModel = new LoginViewModel(w);
             _loginViewModel.LoginSucceeded += LoginSucceededHandler;
@@ -60,6 +64,8 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         public ICommand AboutViewCommand { get; }
 
         public ICommand CapacityViewCommand { get; }
+        
+        public ICommand StatsViewCommand { get; }
 
         public bool IsEnabledCapacity
         {

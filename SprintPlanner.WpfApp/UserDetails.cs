@@ -54,5 +54,11 @@ namespace SprintPlanner.WpfApp
             get { return _model.UserName; }
             set { SetBackingField(() => _model.UserName = value); }
         }
+
+        public Role Role
+        {
+            get { return _model.Role; }
+            set { SetBackingField(() => _model.Role = value); }
+        }
     }
 }

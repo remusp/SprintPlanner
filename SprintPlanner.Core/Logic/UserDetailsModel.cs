@@ -14,6 +14,8 @@
 
         public decimal CapacityFactor { get; set; }
 
+        public Role Role { get; set; }
+
         public decimal Capacity { get { return (DaysInSprint - DaysOff) * HoursPerDay; } }
 
         public decimal ScaledCapacity { get { return Capacity * CapacityFactor / 100; } }

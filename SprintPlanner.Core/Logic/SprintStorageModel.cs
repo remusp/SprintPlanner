@@ -13,5 +13,6 @@ namespace SprintPlanner.Core.Logic
         public List<Tuple<int, string>> Sprints { get; set; }
 
         public int SelectedSprint { get; set; }
+        public List<Issue> Issues { get; set; }
     }
 }

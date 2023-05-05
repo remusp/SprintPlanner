@@ -29,10 +29,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Autoupdater.NET.Official" Version="1.7.7" />
+    <PackageReference Include="Autoupdater.NET.Official" Version="1.8.1" />
     <PackageReference Include="MahApps.Metro" Version="2.4.9" />
     <PackageReference Include="MahApps.Metro.IconPacks" Version="3.7.0" />
-    <PackageReference Include="Sdl.MultiSelectComboBox" Version="1.0.37" />
+    <PackageReference Include="Sdl.MultiSelectComboBox" Version="1.0.42" />
   </ItemGroup>
 
   <ItemGroup>

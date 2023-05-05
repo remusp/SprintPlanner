@@ -77,12 +77,12 @@ namespace SprintPlanner.WpfApp.UI.Login
                 }
                 else
                 {
-                    _window.ShowMessageAsync("Sprint Organizer", "Username or password is wrong.");
+                    _window.ShowMessageAsync("Login failed", "Username or password is wrong.");
                 }
             }
             else
             {
-                _window.ShowMessageAsync("Sprint Organizer", "Unable to login. Error while reading password.");
+                _window.ShowMessageAsync("Login failed", "Password input error.");
             }
         }
 

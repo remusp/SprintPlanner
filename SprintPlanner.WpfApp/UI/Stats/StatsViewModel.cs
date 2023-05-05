@@ -2,11 +2,8 @@
 using SprintPlanner.Core.Logic;
 using SprintPlanner.FrameworkWPF;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SprintPlanner.WpfApp.UI.Stats
 {

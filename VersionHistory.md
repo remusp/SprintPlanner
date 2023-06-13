@@ -1,3 +1,8 @@
+### Version 0.0.11 (2023-06-13)
+ * Added splash screen
+ * Added option to fetch team members assigned in specific sprint
+ * Added option to search for team members (by name or email)
+	
 ### Version 0.0.10 (2023-04-08)
  * Moved to .NET 6
  * Added plan statistics view

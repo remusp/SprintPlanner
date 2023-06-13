@@ -16,7 +16,7 @@ namespace SprintPlanner.WpfApp.UI.Login
         public LoginViewModel(MetroWindow w)
         {
             _window = w;
-            LoginCommand = new DelegateCommand<object>((parameter) => LoginCommandExecute(parameter));
+            LoginCommand = new DelegateCommand<IHavePassword>((parameter) => LoginCommandExecute(parameter));
         }
 
         public event Action LoginSucceeded;
@@ -59,30 +59,22 @@ namespace SprintPlanner.WpfApp.UI.Login
             LoginSucceeded?.Invoke();
         }
 
-        private void LoginCommandExecute(object parameter)
+        private void LoginCommandExecute(IHavePassword passwordContainer)
         {
             Settings.Default.StoreCredentials = StoreCredentials;
-
-            if (parameter is IHavePassword passwordContainer)
+            Business.Jira.ServerAddress = Settings.Default.Server;
+            IsLoggedIn = Business.Jira.Login(UserName, passwordContainer.Password);
+            if (IsLoggedIn)
             {
-                Business.Jira.ServerAddress = Settings.Default.Server;
-                IsLoggedIn = Business.Jira.Login(UserName, passwordContainer.Password);
-                if (IsLoggedIn)
-                {
-                    // Always store credentials, as a workaround to transmit them to main window
-                    Settings.Default.User = UserName;
-                    Settings.Default.Pass = Base64Encode(passwordContainer.Password.Decrypt());
-                    Settings.Default.Save();
-                    OnLoginSucceeded();
-                }
-                else
-                {
-                    _window.ShowMessageAsync("Login failed", "Username or password is wrong.");
-                }
+                // Always store credentials, as a workaround to transmit them to main window
+                Settings.Default.User = UserName;
+                Settings.Default.Pass = Base64Encode(passwordContainer.Password.Decrypt());
+                Settings.Default.Save();
+                OnLoginSucceeded();
             }
             else
             {
-                _window.ShowMessageAsync("Login failed", "Password input error.");
+                _window.ShowMessageAsync("Login failed", "Username or password is wrong.");
             }
         }
 

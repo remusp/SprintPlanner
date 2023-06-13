@@ -261,5 +261,12 @@ namespace SprintPlanner.Core
             string data = $"{{\"fields\": {{\"assignee\":{{\"{userField}\":\"{user}\"}}}}}}";
             _webRequester.HttpPut(uri, data, _username, _password);
         }
+
+        public List<Assignee> SearchUsers(string searchText)
+        {
+            string uri = new Uri(ServerAddress).Append($"/rest/api/2/user/search?username={searchText}").AbsoluteUri;
+            string response = _webRequester.HttpGetByWebRequest(uri, _username, _password);
+            return JsonConvert.DeserializeObject<List<Assignee>>(response);
+        }
     }
 }

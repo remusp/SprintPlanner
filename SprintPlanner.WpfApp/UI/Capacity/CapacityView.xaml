@@ -5,117 +5,193 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:mh="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:core="clr-namespace:System;assembly=mscorlib"
+             xmlns:ip="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:b="clr-namespace:SprintPlanner.Core.Logic;assembly=SprintPlanner.Core"
              mc:Ignorable="d"
              d:DesignHeight="450"
              d:DesignWidth="800"
+             Margin="10"
              MinWidth="200"
-             MinHeight="200"
-             Width="670">
-    <UserControl.InputBindings>
-        <KeyBinding Key="F5"
-                    Command="{Binding RefreshCommand}" />
-    </UserControl.InputBindings>
+             MinHeight="200">
+    <DockPanel>
+        <GroupBox Header="Team availability">
+        <Grid Style="{StaticResource LayoutGrid}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
 
-    <Grid Style="{StaticResource LayoutGrid}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
+            <TextBlock Text="Days in sprint"
+                       VerticalAlignment="Center"
+                       Style="{StaticResource TextBlockStyle}" />
+            <mh:NumericUpDown Value="{Binding DaysInSprint}"
+                              Style="{StaticResource UpDownStyle}"
+                              Minimum="0"
+                              Grid.Row="0"
+                              Grid.Column="1" />
+            <TextBlock Text="Target availability [%]"
+                       Style="{StaticResource TextBlockStyle}"
+                       VerticalAlignment="Center"
+                       Grid.Row="1" />
+            <mh:NumericUpDown Value="{Binding CapacityFactor}"
+                              Style="{StaticResource UpDownStyle}"
+                              Minimum="0"
+                              Maximum="100"
+                              Grid.Row="1"
+                              Grid.Column="1" />
+            <DataGrid AutoGenerateColumns="False"
+                      ItemsSource="{Binding Users}"
+                      CanUserAddRows="False"
+                      Grid.Row="2"
+                      Grid.Column="0"
+                      Grid.ColumnSpan="3">
+                <DataGrid.Resources>
+                    <ObjectDataProvider x:Key="RoleEnum"
+                                        MethodName="GetValues"
+                                        ObjectType="{x:Type core:Enum}">
+                        <ObjectDataProvider.MethodParameters>
+                            <x:Type Type="b:Role" />
+                        </ObjectDataProvider.MethodParameters>
+                    </ObjectDataProvider>
+                </DataGrid.Resources>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Name"
+                                        Binding="{Binding UserName}" />
+                    <DataGridTemplateColumn Header="Hours/Day">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <mh:NumericUpDown Value="{Binding HoursPerDay, UpdateSourceTrigger=PropertyChanged}"
+                                                  Minimum="0" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Days off">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <mh:NumericUpDown Value="{Binding DaysOff, UpdateSourceTrigger=PropertyChanged}"
+                                                  Minimum="0" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="100% Availability (h)">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <mh:NumericUpDown Value="{Binding Capacity,  Mode=OneWay}"
+                                                  Minimum="0"
+                                                  IsReadOnly="True"
+                                                  HideUpDownButtons="True" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Target Availability (h)">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <mh:NumericUpDown Value="{Binding ScaledCapacity,  Mode=OneWay}"
+                                                  Minimum="0"
+                                                  IsReadOnly="True"
+                                                  HideUpDownButtons="True" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridComboBoxColumn Header="Role"
+                                            ItemsSource="{Binding Source={StaticResource RoleEnum}}"
+                                            SelectedItemBinding="{Binding Role}">
+                    </DataGridComboBoxColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+            <mh:ProgressRing Grid.RowSpan="3"
+                             Grid.ColumnSpan="3"
+                             VerticalAlignment="Center"
+                             Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}" />
+        </Grid>
+        </GroupBox>
+        <GroupBox Header="Add team members">
+            <Grid Background="WhiteSmoke">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
 
-        <TextBlock Text="Days in sprint"
-                   VerticalAlignment="Center"
-                   Style="{StaticResource TextBlockStyle}" />
-        <mh:NumericUpDown Value="{Binding DaysInSprint}"
-                          Style="{StaticResource UpDownStyle}"
-                          Minimum="0"
-                          Grid.Row="0"
-                          Grid.Column="1" />
-        <Button Content="Refresh (F5)"
-                Style="{StaticResource ButtonStyle}"
-                Command="{Binding RefreshCommand}"
-                Grid.Row="0"
-                Grid.Column="2" />
-        <TextBlock Text="Target availability [%]"
-                   Style="{StaticResource TextBlockStyle}"
-                   VerticalAlignment="Center"
-                   Grid.Row="1" />
-        <mh:NumericUpDown Value="{Binding CapacityFactor}"
-                          Style="{StaticResource UpDownStyle}"
-                          Minimum="0"
-                          Maximum="100"
+                <!--From planned sprint-->
+                <Button Content="Assigned in current sprint"
+                        Style="{StaticResource ButtonStyle}"
+                        Command="{Binding AddAllInCurrentSprintCommand}"
+                        Grid.Row="0"
+                        Grid.ColumnSpan="2" />
+                <!--From combo sprint-->
+                <ComboBox ItemsSource="{Binding Sprints}"
+                          SelectedItem="{Binding SelectedSprint}"
+                          DisplayMemberPath="Item2"
+                          VerticalAlignment="Stretch"
                           Grid.Row="1"
-                          Grid.Column="1" />
-        <DataGrid AutoGenerateColumns="False"
-                  ItemsSource="{Binding Users}"
-                  CanUserAddRows="False"
-                  Grid.Row="2"
-                  Grid.Column="0"
-                  Grid.ColumnSpan="3">
-            <DataGrid.Resources>
-                <ObjectDataProvider x:Key="RoleEnum"
-                                    MethodName="GetValues"
-                                    ObjectType="{x:Type core:Enum}">
-                    <ObjectDataProvider.MethodParameters>
-                        <x:Type Type="b:Role" />
-                    </ObjectDataProvider.MethodParameters>
-                </ObjectDataProvider>
-            </DataGrid.Resources>
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Name"
-                                    Binding="{Binding UserName}" />
-                <DataGridTemplateColumn Header="Hours/Day">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <mh:NumericUpDown Value="{Binding HoursPerDay, UpdateSourceTrigger=PropertyChanged}"
-                                              Interval="0.1"
-                                              Minimum="0" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Days off">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <mh:NumericUpDown Value="{Binding DaysOff, UpdateSourceTrigger=PropertyChanged}"
-                                              Minimum="0" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="100% Availability (h)">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <mh:NumericUpDown Value="{Binding Capacity,  Mode=OneWay}"
-                                              Minimum="0"
-                                              IsReadOnly="True"
-                                              HideUpDownButtons="True" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Target Availability (h)">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <mh:NumericUpDown Value="{Binding ScaledCapacity,  Mode=OneWay}"
-                                              Minimum="0"
-                                              IsReadOnly="True"
-                                              HideUpDownButtons="True" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridComboBoxColumn Header="Role"
-                                        ItemsSource="{Binding Source={StaticResource RoleEnum}}"
-                                        SelectedItemBinding="{Binding Role}">
-                </DataGridComboBoxColumn>
-            </DataGrid.Columns>
-        </DataGrid>
-        <mh:ProgressRing Grid.RowSpan="3"
-                         Grid.ColumnSpan="3"
-                         VerticalAlignment="Center"
-                         Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}" />
-    </Grid>
+                          Grid.Column="0"
+                          Style="{StaticResource ComboStyle}" />
+                <Button Content="Assigned in sprint"
+                        Style="{StaticResource ButtonStyle}"
+                        Command="{Binding AddFromComboSprintCommand}"
+                        Grid.Row="1"
+                        Grid.Column="1" />
+                <!--From search-->
+                <TextBox Grid.Row="2"
+                         Grid.Column="0"
+                         Style="{StaticResource TextBoxStyle}"
+                         Text="{Binding SearchText}" />
+                <Button Style="{StaticResource ButtonStyle}"
+                        Command="{Binding SearchCommand}"
+                        Grid.Row="2"
+                        Grid.Column="1">
+                    <StackPanel Orientation="Horizontal">
+                        <ip:PackIconEntypo Kind="MagnifyingGlass" />
+                        <TextBlock Text="SEARCH"
+                                   VerticalAlignment="Center"
+                                   Margin="10 0" />
+                    </StackPanel>
+                </Button>
+                <ScrollViewer Grid.Row="3"
+                              Grid.ColumnSpan="2"
+                              VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding FoundUsers}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderThickness="1"
+                                        BorderBrush="DodgerBlue"
+                                        Margin="3"
+                                        CornerRadius="5">
+                                    <DockPanel>
+                                        <Button Command="{Binding AddCommand}"
+                                                CommandParameter="{Binding}"
+                                                DockPanel.Dock="Right"
+                                                Margin="4"
+                                                Padding="6"
+                                                Content="{ip:Entypo Kind=AddToList, Width=32, Height=32}" />
+                                        <TextBlock DockPanel.Dock="Top"
+                                                   Text="{Binding Name}"
+                                                   FontSize="16"
+                                                   FontWeight="Bold"
+                                                   Margin="5" />
+                                        <TextBlock Text="{Binding Email}"
+                                                   FontSize="15"
+                                                   Margin="5" />
+
+                                    </DockPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </GroupBox>
+    </DockPanel>
 </UserControl>

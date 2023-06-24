@@ -1,3 +1,9 @@
+### Version 0.0.12 (2023-xx-xx)
+ * Check server at login and guard against app crash
+ * Fix story link after migration to .NET 6
+ * Added the concept of sprint plan
+
+
 ### Version 0.0.11 (2023-06-13)
  * Added splash screen
  * Added option to fetch team members assigned in specific sprint

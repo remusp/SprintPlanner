@@ -135,15 +135,15 @@ namespace SprintPlanner.Core
             return result;
         }
 
-        public List<Tuple<int, string>> GetOpenSprints(int boardId)
+        public List<BusinessModel.Sprint> GetOpenSprints(int boardId)
         {
             // TODO: investigate if this call can be optimized
             List<Value> values = GetOpenSprintsbyBoardId(boardId);
-            var result = new List<Tuple<int, string>>();
+            var result = new List<BusinessModel.Sprint>();
 
             foreach (var value in values)
             {
-                result.Add(new Tuple<int, string>(value.id, value.name));
+                result.Add(new BusinessModel.Sprint { Id = value.id, Name = value.name });
             }
 
             return result;

@@ -10,9 +10,9 @@ namespace SprintPlanner.Core.Logic
 
         public int SelectedBoard { get; set; }
 
-        public List<Tuple<int, string>> Sprints { get; set; }
+        public List<BusinessModel.Sprint> Sprints { get; set; }
 
-        public int SelectedSprint { get; set; }
+        public BusinessModel.Sprint SelectedSprint { get; set; }
         public List<Issue> Issues { get; set; }
     }
 }

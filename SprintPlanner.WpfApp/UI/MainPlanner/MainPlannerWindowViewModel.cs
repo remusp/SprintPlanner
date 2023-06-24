@@ -7,6 +7,7 @@ using SprintPlanner.WpfApp.UI.Capacity;
 using SprintPlanner.WpfApp.UI.Login;
 using SprintPlanner.WpfApp.UI.Planning;
 using SprintPlanner.WpfApp.UI.SettingsUI;
+using SprintPlanner.WpfApp.UI.SprintCrud;
 using SprintPlanner.WpfApp.UI.Stats;
 using System;
 using System.Diagnostics;
@@ -22,7 +23,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 {
     public class MainPlannerWindowViewModel : ViewModelBase
     {
-        private const string sprintFileName = "Sprint.spl.json";
+        private const string sprintFileName = "Sprint.app.json";
 
         private readonly AboutViewModel _aboutViewModel;
         private readonly CapacityViewModel _capacityViewModel;
@@ -30,6 +31,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         private readonly LoginViewModel _loginViewModel;
         private readonly PlanningViewModel _planningViewModel;
         private readonly SettingsViewModel _settingsViewModel;
+        private readonly SprintCrudViewModel _sprintCrudViewModel;
 
         private readonly MetroWindow _window;
 
@@ -43,6 +45,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             SettingsViewCommand = new DelegateCommand(() => SetView(_settingsViewModel));
             PlanningViewCommand = new DelegateCommand(() => SetView(_planningViewModel));
             LoginViewCommand = new DelegateCommand(() => SetView(_loginViewModel));
+            SprintCrudViewCommand = new DelegateCommand(() => SetView(_sprintCrudViewModel));
             LogoutCommand = new DelegateCommand(LogoutExecute);
 
             LogoutVisibility = Visibility.Collapsed;
@@ -51,6 +54,8 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             _capacityViewModel = new CapacityViewModel(w);
             _statsViewModel = new StatsViewModel();
             _settingsViewModel = new SettingsViewModel();
+            _sprintCrudViewModel = new SprintCrudViewModel(w, PlanningViewCommand);
+
             _loginViewModel = new LoginViewModel(w);
             _loginViewModel.LoginSucceeded += LoginSucceededHandler;
             var assembly = Assembly.GetExecutingAssembly();
@@ -60,12 +65,6 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
                 ProductVersion = assembly.GetName().Version.ToString()
             };
         }
-
-        public ICommand AboutViewCommand { get; }
-
-        public ICommand CapacityViewCommand { get; }
-        
-        public ICommand StatsViewCommand { get; }
 
         public bool IsEnabledCapacity
         {
@@ -85,9 +84,6 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             set { Set(() => LoggedInUserPictureData, value); }
         }
 
-        public ICommand LoginViewCommand { get; }
-        public ICommand LogoutCommand { get; }
-
         public Visibility LogoutVisibility
         {
             get { return Get(() => LogoutVisibility); }
@@ -100,8 +96,14 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             set { Set(() => MainViewModel, value); }
         }
 
+        public ICommand AboutViewCommand { get; }
+        public ICommand CapacityViewCommand { get; }
+        public ICommand StatsViewCommand { get; }
+        public ICommand LoginViewCommand { get; }
+        public ICommand LogoutCommand { get; }
         public ICommand PlanningViewCommand { get; }
         public ICommand SettingsViewCommand { get; }
+        public ICommand SprintCrudViewCommand { get; }
 
         public void EnsureLoggedIn()
         {
@@ -133,7 +135,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
                     }
 
                     LogoutVisibility = Visibility.Visible;
-                    SetView(_planningViewModel);
+                    SetView(_sprintCrudViewModel);
 
                     IsEnabledPlanning = true;
                     IsEnabledCapacity = true;
@@ -155,7 +157,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             var appName = ((AssemblyTitleAttribute)assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute))).Title;
             if (string.IsNullOrWhiteSpace(dataFolder))
             {
-                dataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), appName);
+                dataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName);
                 Settings.Default.SprintDataFolder = dataFolder;
                 Settings.Default.Save();
 
@@ -164,11 +166,19 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
             var sprintFilePath = Path.Combine(dataFolder, sprintFileName);
 
-            if (File.Exists(sprintFilePath))
+            try
             {
-                Business.Data = JsonConvert.DeserializeObject<DataStorageModel>(File.ReadAllText(sprintFilePath));
+                if (File.Exists(sprintFilePath))
+                {
+                    Business.Data = JsonConvert.DeserializeObject<DataStorageModel>(File.ReadAllText(sprintFilePath));
+                }
             }
-            else
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
+
+            if (Business.Data == null) 
             {
                 Business.Data = new DataStorageModel()
                 {

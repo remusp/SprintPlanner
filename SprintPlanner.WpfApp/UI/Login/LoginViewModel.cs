@@ -61,20 +61,33 @@ namespace SprintPlanner.WpfApp.UI.Login
 
         private void LoginCommandExecute(IHavePassword passwordContainer)
         {
-            Settings.Default.StoreCredentials = StoreCredentials;
-            Business.Jira.ServerAddress = Settings.Default.Server;
-            IsLoggedIn = Business.Jira.Login(UserName, passwordContainer.Password);
-            if (IsLoggedIn)
+            try
             {
-                // Always store credentials, as a workaround to transmit them to main window
-                Settings.Default.User = UserName;
-                Settings.Default.Pass = Base64Encode(passwordContainer.Password.Decrypt());
-                Settings.Default.Save();
-                OnLoginSucceeded();
+                if (string.IsNullOrWhiteSpace(Settings.Default.Server)) 
+                {
+                    _window.ShowMessageAsync("Login failed", "No server configured.");
+                    return;
+                }
+
+                Settings.Default.StoreCredentials = StoreCredentials;
+                Business.Jira.ServerAddress = Settings.Default.Server;
+                IsLoggedIn = Business.Jira.Login(UserName, passwordContainer.Password);
+                if (IsLoggedIn)
+                {
+                    // Always store credentials, as a workaround to transmit them to main window
+                    Settings.Default.User = UserName;
+                    Settings.Default.Pass = Base64Encode(passwordContainer.Password.Decrypt());
+                    Settings.Default.Save();
+                    OnLoginSucceeded();
+                }
+                else
+                {
+                    _window.ShowMessageAsync("Login failed", "Username or password is wrong.");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                _window.ShowMessageAsync("Login failed", "Username or password is wrong.");
+                _window.ShowMessageAsync($"Login failed: {ex.Message}", ex.StackTrace);
             }
         }
 

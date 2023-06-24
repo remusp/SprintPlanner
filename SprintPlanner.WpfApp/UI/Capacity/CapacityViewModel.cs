@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using CoreSprint = SprintPlanner.Core.BusinessModel.Sprint;
 
 namespace SprintPlanner.WpfApp.UI.Capacity
 {
@@ -55,7 +56,7 @@ namespace SprintPlanner.WpfApp.UI.Capacity
             set { Set(() => IsBusy, value); }
         }
 
-        public List<Tuple<int, string>> Sprints
+        public List<CoreSprint> Sprints
         {
             get { return Get(() => Sprints); }
             set { Set(() => Sprints, value); }
@@ -67,7 +68,7 @@ namespace SprintPlanner.WpfApp.UI.Capacity
             set { Set(() => Users, value); }
         }
 
-        public Tuple<int, string> SelectedSprint
+        public CoreSprint SelectedSprint
         {
             get { return Get(() => SelectedSprint); }
             set { Set(() => SelectedSprint, value); }
@@ -108,11 +109,11 @@ namespace SprintPlanner.WpfApp.UI.Capacity
 
             CapacityFactor = Business.Data.Capacity.CapacityFactor;
 
-            _sprintId = Business.Data.Sprint.SelectedSprint;
+            _sprintId = Business.Data.Sprint.SelectedSprint.Id;
 
             if (Business.Data?.Sprint?.Sprints != null)
             {
-                Sprints = new List<Tuple<int, string>>(Business.Data.Sprint.Sprints);
+                Sprints = new List<CoreSprint>(Business.Data.Sprint.Sprints);
                 SelectedSprint = Sprints.First();
             }
         }
@@ -146,7 +147,7 @@ namespace SprintPlanner.WpfApp.UI.Capacity
 
         private void AddFromComboSprintCommandExecute()
         {
-            AddAssigneesFromSprint(SelectedSprint.Item1);
+            AddAssigneesFromSprint(SelectedSprint.Id);
         }
 
         private void AddAssigneesFromSprint(int sprintId)

@@ -50,6 +50,7 @@
                 Style="{StaticResource ButtonStyle}"
                 Command="{Binding LoginCommand}"
                 CommandParameter="{Binding ElementName=This}"
+                IsDefault="True"
                 Grid.Row="3"
                 Grid.ColumnSpan="2" />
     </Grid>

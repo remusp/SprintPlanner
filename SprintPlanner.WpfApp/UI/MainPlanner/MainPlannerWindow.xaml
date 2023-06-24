@@ -6,6 +6,7 @@
                 xmlns:mh="http://metro.mahapps.com/winfx/xaml/controls"
                 xmlns:ip="http://metro.mahapps.com/winfx/xaml/iconpacks"
                 xmlns:plan="clr-namespace:SprintPlanner.WpfApp.UI.Planning"
+                xmlns:sc="clr-namespace:SprintPlanner.WpfApp.UI.SprintCrud"
                 xmlns:cp="clr-namespace:SprintPlanner.WpfApp.UI.Capacity"
                 xmlns:lg="clr-namespace:SprintPlanner.WpfApp.UI.Login"
                 xmlns:ab="clr-namespace:SprintPlanner.WpfApp.UI.About"
@@ -31,6 +32,7 @@
                     </Trigger>
                 </Style.Triggers>
             </Style>
+
             <DataTemplate x:Key="MenuItemTemplate">
                 <DockPanel Height="64"
                            LastChildFill="True">
@@ -69,13 +71,17 @@
                           PanePlacement="Left"
                           ItemTemplate="{StaticResource MenuItemTemplate}"
                           OptionsItemTemplate="{StaticResource MenuItemTemplate}"
+                          Style="{StaticResource DefaultHamburgerStyle}"
                           Grid.Column="0">
             <mh:HamburgerMenu.ItemsSource>
                 <mh:HamburgerMenuItemCollection>
+                    <mh:HamburgerMenuIconItem Icon="{ip:Entypo Kind=Blackboard, Width=48, Height=48}"
+                                              Command="{Binding SprintCrudViewCommand}"
+                                              Label="Plans" />
                     <mh:HamburgerMenuIconItem Icon="{ip:Entypo Kind=PaperPlane, Width=48, Height=48}"
                                               Command="{Binding PlanningViewCommand}"
                                               IsEnabled="{Binding IsEnabledPlanning}"
-                                              Label="Planning" />
+                                              Label="Work allocation" />
                     <mh:HamburgerMenuIconItem Icon="{ip:Modern Kind=ScaleUnbalanced, Width=48, Height=48}"
                                               Command="{Binding CapacityViewCommand}"
                                               IsEnabled="{Binding IsEnabledCapacity}"
@@ -101,19 +107,14 @@
                                               Label="About" />
                 </mh:HamburgerMenuItemCollection>
             </mh:HamburgerMenu.OptionsItemsSource>
-            <mh:HamburgerMenu.Style>
-                <Style TargetType="{x:Type mh:HamburgerMenu}"
-                       BasedOn="{StaticResource DefaultHamburgerStyle}">
-                    <Setter Property="OpenPaneLength"
-                            Value="200" />
-                </Style>
-            </mh:HamburgerMenu.Style>
-
         </mh:HamburgerMenu>
         <ContentControl Grid.Column="1"
                         Content="{Binding MainViewModel}">
             <ContentControl.Resources>
                 <ResourceDictionary>
+                    <DataTemplate DataType="{x:Type sc:SprintCrudViewModel}">
+                        <sc:SprintCrudView />
+                    </DataTemplate>
                     <DataTemplate DataType="{x:Type plan:PlanningViewModel}">
                         <plan:PlanningView />
                     </DataTemplate>
@@ -132,7 +133,7 @@
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type sui:SettingsViewModel}">
                         <sui:SettingsView HorizontalAlignment="Left"
-                                          VerticalAlignment="Top"/>
+                                          VerticalAlignment="Top" />
                     </DataTemplate>
                 </ResourceDictionary>
             </ContentControl.Resources>

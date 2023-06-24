@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SprintPlanner.Core.Logic
+﻿namespace SprintPlanner.Core.Logic
 {
     public class DataStorageModel
     {

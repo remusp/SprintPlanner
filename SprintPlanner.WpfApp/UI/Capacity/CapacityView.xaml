@@ -133,7 +133,7 @@
                 <!--From combo sprint-->
                 <ComboBox ItemsSource="{Binding Sprints}"
                           SelectedItem="{Binding SelectedSprint}"
-                          DisplayMemberPath="Item2"
+                          DisplayMemberPath="Name"
                           VerticalAlignment="Stretch"
                           Grid.Row="1"
                           Grid.Column="0"

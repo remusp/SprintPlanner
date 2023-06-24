@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:sdl="http://schemas.sdl.com/xaml"
              xmlns:mh="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:ip="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:l="clr-namespace:SprintPlanner.WpfApp.UI.Planning"
@@ -32,46 +31,8 @@
                     <ColumnDefinition />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Board"
-                           VerticalAlignment="Center"
-                           Style="{StaticResource TextBlockStyle}" />
-                <sdl:MultiSelectComboBox ItemsSource="{Binding Boards}"
-                                         SelectedItems="{Binding SelectedBoards}"
-                                         sdl:SelectedItemsChangedBehaviour.SelectedItemsChanged="{Binding SelectedBoardChangedCommand}"
-                                         ClearFilterOnDropdownClosing="True"
-                                         SelectionMode="Single"
-                                         IsEditable="True"
-                                         MinHeight="38"
-                                         Margin="5"
-                                         Grid.Column="1">
-                    <sdl:MultiSelectComboBox.SelectedItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Item2}"
-                                       VerticalAlignment="Center" />
-                        </DataTemplate>
-                    </sdl:MultiSelectComboBox.SelectedItemTemplate>
-                    <sdl:MultiSelectComboBox.DropdownItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Item2}"
-                                       VerticalAlignment="Center" />
-                        </DataTemplate>
-                    </sdl:MultiSelectComboBox.DropdownItemTemplate>
-                </sdl:MultiSelectComboBox>
-                <TextBlock Text="Sprint"
-                           VerticalAlignment="Center"
-                           Style="{StaticResource TextBlockStyle}"
-                           Grid.Column="2" />
-                <ComboBox ItemsSource="{Binding Sprints}"
-                          SelectedItem="{Binding SelectedSprint}"
-                          DisplayMemberPath="Item2"
-                          VerticalAlignment="Stretch"
-                          Grid.Column="3"
-                          Style="{StaticResource ComboStyle}" />
-                <Button Grid.Column="4"
-                        Content="{ip:Material Kind=Refresh}"
-                        Padding="10, 2"
-                        Style="{StaticResource ButtonStyle}"
-                        Command="{Binding RefreshSprintsCommand}" />
+             
+               
             </Grid>
 
             <ScrollViewer PreviewMouseWheel="ListBox_PreviewMouseWheel"
@@ -143,9 +104,6 @@
                           Grid.Column="1">
             <mh:HamburgerMenu.ItemsSource>
                 <mh:HamburgerMenuItemCollection>
-                    <mh:HamburgerMenuIconItem Icon="{ip:Octicons Kind=Clippy, Width=48, Height=48}"
-                                              Command="{Binding ReloadCommand}"
-                                              Label="Read boards" />
                     <mh:HamburgerMenuIconItem Icon="{ip:Material Kind=AccountConvert, Width=48, Height=48}"
                                               Command="{Binding SyncLoadCommand}"
                                               Label="Get team data" />

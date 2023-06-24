@@ -18,35 +18,24 @@ using System.Windows.Input;
 
 namespace SprintPlanner.WpfApp.UI.Planning
 {
-    public class PlanningViewModel : ViewModelBase, IStorageManipulator
+    public class PlanningViewModel : ViewModelBase
     {
         private readonly ReportGenerator _reportGenerator;
         private readonly MetroWindow _window;
-        private bool _initializing;
 
         public PlanningViewModel(MetroWindow w)
         {
-            ReloadCommand = new DelegateCommand(ReloadComandExecute);
-            RefreshSprintsCommand = new DelegateCommand(RefreshSprintsComandExecute);
             SyncLoadCommand = new DelegateCommand(SyncLoadComandExecute);
             ExportCommand = new DelegateCommand(ExportComandExecute);
-            SelectedBoardChangedCommand = new DelegateCommand(SelectedBoardChangedComandExecute);
             AssignCommand = new DelegateCommand<Assignation>(AssignCommandExecute);
-
-            SelectedBoards = new ObservableCollection<Tuple<int, string>>();
+            
             UserLoads = new ObservableCollection<UserLoadViewModel>();
-            Boards = new ObservableCollection<Tuple<int, string>>();
+            
             _window = w;
             _reportGenerator = new ReportGenerator();
         }
 
         public ICommand AssignCommand { get; }
-
-        public ObservableCollection<Tuple<int, string>> Boards
-        {
-            get { return Get(() => Boards); }
-            set { Set(() => Boards, value); }
-        }
 
         public ICommand ExportCommand { get; }
 
@@ -58,31 +47,6 @@ namespace SprintPlanner.WpfApp.UI.Planning
 
         [DependsUpon(nameof(IsBusy))]
         public bool IsNotBusy => !IsBusy;
-
-        public ICommand ReloadCommand { get; }
-
-        public ICommand RefreshSprintsCommand { get; }
-
-
-        public ICommand SelectedBoardChangedCommand { get; }
-
-        public ObservableCollection<Tuple<int, string>> SelectedBoards
-        {
-            get { return Get(() => SelectedBoards); }
-            set { Set(() => SelectedBoards, value); }
-        }
-
-        public Tuple<int, string> SelectedSprint
-        {
-            get { return Get(() => SelectedSprint); }
-            set { Set(() => SelectedSprint, value); }
-        }
-
-        public ObservableCollection<Tuple<int, string>> Sprints
-        {
-            get { return Get(() => Sprints); }
-            set { Set(() => Sprints, value); }
-        }
 
         public int StoryPoints
         {
@@ -96,45 +60,6 @@ namespace SprintPlanner.WpfApp.UI.Planning
         {
             get { return Get(() => UserLoads); }
             set { Set(() => UserLoads, value); }
-        }
-
-        public void Flush()
-        {
-            Business.Data.Sprint.SelectedBoard = SelectedBoards.FirstOrDefault()?.Item1 ?? 0;
-            Business.Data.Sprint.SelectedSprint = SelectedSprint?.Item1 ?? 0;
-            Business.Data.Sprint.Boards = Boards?.ToList();
-            Business.Data.Sprint.Sprints = Sprints?.ToList();
-        }
-
-        public void Pull()
-        {
-            _initializing = true;
-            if (Business.Data?.Sprint?.Boards != null && Boards.Count == 0)
-            {
-                Boards = new ObservableCollection<Tuple<int, string>>(Business.Data.Sprint.Boards);
-            }
-
-            if (Business.Data?.Sprint?.Sprints != null)
-            {
-                Sprints = new ObservableCollection<Tuple<int, string>>(Business.Data.Sprint.Sprints);
-            }
-
-            try
-            {
-                var board = Boards.First(i => i.Item1 == Business.Data.Sprint.SelectedBoard);
-                if (!SelectedBoards.Contains(board))
-                {
-                    SelectedBoards.Add(board);
-                }
-
-                SelectedSprint = Sprints.First(i => i.Item1 == Business.Data.Sprint.SelectedSprint);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"{ex.Message} {ex.StackTrace}");
-            }
-
-            _initializing = false;
         }
 
         private void AddCapacity(List<UserLoadViewModel> capacities, IEnumerable<Issue> issues, UserDetailsModel user, string link, byte[] picture, UserStatus? explicitStatus = null)
@@ -235,7 +160,7 @@ namespace SprintPlanner.WpfApp.UI.Planning
 
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.Filter = "Excel (*.xls)|*.xls|Excel (*.xlsx)|*.xlsx";
-            sfd.FileName = SelectedSprint.Item2;
+            sfd.FileName = Business.Plan.Sprint.Name;
 
             var dialogResult = sfd.ShowDialog();
 
@@ -277,108 +202,7 @@ namespace SprintPlanner.WpfApp.UI.Planning
 
             return UserStatus.Normal;
         }
-
-        private void ReloadComandExecute()
-        {
-            IsBusy = true;
-            Boards.Clear();
-            Task.Factory.StartNew(() => Business.Jira.GetBoards()).ContinueWith(t =>
-            {
-                t.Result.Select(b => new Tuple<int, string>(b.Key, b.Value)).ToList().ForEach(i => Boards.Add(i));
-                IsBusy = false;
-            }, TaskScheduler.FromCurrentSynchronizationContext());
-        }
-
-        private void RefreshSprintsComandExecute()
-        {
-            try
-            {
-                int board = -1;
-                var boardTuple = SelectedBoards.FirstOrDefault();
-                if (boardTuple != null)
-                {
-                    board = boardTuple.Item1;
-                }
-
-                if (board >= 0)
-                {
-                    IsBusy = true;
-                    Task.Factory.StartNew(() => Business.Jira.GetOpenSprints(board)).ContinueWith(t =>
-                    {
-                        Business.Data.Sprint.SelectedBoard = board;
-                        if (!t.IsFaulted)
-                        {
-                            Sprints = new ObservableCollection<Tuple<int, string>>(t.Result);
-                            var sprint = Sprints.FirstOrDefault(i => i.Item1 == Business.Data.Sprint.SelectedSprint);
-                            SelectedSprint = sprint ?? Sprints.FirstOrDefault();
-                        }
-                        else
-                        {
-                            _window.ShowMessageAsync("Error fetching open sprints", t.Exception.Flatten().Message + Environment.NewLine + t.Exception.Flatten().StackTrace);
-                        }
-
-                        IsBusy = false;
-                    }, TaskScheduler.FromCurrentSynchronizationContext());
-                }
-                else
-                {
-                    _window.ShowMessageAsync("Error fetching open sprints", "Invalid board");
-                }
-            }
-            catch (Exception ex)
-            {
-                _window.ShowMessageAsync("Error fetching open sprints", ex.Message + Environment.NewLine + ex.StackTrace);
-            }
-        }
-
-        private void SelectedBoardChangedComandExecute()
-        {
-            if (!_initializing && !SelectedBoards.Equals(default(Tuple<int, string>)))
-            {
-                try
-                {
-                    int board = -1;
-                    var boardTuple = SelectedBoards.FirstOrDefault();
-                    if (boardTuple != null)
-                    {
-                        board = boardTuple.Item1;
-                    }
-
-                    if (board >= 0 && Business.Data.Sprint.SelectedBoard == board)
-                    {
-                        return;
-                    }
-
-                    if (board >= 0)
-                    {
-                        IsBusy = true;
-                        Task.Factory.StartNew(() => Business.Jira.GetOpenSprints(board)).ContinueWith(t =>
-                        {
-                            Business.Data.Sprint.SelectedBoard = board;
-                            if (!t.IsFaulted)
-                            {
-                                Sprints = new ObservableCollection<Tuple<int, string>>(t.Result);
-                                var sprint = Sprints.FirstOrDefault(i => i.Item1 == Business.Data.Sprint.SelectedSprint);
-                                SelectedSprint = sprint ?? Sprints.FirstOrDefault();
-                            }
-                            else
-                            {
-                                _window.ShowMessageAsync("Error fetching open sprints", t.Exception.Flatten().Message + Environment.NewLine + t.Exception.Flatten().StackTrace);
-                            }
-
-                            IsBusy = false;
-                        }, TaskScheduler.FromCurrentSynchronizationContext());
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _window.ShowMessageAsync("Error fetching open sprints", ex.Message + Environment.NewLine + ex.StackTrace);
-                }
-            }
-
-            _initializing = false;
-        }
-
+        
         private void SyncLoadComandExecute()
         {
             IsBusy = true;
@@ -400,7 +224,7 @@ namespace SprintPlanner.WpfApp.UI.Planning
 
                 var customFields = new List<string> { Settings.Default.StoryPointsField };
 
-                var extendedIssues = Business.Jira.GetAllIssuesInSprint(SelectedSprint.Item1, mandatoryFields, customFields);
+                var extendedIssues = Business.Jira.GetAllIssuesInSprint(Business.Plan.Sprint.Id, mandatoryFields, customFields);
                 Business.Data.Sprint.Issues = extendedIssues.Item1;
                 var allIssues = extendedIssues.Item1;
                 query1.Stop();

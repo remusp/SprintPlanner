@@ -4,20 +4,14 @@ using SprintPlanner.Core.Logic;
 using SprintPlanner.FrameworkWPF;
 using SprintPlanner.WpfApp.UI.About;
 using SprintPlanner.WpfApp.UI.Capacity;
-using SprintPlanner.WpfApp.UI.Login;
 using SprintPlanner.WpfApp.UI.Planning;
 using SprintPlanner.WpfApp.UI.Servers;
-using SprintPlanner.WpfApp.UI.SettingsUI;
 using SprintPlanner.WpfApp.UI.SprintCrud;
 using SprintPlanner.WpfApp.UI.Stats;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Net;
 using System.Reflection;
-using System.Security;
-using System.Text;
-using System.Windows;
 using System.Windows.Input;
 
 namespace SprintPlanner.WpfApp.UI.MainPlanner
@@ -29,9 +23,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         private readonly AboutViewModel _aboutViewModel;
         private readonly CapacityViewModel _capacityViewModel;
         private readonly StatsViewModel _statsViewModel;
-        private readonly LoginViewModel _loginViewModel;
         private readonly PlanningViewModel _planningViewModel;
-        private readonly SettingsViewModel _settingsViewModel;
         private readonly SprintCrudViewModel _sprintCrudViewModel;
         private readonly ServersViewModel _serversViewModel;
 
@@ -44,54 +36,22 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             CapacityViewCommand = new DelegateCommand(() => SetView(_capacityViewModel));
             StatsViewCommand = new DelegateCommand(() => SetView(_statsViewModel));
             AboutViewCommand = new DelegateCommand(() => SetView(_aboutViewModel));
-            SettingsViewCommand = new DelegateCommand(() => SetView(_settingsViewModel));
             ServersViewCommand = new DelegateCommand(() => SetView(_serversViewModel));
             PlanningViewCommand = new DelegateCommand(() => SetView(_planningViewModel));
-            LoginViewCommand = new DelegateCommand(() => SetView(_loginViewModel));
             SprintCrudViewCommand = new DelegateCommand(() => SetView(_sprintCrudViewModel));
-            LogoutCommand = new DelegateCommand(LogoutExecute);
-
-            LogoutVisibility = Visibility.Collapsed;
 
             _planningViewModel = new PlanningViewModel(w);
             _capacityViewModel = new CapacityViewModel(w);
             _statsViewModel = new StatsViewModel();
-            _settingsViewModel = new SettingsViewModel();
             _sprintCrudViewModel = new SprintCrudViewModel(w, PlanningViewCommand);
 
-            _serversViewModel = new ServersViewModel();
-            _loginViewModel = new LoginViewModel(w);
-            _loginViewModel.LoginSucceeded += LoginSucceededHandler;
+            _serversViewModel = new ServersViewModel(w);
             var assembly = Assembly.GetExecutingAssembly();
             _aboutViewModel = new AboutViewModel(w)
             {
                 ProductName = ((AssemblyTitleAttribute)assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute))).Title,
                 ProductVersion = assembly.GetName().Version.ToString()
             };
-        }
-
-        public bool IsEnabledCapacity
-        {
-            get { return Get(() => IsEnabledCapacity); }
-            set { Set(() => IsEnabledCapacity, value); }
-        }
-
-        public bool IsEnabledPlanning
-        {
-            get { return Get(() => IsEnabledPlanning); }
-            set { Set(() => IsEnabledPlanning, value); }
-        }
-
-        public byte[] LoggedInUserPictureData
-        {
-            get { return Get(() => LoggedInUserPictureData); }
-            set { Set(() => LoggedInUserPictureData, value); }
-        }
-
-        public Visibility LogoutVisibility
-        {
-            get { return Get(() => LogoutVisibility); }
-            set { Set(() => LogoutVisibility, value); }
         }
 
         public ViewModelBase MainViewModel
@@ -103,73 +63,13 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         public ICommand AboutViewCommand { get; }
         public ICommand CapacityViewCommand { get; }
         public ICommand StatsViewCommand { get; }
-        public ICommand LoginViewCommand { get; }
-        public ICommand LogoutCommand { get; }
         public ICommand PlanningViewCommand { get; }
-
-        public ICommand SettingsViewCommand { get; }
         public ICommand SprintCrudViewCommand { get; }
-
         public ICommand ServersViewCommand { get; }
-
-        public void EnsureLoggedIn()
-        {
-            if (string.IsNullOrWhiteSpace(Settings.Default.User) || string.IsNullOrWhiteSpace(Settings.Default.Pass))
-            {
-                SetView(_loginViewModel);
-            }
-            else
-            {
-                string str = Base64Decode(Settings.Default.Pass);
-
-                var secure = new SecureString();
-                foreach (char c in str)
-                {
-                    secure.AppendChar(c);
-                }
-
-                // TODO: duplicate login
-                bool isLoggedIn = Business.Jira.Login(Settings.Default.User, secure);
-                if (isLoggedIn)
-                {
-                    try
-                    {
-                        LoggedInUserPictureData = Business.Jira.GetPicture(Settings.Default.User);
-                    }
-                    catch (WebException wex)
-                    {
-                        Debug.WriteLine(wex);
-                    }
-
-                    LogoutVisibility = Visibility.Visible;
-                    SetView(_sprintCrudViewModel);
-
-                    IsEnabledPlanning = true;
-                    IsEnabledCapacity = true;
-                }
-                else
-                {
-                    SetView(_loginViewModel);
-                    IsEnabledPlanning = false;
-                    IsEnabledCapacity = false;
-                }
-            }
-        }
 
         public void Load()
         {
-            var dataFolder = Settings.Default.SprintDataFolder;
-
-            var assembly = Assembly.GetExecutingAssembly();
-            var appName = ((AssemblyTitleAttribute)assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute))).Title;
-            if (string.IsNullOrWhiteSpace(dataFolder))
-            {
-                dataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName);
-                Settings.Default.SprintDataFolder = dataFolder;
-                Settings.Default.Save();
-
-                Directory.CreateDirectory(dataFolder);
-            }
+            string dataFolder = GetAppDataFolder();
 
             var sprintFilePath = Path.Combine(dataFolder, sprintFileName);
 
@@ -177,7 +77,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             {
                 if (File.Exists(sprintFilePath))
                 {
-                    Business.Data = JsonConvert.DeserializeObject<DataStorageModel>(File.ReadAllText(sprintFilePath));
+                    Business.AppData = JsonConvert.DeserializeObject<DataStorageModel>(File.ReadAllText(sprintFilePath));
                 }
             }
             catch (Exception ex)
@@ -185,83 +85,45 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
                 Debug.WriteLine(ex);
             }
 
-            if (Business.Data == null) 
+            Business.AppData ??= new DataStorageModel();
+
+            if (Business.AppData.SprintCrud.SelectedServer != null && Business.AppData.SprintCrud.SelectedServer.IsLoggedIn)
             {
-                Business.Data = new DataStorageModel()
-                {
-                    Sprint = new SprintStorageModel(),
-                    Capacity = new CapacityStorageModel()
-                };
+                SetView(_sprintCrudViewModel);
+            }
+            else 
+            {
+                SetView(_serversViewModel);
             }
         }
 
         public void Persist()
         {
-            string serialized = JsonConvert.SerializeObject(Business.Data, Formatting.Indented);
+            string serialized = JsonConvert.SerializeObject(Business.AppData, Formatting.Indented);
 
-            var sprintFilePath = Path.Combine(Settings.Default.SprintDataFolder, sprintFileName);
+            var sprintFilePath = Path.Combine(GetAppDataFolder(), sprintFileName);
             File.WriteAllText(sprintFilePath, serialized);
-        }
-
-        private static string Base64Decode(string base64EncodedData)
-        {
-            var base64EncodedBytes = Convert.FromBase64String(base64EncodedData);
-            return Encoding.UTF8.GetString(base64EncodedBytes);
-        }
-
-        private void LoginSucceededHandler()
-        {
-            // TODO: duplicate login
-            bool isLoggedIn = _loginViewModel.IsLoggedIn;
-            if (isLoggedIn)
-            {
-                try
-                {
-                    LoggedInUserPictureData = Business.Jira.GetPicture(Settings.Default.User);
-                }
-                catch (WebException wex)
-                {
-                    Debug.WriteLine(wex);
-                }
-
-                LogoutVisibility = Visibility.Visible;
-                SetView(_planningViewModel);
-
-                IsEnabledPlanning = true;
-                IsEnabledCapacity = true;
-            }
-            else
-            {
-                SetView(_loginViewModel);
-                IsEnabledPlanning = false;
-                IsEnabledCapacity = false;
-            }
-        }
-
-        private void LogoutExecute()
-        {
-            Settings.Default.User = string.Empty;
-            Settings.Default.Pass = null;
-            Settings.Default.StoreCredentials = false;
-            Settings.Default.Save();
-
-            LoggedInUserPictureData = null;
-            Business.Jira.Logout();
-            LogoutVisibility = Visibility.Collapsed;
-            SetView(_loginViewModel);
-            IsEnabledPlanning = false;
-            IsEnabledCapacity = false;
         }
 
         private void SetView(ViewModelBase vm)
         {
             if (MainViewModel is IStorageManipulator m)
             {
-                m.Flush();
+                m.PushData();
             }
 
-            (vm as IStorageManipulator)?.Pull();
+            (vm as IStorageManipulator)?.PullData();
             MainViewModel = vm;
+        }
+
+        private static string GetAppDataFolder()
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var appName = ((AssemblyTitleAttribute)assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute))).Title;
+
+            var dataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName);
+            Directory.CreateDirectory(dataFolder);
+            return dataFolder;
         }
     }
 }

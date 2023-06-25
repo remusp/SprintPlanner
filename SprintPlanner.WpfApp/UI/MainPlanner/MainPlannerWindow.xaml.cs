@@ -2,6 +2,7 @@
 using MahApps.Metro.Controls;
 using SprintPlanner.Core;
 using SprintPlanner.Core.Logic;
+using System;
 using System.IO;
 using System.Windows;
 
@@ -42,39 +43,42 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
             }
 
-            Business.Jira = new JiraWrapper(_webRequester) { ServerAddress = Settings.Default.Server };
+            Business.Jira = new JiraWrapper(_webRequester);
 
             var vm = new MainPlannerWindowViewModel(this);
             vm.Load();
             DataContext = vm;
-            vm.EnsureLoggedIn();
         }
 
-        private void MetroWindow_Closed(object sender, System.EventArgs e)
+        private void MetroWindow_Closed(object sender, EventArgs e)
         {
             if (_webRequester is CachingHttpRequester cr)
             {
                 cr.FlushCacheToDisk();
             }
 
-            if (!Settings.Default.StoreCredentials)
-            {
-                Settings.Default.User = string.Empty;
-                Settings.Default.Pass = null;
-                Settings.Default.Save();
-            }
-
             if (DataContext is MainPlannerWindowViewModel vm)
             {
                 if (vm.MainViewModel is IStorageManipulator m)
                 {
-                    m.Flush();
+                    m.PushData();
                 }
+
+                ClearTempLogins();
 
                 vm.Persist();
             }
         }
 
-
+        private void ClearTempLogins()
+        {
+            foreach (var server in Business.AppData.ServerModel.Servers)
+            {
+                if (!server.StoreCredentials) 
+                {
+                    server.Logout();
+                }
+            }
+        }
     }
 }

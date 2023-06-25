@@ -2,8 +2,17 @@
 {
     public class DataStorageModel
     {
-        public SprintStorageModel Sprint { get; set; }
+        public DataStorageModel()
+        {
+            SprintCrud = new SprintCrudStorageModel();
+            Capacity = new CapacityStorageModel();
+            ServerModel = new ServerStorageModel();
+        }
+
+        public SprintCrudStorageModel SprintCrud { get; set; }
 
         public CapacityStorageModel Capacity { get; set; }
+
+        public ServerStorageModel ServerModel { get; set; }
     }
 }

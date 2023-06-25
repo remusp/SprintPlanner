@@ -12,7 +12,7 @@ namespace SprintPlanner.Core
         public virtual string HttpGetByWebRequest(string uri, string username, SecureString password)
         {
             //For Basic Authentication
-            string authInfo = Convert.ToBase64String(Encoding.Default.GetBytes($"{username}:{password.Decrypt()}"));
+            string authInfo = Convert.ToBase64String(Encoding.Default.GetBytes($"{username}:{password.ToPlain()}"));
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
             request.Method = "GET";
@@ -34,7 +34,7 @@ namespace SprintPlanner.Core
         public virtual byte[] HttpGetBinaryByWebRequest(string uri, string username, SecureString password)
         {
             //For Basic Authentication
-            string authInfo = $"{username}:{password.Decrypt()}";
+            string authInfo = $"{username}:{password.ToPlain()}";
             authInfo = Convert.ToBase64String(Encoding.Default.GetBytes(authInfo));
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
@@ -112,7 +112,7 @@ namespace SprintPlanner.Core
             byte[] dataBytes = Encoding.UTF8.GetBytes(data);
             using (var client = new WebClient())
             {
-                string authInfo = $"{username}:{password.Decrypt()}";
+                string authInfo = $"{username}:{password.ToPlain()}";
                 authInfo = Convert.ToBase64String(Encoding.Default.GetBytes(authInfo));
 
                 client.Headers["Authorization"] = "Basic " + authInfo;

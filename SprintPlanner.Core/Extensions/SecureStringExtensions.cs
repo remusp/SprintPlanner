@@ -1,28 +1,12 @@
-﻿using System;
-using System.Runtime.InteropServices;
-using System.Security;
+﻿using System.Security;
 
 namespace SprintPlanner.Core.Extensions
 {
     public static class SecureStringExtensions
     {
-        public static string Decrypt(this SecureString securePassword)
+        public static string ToPlain(this SecureString secure)
         {
-            if (securePassword == null)
-            {
-                return string.Empty;
-            }
-
-            IntPtr unmanagedString = IntPtr.Zero;
-            try
-            {
-                unmanagedString = Marshal.SecureStringToGlobalAllocUnicode(securePassword);
-                return Marshal.PtrToStringUni(unmanagedString);
-            }
-            finally
-            {
-                Marshal.ZeroFreeGlobalAllocUnicode(unmanagedString);
-            }
+            return SecureHelper.ToString(secure);
         }
     }
 }

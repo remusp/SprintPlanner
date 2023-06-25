@@ -3,58 +3,167 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mh="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:local="clr-namespace:SprintPlanner.WpfApp.UI.Servers"
              xmlns:cnv="clr-namespace:SprintPlanner.WpfApp.UI.Converters"
              xmlns:dt="clr-namespace:SprintPlanner.WpfApp.DesignTime"
+             x:Name="This"
              mc:Ignorable="d"
              d:DataContext="{x:Static dt:DesignData.ServerItemViewModelDesign}">
     <UserControl.Resources>
         <cnv:BoolToVisibilityConverter x:Key="btv"
-                                       FalseValue="Hidden" />
+                                       FalseValue="Collapsed" />
     </UserControl.Resources>
-    <StackPanel Margin="5">
-        <TextBox Text="{Binding ServerName}"
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <!--Server name-->
+        <TextBox Grid.Row="0"
+                 Grid.Column="0"
+                 Grid.ColumnSpan="2"
+                 Text="{Binding Name}"
                  FontWeight="DemiBold"
                  FontSize="16"
                  Margin="5" />
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
 
-            <!--URL-->
-            <TextBlock Text="URL"
-                       Grid.Row="0"
-                       Grid.Column="0"
-                       Margin="5"
-                       HorizontalAlignment="Right"
-                       VerticalAlignment="Center" />
-            <TextBox Text="{Binding Url}"
-                     Grid.Row="0"
-                     Grid.Column="1"
-                     Margin="5" />
-            <!--SP Field-->
-            <TextBlock Text="Story points field"
-                       Grid.Row="1"
-                       Grid.Column="0"
-                       Margin="5"
-                       HorizontalAlignment="Right"
-                       VerticalAlignment="Center" />
-            <TextBox Text="{Binding StoryPointsField}"
-                     Grid.Row="1"
-                     Grid.Column="1"
-                     Margin="5" />
-        </Grid>
-        <TextBlock Text="ACTIVE"
-                   Visibility="{Binding IsActive, Converter={StaticResource btv}}"
-                   Foreground="Green"
-                   FontWeight="Bold"
+        <!--URL-->
+        <TextBlock Text="URL"
+                   Grid.Row="1"
+                   Grid.Column="0"
+                   Margin="5"
                    HorizontalAlignment="Right"
-                   Margin="5" />
-    </StackPanel>
+                   VerticalAlignment="Center" />
+        <TextBox Text="{Binding Url}"
+                 Grid.Row="1"
+                 Grid.Column="1"
+                 Margin="5" />
+        <!--SP Field-->
+        <TextBlock Text="Story points field"
+                   Grid.Row="2"
+                   Grid.Column="0"
+                   Margin="5"
+                   HorizontalAlignment="Right"
+                   VerticalAlignment="Center" />
+        <TextBox Text="{Binding StoryPointsField}"
+                 Grid.Row="2"
+                 Grid.Column="1"
+                 Margin="5" />
+
+        <!--Server actions-->
+        <Button Command="{Binding CommandUserLogin}"
+                Grid.Row="3"
+                Grid.Column="0">
+            <Button.Style>
+                <Style TargetType="Button"
+                       BasedOn="{StaticResource ButtonStyle}">
+                    <Setter Property="Content"
+                            Value="User Login" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsDoingLogin}"
+                                     Value="True">
+                            <Setter Property="Content"
+                                    Value="Cancel" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
+        <Button Content="User logout"
+                Command="{Binding CommandUserLogout}"
+                Grid.Row="3"
+                Grid.Column="1"
+                Style="{StaticResource ButtonStyle}" />
+
+        <!--Login username-->
+        <TextBlock Grid.Row="0"
+                   Grid.Column="2"
+                   Text="User name"
+                   Visibility="{Binding IsDoingLogin, Converter={StaticResource btv}}"
+                   Style="{StaticResource TextBlockStyle}" />
+        <TextBox Text="{Binding UserName}"
+                 VerticalAlignment="Center"
+                 Style="{StaticResource TextBoxStyle}"
+                 Visibility="{Binding IsDoingLogin, Converter={StaticResource btv}}"
+                 Grid.Row="0"
+                 Grid.Column="3" />
+
+        <!--Login password-->
+        <TextBlock Text="Password / API Key"
+                   ToolTip="Use password for Server Login.&#x0a;Use API Key for Cloud login."
+                   Style="{StaticResource TextBlockStyle}"
+                   Visibility="{Binding IsDoingLogin, Converter={StaticResource btv}}"
+                   Grid.Row="1"
+                   Grid.Column="2" />
+        <PasswordBox x:Name="userPassword"
+                     VerticalAlignment="Center"
+                     Margin="5"
+                     mh:TextBoxHelper.ClearTextButton="True"
+                     Visibility="{Binding IsDoingLogin, Converter={StaticResource btv}}"
+                     Grid.Row="1"
+                     Grid.Column="3"
+                     Style="{StaticResource MahApps.Styles.PasswordBox.Button.Revealed}" />
+
+        <!--Login remember me-->
+        <CheckBox Content="Remember me"
+                  Margin="5"
+                  IsChecked="{Binding StoreCredentials}"
+                  Visibility="{Binding IsDoingLogin, Converter={StaticResource btv}}"
+                  Grid.Row="2"
+                  Grid.Column="2" />
+
+        <!--Login cmd-->
+        <Button Content="Login"
+                Command="{Binding CommandServerLogin}"
+                Style="{StaticResource ButtonStyle}"
+                CommandParameter="{Binding ElementName=This}"
+                IsDefault="True"
+                Visibility="{Binding IsDoingLogin, Converter={StaticResource btv}}"
+                Grid.Row="2"
+                Grid.Column="3" />
+
+        <!--Picture-->
+        <Border Visibility="{Binding IsLoggedIn, Converter={StaticResource btv}}"
+                Background="LightSteelBlue"
+                CornerRadius="3"
+                Padding="5"
+                Margin="5"
+                Grid.Row="0"
+                Grid.Column="4"
+                Grid.RowSpan="2"
+                HorizontalAlignment="Left">
+            <Image Margin="5"
+                   Width="48"
+                   HorizontalAlignment="Left"
+                   Stretch="Uniform"
+                   Source="{Binding UserPictureData}" />
+        </Border>
+
+        <!--Human readable user-->
+        <TextBlock Grid.Row="2"
+                   Grid.Column="4"
+                   Text="{Binding UserDisplayName}"
+                   Visibility="{Binding IsLoggedIn, Converter={StaticResource btv}}"
+                   Style="{StaticResource TextBlockStyle}" />
+
+        <!--User email-->
+        <TextBlock Grid.Row="3"
+                   Grid.Column="4"
+                   Text="{Binding UserEmail}"
+                   Visibility="{Binding IsLoggedIn, Converter={StaticResource btv}}"
+                   Style="{StaticResource TextBlockStyle}" />
+
+    </Grid>
 </UserControl>

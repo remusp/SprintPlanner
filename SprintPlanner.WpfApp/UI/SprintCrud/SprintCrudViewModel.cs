@@ -1,6 +1,7 @@
 ﻿using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using Newtonsoft.Json;
+using SprintPlanner.Core;
 using SprintPlanner.Core.BusinessModel;
 using SprintPlanner.Core.Logic;
 using SprintPlanner.FrameworkWPF;
@@ -31,11 +32,11 @@ namespace SprintPlanner.WpfApp.UI.SprintCrud
             SelectedBoards = new ObservableCollection<Tuple<int, string>>();
             SprintPlanItems = new ObservableCollection<SprintPlanItem>();
 
-            FetchBoardsCommand = new DelegateCommand(ExecuteFetchBoards);
-            FetchSprintsCommand = new DelegateCommand(ExecuteFetchSprints);
-            SelectedBoardChangedCommand = new DelegateCommand(ExecuteSelectedBoardChanged);
-            AddPlanCommand = new DelegateCommand(async () => await ExecuteAddPlanAsync());
-            OpenSprintPlanCommand = new DelegateCommand<SprintPlanItem>(ExecuteOpenSprintPlan);
+            CommandFetchBoards = new DelegateCommand(ExecuteFetchBoards);
+            CommandFetchSprints = new DelegateCommand(ExecuteFetchSprints);
+            CommandSelectedBoardChanged = new DelegateCommand(ExecuteSelectedBoardChanged);
+            CommandAddPlan = new DelegateCommand(async () => await ExecuteAddPlanAsync());
+            CommandOpenSprintPlan = new DelegateCommand<SprintPlanItem>(ExecuteOpenSprintPlan);
 
             PropertyChanged += SprintCrudViewModel_PropertyChanged;
         }
@@ -64,6 +65,18 @@ namespace SprintPlanner.WpfApp.UI.SprintCrud
             set { Set(() => Sprints, value); }
         }
 
+        public ObservableCollection<SelectableServerItem> Servers
+        {
+            get { return Get(() => Servers); }
+            set { Set(() => Servers, value); }
+        }
+
+        public SelectableServerItem SelectedServer
+        {
+            get { return Get(() => SelectedServer); }
+            set { Set(() => SelectedServer, value); }
+        }
+
         public ObservableCollection<SprintPlanItem> SprintPlanItems
         {
             get { return Get(() => SprintPlanItems); }
@@ -85,53 +98,30 @@ namespace SprintPlanner.WpfApp.UI.SprintCrud
         [DependsUpon(nameof(IsBusy))]
         public bool IsNotBusy => !IsBusy;
 
-        public ICommand FetchBoardsCommand { get; }
+        public ICommand CommandFetchBoards { get; }
 
-        public ICommand FetchSprintsCommand { get; }
+        public ICommand CommandFetchSprints { get; }
 
-        public ICommand SelectedBoardChangedCommand { get; }
-        public ICommand AddPlanCommand { get; }
-        public ICommand OpenSprintPlanCommand { get; }
+        public ICommand CommandSelectedBoardChanged { get; }
+        public ICommand CommandAddPlan { get; }
+        public ICommand CommandOpenSprintPlan { get; }
 
-        public void Pull()
+        public void PullData()
         {
             _initializing = true;
-            if (Business.Data?.Sprint?.Boards != null && Boards.Count == 0)
-            {
-                Boards = new ObservableCollection<Tuple<int, string>>(Business.Data.Sprint.Boards);
-            }
-
-            if (Business.Data?.Sprint?.Sprints != null)
-            {
-                Sprints = new ObservableCollection<CoreSprint>(Business.Data.Sprint.Sprints);
-            }
-
-            try
-            {
-                var board = Boards.First(i => i.Item1 == Business.Data.Sprint.SelectedBoard);
-                if (!SelectedBoards.Contains(board))
-                {
-                    SelectedBoards.Add(board);
-                }
-
-                SelectedSprint = Sprints.First(i => i.Id == Business.Data.Sprint.SelectedSprint?.Id);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"{ex.Message} {ex.StackTrace}");
-            }
-
+            LoadServers();
+            LoadBoardsAndSprints();
             LoadPlans();
-
             _initializing = false;
         }
 
-        public void Flush()
+        public void PushData()
         {
-            Business.Data.Sprint.Boards = Boards?.ToList();
-            Business.Data.Sprint.SelectedBoard = SelectedBoards.FirstOrDefault()?.Item1 ?? 0;
-            Business.Data.Sprint.Sprints = Sprints?.ToList();
-            Business.Data.Sprint.SelectedSprint = SelectedSprint;
+            Business.AppData.SprintCrud.Boards = Boards?.ToList();
+            Business.AppData.SprintCrud.SelectedBoard = SelectedBoards.FirstOrDefault()?.Item1 ?? 0;
+            Business.AppData.SprintCrud.Sprints = Sprints?.ToList();
+            Business.AppData.SprintCrud.SelectedSprint = SelectedSprint;
+            Business.AppData.SprintCrud.SelectedServer = SelectedServer?.Server;
         }
 
         private void ExecuteFetchBoards()
@@ -140,8 +130,15 @@ namespace SprintPlanner.WpfApp.UI.SprintCrud
             Boards.Clear();
             Task.Factory.StartNew(() => Business.Jira.GetBoards()).ContinueWith(t =>
             {
-                t.Result.Select(b => new Tuple<int, string>(b.Key, b.Value)).ToList().ForEach(i => Boards.Add(i));
-                IsBusy = false;
+                try
+                {
+                    t.Result.Select(b => new Tuple<int, string>(b.Key, b.Value)).ToList().ForEach(i => Boards.Add(i));
+                }
+                finally
+                {
+                    IsBusy = false;
+                }
+                
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
@@ -161,11 +158,11 @@ namespace SprintPlanner.WpfApp.UI.SprintCrud
                     IsBusy = true;
                     Task.Factory.StartNew(() => Business.Jira.GetOpenSprints(board)).ContinueWith(t =>
                     {
-                        Business.Data.Sprint.SelectedBoard = board;
+                        Business.AppData.SprintCrud.SelectedBoard = board;
                         if (!t.IsFaulted)
                         {
                             Sprints = new ObservableCollection<CoreSprint>(t.Result);
-                            var sprint = Sprints.FirstOrDefault(i => i.Id == Business.Data.Sprint.SelectedSprint?.Id);
+                            var sprint = Sprints.FirstOrDefault(i => i.Id == Business.AppData.SprintCrud.SelectedSprint?.Id);
                             SelectedSprint = sprint ?? Sprints.FirstOrDefault();
                         }
                         else
@@ -200,7 +197,7 @@ namespace SprintPlanner.WpfApp.UI.SprintCrud
                         board = boardTuple.Item1;
                     }
 
-                    if (board >= 0 && Business.Data.Sprint.SelectedBoard == board)
+                    if (board >= 0 && Business.AppData.SprintCrud.SelectedBoard == board)
                     {
                         return;
                     }
@@ -210,11 +207,11 @@ namespace SprintPlanner.WpfApp.UI.SprintCrud
                         IsBusy = true;
                         Task.Factory.StartNew(() => Business.Jira.GetOpenSprints(board)).ContinueWith(t =>
                         {
-                            Business.Data.Sprint.SelectedBoard = board;
+                            Business.AppData.SprintCrud.SelectedBoard = board;
                             if (!t.IsFaulted)
                             {
                                 Sprints = new ObservableCollection<CoreSprint>(t.Result);
-                                var sprint = Sprints.FirstOrDefault(i => i.Id == Business.Data.Sprint.SelectedSprint?.Id);
+                                var sprint = Sprints.FirstOrDefault(i => i.Id == Business.AppData.SprintCrud.SelectedSprint?.Id);
                                 SelectedSprint = sprint ?? Sprints.FirstOrDefault();
                             }
                             else
@@ -238,35 +235,68 @@ namespace SprintPlanner.WpfApp.UI.SprintCrud
         {
             if (SelectedSprint == null)
             {
+                await _window.ShowMessageAsync("Cannot create plan!", "No sprint selected");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(PlanName)) 
+            {
+                await _window.ShowMessageAsync("Cannot create plan!", "Please input a plan name");
                 return;
             }
 
             var plan = new SprintPlan()
             {
-                Sprint = SelectedSprint
+                Sprint = SelectedSprint,
+                Server = SelectedServer.Server
             };
 
-            string serialized = JsonConvert.SerializeObject(plan, Formatting.Indented);
-            var filePath = Path.Combine(GetPlansFolder(), $"{PlanName}.spl.json");
-
-            if (File.Exists(filePath))
+            try
             {
-                var result = await _window.ShowMessageAsync("Add plan", $"{Path.GetFileName(filePath)} already exists. Overwrite?", MessageDialogStyle.AffirmativeAndNegative);
-                if (result == MessageDialogResult.Negative)
+                string serialized = JsonConvert.SerializeObject(plan, Formatting.Indented);
+                var filePath = Path.Combine(GetPlansFolder(), $"{PlanName}.spl.json");
+
+                MessageDialogResult overwrite = MessageDialogResult.Negative;
+                if (File.Exists(filePath))
                 {
-                    return;
+                    overwrite = await _window.ShowMessageAsync("Add plan", $"{Path.GetFileName(filePath)} already exists. Overwrite?", MessageDialogStyle.AffirmativeAndNegative);
+                    if (overwrite == MessageDialogResult.Negative)
+                    {
+                        return;
+                    }
+                }
+
+                File.WriteAllText(filePath, serialized);
+
+                if (overwrite == MessageDialogResult.Negative) 
+                {
+                    SprintPlanItems.Add(new SprintPlanItem { FullPath = filePath, Name = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(filePath)) });
                 }
             }
-
-            File.WriteAllText(filePath, serialized);
-
-            SprintPlanItems.Add(new SprintPlanItem { FullPath = filePath, Name = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(filePath)) });
+            catch (Exception ex)
+            {
+                await _window.ShowMessageAsync("Cannot create plan", ex.Message);
+            }
         }
 
-        private void ExecuteOpenSprintPlan(SprintPlanItem plan) 
+        private void ExecuteOpenSprintPlan(SprintPlanItem planItem) 
         {
-            Business.Plan = JsonConvert.DeserializeObject<SprintPlan>(File.ReadAllText(plan.FullPath));
-            _goToPlanningCommand.Execute(null);
+            try
+            {
+                var plan = Business.Plan = JsonConvert.DeserializeObject<SprintPlan>(File.ReadAllText(planItem.FullPath));
+                bool loggedIn = Business.Jira.Login(plan.Server.Url, plan.Server.UserName, SecureHelper.ToSecure(plan.Server.Pass));
+                if (!loggedIn)
+                {
+                    _window.ShowMessageAsync("Login unavailable or expired", "Please login from the servers page");
+                    return;
+                }
+
+                _goToPlanningCommand.Execute(null);
+            }
+            catch (Exception ex)
+            {
+                _window.ShowMessageAsync(ex.Message, ex.StackTrace);
+            }
         }
 
         private string GetPlansFolder()
@@ -281,9 +311,67 @@ namespace SprintPlanner.WpfApp.UI.SprintCrud
 
         private void SprintCrudViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName.Equals(nameof(SelectedSprint)))
+            try
             {
-                PlanName = $"Plan for {SelectedSprint?.Name}";
+                switch (e.PropertyName)
+                {
+                    case nameof(SelectedServer):
+                        if (SelectedServer != null)
+                        {
+                            bool loggedIn = false;
+                            try
+                            {
+                                loggedIn = Business.Jira.Login(SelectedServer.Server.Url, SelectedServer.Server.UserName, SecureHelper.ToSecure(SelectedServer.Server.Pass));
+                            }
+                            catch 
+                            {
+                                // Ignore
+                            }
+                            
+                            if (!loggedIn)
+                            {
+                                Business.Jira.Logout();
+                                _window.ShowMessageAsync("Login unavailable or expired", "Please login from the servers page");
+                            }
+                        }
+                        break;
+
+                    case nameof(SelectedSprint):
+                        PlanName = $"Plan for {SelectedSprint?.Name}";
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                _window.ShowMessageAsync(ex.Message, ex.StackTrace);
+            }
+        }
+
+        private void LoadBoardsAndSprints()
+        {
+            if (Business.AppData?.SprintCrud?.Boards != null && Boards.Count == 0)
+            {
+                Boards = new ObservableCollection<Tuple<int, string>>(Business.AppData.SprintCrud.Boards);
+            }
+
+            if (Business.AppData?.SprintCrud?.Sprints != null)
+            {
+                Sprints = new ObservableCollection<CoreSprint>(Business.AppData.SprintCrud.Sprints);
+            }
+
+            try
+            {
+                var board = Boards.First(i => i.Item1 == Business.AppData.SprintCrud.SelectedBoard);
+                if (!SelectedBoards.Contains(board))
+                {
+                    SelectedBoards.Add(board);
+                }
+
+                SelectedSprint = Sprints.First(i => i.Id == Business.AppData.SprintCrud.SelectedSprint?.Id);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"{ex.Message} {ex.StackTrace}");
             }
         }
 
@@ -292,6 +380,28 @@ namespace SprintPlanner.WpfApp.UI.SprintCrud
             var path = GetPlansFolder();
             var plans = Directory.GetFiles(path, "*.spl.json");
             SprintPlanItems = new ObservableCollection<SprintPlanItem>(plans?.Select(p => new SprintPlanItem { Name = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(p)), FullPath = p }));
+        }
+
+        private void LoadServers()
+        {
+            if (Business.AppData.ServerModel?.Servers == null) 
+            {
+                return;
+            }
+
+            Servers = new ObservableCollection<SelectableServerItem>(Business.AppData.ServerModel.Servers.Select(s => new SelectableServerItem
+            {
+                DisplayName = $"{s.Name} ({s.Url})",
+                Server = s
+            }));
+
+            var toSelect = Servers.FirstOrDefault(s => s.Server.Id.Equals(Business.AppData.SprintCrud.SelectedServer?.Id));
+            if (toSelect == null) 
+            {
+                return;
+            }
+
+            SelectedServer = toSelect;
         }
     }
 }

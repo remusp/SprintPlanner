@@ -22,25 +22,12 @@ namespace SprintPlanner.Core
             _webRequester = webRequester;
         }
 
-        public string ServerAddress { get; set; }
-
-        public List<Tuple<string, decimal>> GetAllAssigneesAndWorkInSprint(int sprintId)
+        public JiraWrapper(bool isOffline)
         {
-            var extendedIssues = GetAllIssuesInSprint(sprintId);
-
-            List<Issue> issues = extendedIssues.Item1;
-
-            IEnumerable<IGrouping<string, Issue>> issuesPerAssignee = issues.Where(l => l.fields.assignee != null).GroupBy(i => i.fields.assignee.name);
-            var result = new List<Tuple<string, decimal>>();
-
-            foreach (var issuePerAssignee in issuesPerAssignee)
-            {
-                result.Add(new Tuple<string, decimal>(issuePerAssignee.Key,
-                    issuePerAssignee.Sum(ipa => ipa.fields.timetracking.remainingEstimateSeconds)));
-            }
-
-            return result;
+            _webRequester = isOffline ? new CachingHttpRequester("requestCache.json") : new SimpleHttpRequester();
         }
+
+        public string ServerAddress { get; set; }
 
         public List<Assignee> GetAllAssigneesInSprint(int sprintId)
         {
@@ -155,20 +142,20 @@ namespace SprintPlanner.Core
             return _webRequester.HttpGetBinaryByWebRequest(uri, _username, _password);
         }
 
-        public string GetUserDisplayName(string uid)
+        public Assignee GetAssignee(string uid)
         {
             string uri = new Uri(ServerAddress).Append($"/rest/api/2/user?username={uid}").AbsoluteUri;
             string x = _webRequester.HttpGetByWebRequest(uri, _username, _password);
-            Assignee asignee = JsonConvert.DeserializeObject<Assignee>(x);
-            return asignee.displayName;
+            return JsonConvert.DeserializeObject<Assignee>(x);
         }
 
-        public bool Login(string username, SecureString password)
+        public bool Login(string serverUrl, string username, SecureString password)
         {
             _username = username;
             _password = password;
+            ServerAddress = serverUrl;
 
-            return CheckValidLogin();
+            return CheckValidLogin(serverUrl, _username, _password);
         }
 
         public void Logout()
@@ -177,12 +164,12 @@ namespace SprintPlanner.Core
             _password = null;
         }
 
-        private bool CheckValidLogin()
+        private bool CheckValidLogin(string serverUrl, string username, SecureString password)
         {
             try
             {
-                string uri = new Uri(ServerAddress).Append("/rest/agile/1.0/board/1").AbsoluteUri;
-                _webRequester.HttpGetByWebRequest(uri, _username, _password);
+                string uri = new Uri(serverUrl).Append("/rest/agile/1.0/board/1").AbsoluteUri;
+                _webRequester.HttpGetByWebRequest(uri, username, password);
                 return true;
             }
             catch (WebException ex)

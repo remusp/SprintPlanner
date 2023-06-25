@@ -1,42 +1,55 @@
-﻿using SprintPlanner.WpfApp.UI.Servers;
+﻿using SprintPlanner.Core.BusinessModel;
+using SprintPlanner.WpfApp.UI.Servers;
 using System.Collections.ObjectModel;
 
 namespace SprintPlanner.WpfApp.DesignTime
 {
     public static class DesignData
     {
-        public static ServerItemViewModel ServerItemViewModelDesign => new ServerItemViewModel
+        public static ServerItemViewModel ServerItemViewModelDesign => new ServerItemViewModel(new Server
         {
-            ServerName = "My test Server Name",
+            Name = "My test Server Name",
             Url = "https://www.mysuperurl.com/link",
             StoryPointsField = "customfield_1234",
-            IsActive = true
+        }, null)
+        {
+            UserName = "grgrg.usr",
+            IsDoingLogin = false,
+            IsLoggedIn = true,
+            UserDisplayName = "The George",
+            UserEmail = "grg@mail.com",
         };
 
-        public static ServersViewModel ServersViewModelDesign => new ServersViewModel
+        public static ServersViewModel ServersViewModelDesign => new ServersViewModel(null)
         {
             Servers = new ObservableCollection<ServerItemViewModel>
             {
-                new ServerItemViewModel
+                new ServerItemViewModel(new Server
                 {
-                    ServerName = "My test Server Name",
+                    Name = "My test Server Name",
                     Url = "https://www.google.com/",
                     StoryPointsField = "customfield_1234",
-                    IsActive = false
-                },
-                new ServerItemViewModel
+                }, null),
+                new ServerItemViewModel(new Server
                 {
-                    ServerName = "My test Server Name Super Duper Default",
+                    Name = "My test Server Name Super Duper Default",
                     Url = "https://www.mysuperurl.com/link",
                     StoryPointsField = "customfield_1234",
-                    IsActive = true
-                },
-                new ServerItemViewModel
+                }, null)
                 {
-                    ServerName = "Some JIRA",
+                    IsDoingLogin = true,
+                    StoreCredentials = true,
+                    UserName = "superuser",
+                },
+                new ServerItemViewModel(new Server
+                {
+                    Name = "Some JIRA",
                     Url = "https://www.mysuperurl.com/jira/specific/value",
                     StoryPointsField = "customfield_12341234123412341234",
-                    IsActive = false
+                }, null)
+                {
+                    IsDoingLogin = true,
+                    StoreCredentials = false
                 }
             }
         };

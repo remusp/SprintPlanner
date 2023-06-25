@@ -10,8 +10,22 @@
              mc:Ignorable="d"
              d:DesignHeight="450"
              d:DesignWidth="800">
-    <StackPanel IsEnabled="{Binding IsNotBusy}">
-        <GroupBox Header="New Plan">
+    <Grid IsEnabled="{Binding IsNotBusy}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <mh:ProgressRing Grid.Row="0"
+                         Grid.RowSpan="2"
+                         Panel.ZIndex="10"
+                         VerticalAlignment="Center"
+                         Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}" />
+        <Expander Header="New Plan"
+                  IsExpanded="True"
+                  Grid.Row="0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition />
@@ -25,23 +39,32 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <mh:ProgressRing Grid.Row="1"
-                                 Grid.Column="1"
-                                 Panel.ZIndex="10"
-                                 VerticalAlignment="Center"
-                                 Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <!--Server-->
+                <TextBlock Text="Server"
+                           VerticalAlignment="Center"
+                           Style="{StaticResource TextBlockStyle}"
+                           Grid.Row="0"
+                           Grid.Column="0" />
+                <ComboBox Grid.Row="0"
+                          Grid.Column="1"
+                          ItemsSource="{Binding Servers}"
+                          SelectedItem="{Binding SelectedServer}"
+                          DisplayMemberPath="DisplayName"
+                          VerticalAlignment="Stretch"
+                          MinHeight="33"
+                          Style="{StaticResource ComboStyle}" />
 
                 <!--Board-->
-                <TextBlock Grid.Row="0"
+                <TextBlock Grid.Row="1"
                            Grid.Column="0"
                            Text="Board"
                            VerticalAlignment="Center"
                            Style="{StaticResource TextBlockStyle}" />
-                <sdl:MultiSelectComboBox Grid.Row="0"
+                <sdl:MultiSelectComboBox Grid.Row="1"
                                          Grid.Column="1"
                                          ItemsSource="{Binding Boards}"
                                          SelectedItems="{Binding SelectedBoards}"
-                                         sdl:SelectedItemsChangedBehaviour.SelectedItemsChanged="{Binding SelectedBoardChangedCommand}"
+                                         sdl:SelectedItemsChangedBehaviour.SelectedItemsChanged="{Binding CommandSelectedBoardChanged}"
                                          ClearFilterOnDropdownClosing="True"
                                          SelectionMode="Single"
                                          IsEditable="True"
@@ -60,48 +83,48 @@
                         </DataTemplate>
                     </sdl:MultiSelectComboBox.DropdownItemTemplate>
                 </sdl:MultiSelectComboBox>
-                <Button Grid.Row="0"
-                        Grid.Column="3"
+                <Button Grid.Row="1"
+                        Grid.Column="2"
                         Content="{ip:Octicons Kind=Clippy}"
                         Padding="10"
                         Style="{StaticResource ButtonStyle}"
-                        Command="{Binding FetchBoardsCommand}" />
+                        Command="{Binding CommandFetchBoards}" />
 
                 <!--Sprint-->
                 <TextBlock Text="Sprint"
                            VerticalAlignment="Center"
                            Style="{StaticResource TextBlockStyle}"
-                           Grid.Row="1"
+                           Grid.Row="2"
                            Grid.Column="0" />
-                <ComboBox Grid.Row="1"
+                <ComboBox Grid.Row="2"
                           Grid.Column="1"
                           ItemsSource="{Binding Sprints}"
                           SelectedItem="{Binding SelectedSprint}"
                           DisplayMemberPath="Name"
                           VerticalAlignment="Stretch"
                           Style="{StaticResource ComboStyle}" />
-                <Button Grid.Row="1"
+                <Button Grid.Row="2"
                         Grid.Column="2"
                         Content="{ip:Material Kind=Refresh}"
                         Padding="10"
                         Style="{StaticResource ButtonStyle}"
-                        Command="{Binding FetchSprintsCommand}" />
+                        Command="{Binding CommandFetchSprints}" />
 
                 <!--Plan name-->
                 <TextBlock Text="Plan name"
                            VerticalAlignment="Center"
                            Style="{StaticResource TextBlockStyle}"
-                           Grid.Row="2"
+                           Grid.Row="3"
                            Grid.Column="0" />
                 <TextBox Text="{Binding PlanName}"
                          Style="{StaticResource TextBoxStyle}"
-                         Grid.Row="2"
+                         Grid.Row="3"
                          Grid.Column="1" />
-                <Button Grid.Row="2"
+                <Button Grid.Row="3"
                         Grid.Column="2"
                         Content="{ip:Modern Kind=Add}"
                         Padding="10"
-                        Command="{Binding AddPlanCommand}">
+                        Command="{Binding CommandAddPlan}">
                     <Button.Style>
                         <Style TargetType="Button"
                                BasedOn="{StaticResource ButtonStyle}">
@@ -111,8 +134,9 @@
                     </Button.Style>
                 </Button>
             </Grid>
-        </GroupBox>
-        <GroupBox Header="Plans">
+        </Expander>
+        <GroupBox Header="Plans"
+                  Grid.Row="1">
             <ListBox ItemsSource="{Binding SprintPlanItems}"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 <ListBox.ItemsPanel>
@@ -147,5 +171,5 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </GroupBox>
-    </StackPanel>
+    </Grid>
 </UserControl>

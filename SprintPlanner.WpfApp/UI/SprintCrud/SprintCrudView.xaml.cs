@@ -30,7 +30,7 @@ namespace SprintPlanner.WpfApp.UI.SprintCrud
                 return;
             }
 
-            vm.OpenSprintPlanCommand.Execute(spi);
+            vm.CommandOpenSprintPlan.Execute(spi);
         }
     }
 }

@@ -2,7 +2,7 @@
 {
     public interface IStorageManipulator
     {
-        void Pull();
-        void Flush();
+        void PullData();
+        void PushData();
     }
 }

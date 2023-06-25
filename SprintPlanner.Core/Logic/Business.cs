@@ -7,7 +7,7 @@ namespace SprintPlanner.Core.Logic
     {
         public static JiraWrapper Jira { get; set; }
 
-        public static DataStorageModel Data { get; set; }
+        public static DataStorageModel AppData { get; set; }
 
         public static SprintPlan Plan { get; set; }
     }

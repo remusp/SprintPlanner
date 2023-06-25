@@ -205,6 +205,12 @@ namespace SprintPlanner.WpfApp.UI.Planning
         
         private void SyncLoadComandExecute()
         {
+            if (Business.Plan == null) 
+            {
+                _window.ShowMessageAsync("No plan open!", "Open a plan from the plans list.");
+                return;
+            }
+
             IsBusy = true;
             Task.Factory.StartNew(() =>
             {
@@ -214,18 +220,20 @@ namespace SprintPlanner.WpfApp.UI.Planning
                 var capacities = new List<UserLoadViewModel>();
                 var team = new List<string>();
 
+                string storyPointsField = Business.Plan.Server.StoryPointsField;
+
                 Stopwatch query1 = new Stopwatch();
                 query1.Start();
                 var mandatoryFields = new List<string>
                     {
                         "id", "key", "timetracking", "status", "assignee",
-                        "issuetype", "subtasks", "parent","summary",Settings.Default.StoryPointsField
+                        "issuetype", "subtasks", "parent","summary",storyPointsField
                     };
 
-                var customFields = new List<string> { Settings.Default.StoryPointsField };
+                var customFields = new List<string> { storyPointsField };
 
                 var extendedIssues = Business.Jira.GetAllIssuesInSprint(Business.Plan.Sprint.Id, mandatoryFields, customFields);
-                Business.Data.Sprint.Issues = extendedIssues.Item1;
+                Business.AppData.SprintCrud.Issues = extendedIssues.Item1;
                 var allIssues = extendedIssues.Item1;
                 query1.Stop();
                 Debug.WriteLine($"Query 1: {query1.Elapsed}");
@@ -237,16 +245,16 @@ namespace SprintPlanner.WpfApp.UI.Planning
                 var customDataForOpenIssues = extendedIssues.Item2.Where(kvp => openIssueKeys.Contains(kvp.Key));
 
                 var flatCustomDataForOpenIssues = customDataForOpenIssues.SelectMany(kvp => kvp.Value);
-                double storyPointsRaw = flatCustomDataForOpenIssues.Where(d => d != null && d is JProperty).Select(d1 => d1 as JProperty).Where(d2 => d2.Name == Settings.Default.StoryPointsField).Sum(d3 => ((JValue)d3.Value).Value != null ? d3.Value.Value<double>() : 0);
+                double storyPointsRaw = flatCustomDataForOpenIssues.Where(d => d != null && d is JProperty).Select(d1 => d1 as JProperty).Where(d2 => d2.Name == storyPointsField).Sum(d3 => ((JValue)d3.Value).Value != null ? d3.Value.Value<double>() : 0);
 
                 StoryPoints = (int)Math.Round(storyPointsRaw);
 
                 var loads = openAssignedIssues.Where(l => l.fields.issuetype.subtask || l.fields.subtasks.Count == 0).GroupBy(i => i.fields.assignee.name);
-                string link = new Uri(Settings.Default.Server).Append("browse/").AbsoluteUri;
+                string link = new Uri(Business.Plan.Server.Url).Append("browse/").AbsoluteUri;
 
-                if (Business.Data.Capacity.Users != null)
+                if (Business.AppData.Capacity.Users != null)
                 {
-                    foreach (var user in Business.Data.Capacity.Users)
+                    foreach (var user in Business.AppData.Capacity.Users)
                     {
                         var userIssues = loads.FirstOrDefault(l => l.Key.Equals(user.Uid));
                         byte[] pictureData = null;
@@ -265,9 +273,9 @@ namespace SprintPlanner.WpfApp.UI.Planning
                     }
                 }
 
-                if (Business.Data.Capacity.Users != null)
+                if (Business.AppData.Capacity.Users != null)
                 {
-                    team = Business.Data.Capacity.Users.Select(u => u.Uid).ToList();
+                    team = Business.AppData.Capacity.Users.Select(u => u.Uid).ToList();
                 }
 
                 foreach (var load in loads.Where(l => !team.Contains(l.Key)))
@@ -323,7 +331,7 @@ namespace SprintPlanner.WpfApp.UI.Planning
                 }
 
                 _reportGenerator.SetReportData(openIssues, UserLoads.Select(ul => ul.GetModel()), customDataForOpenIssues);
-                _reportGenerator.StoryPointsField = Settings.Default.StoryPointsField;
+                _reportGenerator.StoryPointsField = storyPointsField;
 
                 performanceTimer.Stop();
 

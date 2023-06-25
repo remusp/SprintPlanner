@@ -4,19 +4,116 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:l="clr-namespace:SprintPlanner.WpfApp.UI.Servers"
+             xmlns:ip="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:dt="clr-namespace:SprintPlanner.WpfApp.DesignTime"
              mc:Ignorable="d"
              d:DataContext="{x:Static dt:DesignData.ServersViewModelDesign}"
-             d:DesignHeight="450"
+             d:DesignHeight="800"
              d:DesignWidth="800">
     <Grid>
-        <ListView ItemsSource="{Binding Servers}"
-                  Width="300">
-            <ListView.ItemTemplate>
-                <DataTemplate DataType="l:ServerItemViewModel">
-                    <l:ServerItemView />
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Expander  Header="Add server"
+                   IsExpanded="True"
+                   Grid.Row="0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!--Server name-->
+                <TextBlock Text="Server name"
+                           Grid.Row="0"
+                           Grid.Column="0"
+                           Style="{StaticResource TextBlockStyle}"
+                           HorizontalAlignment="Right" />
+                <TextBox Text="{Binding NewServerName}"
+                         Style="{StaticResource TextBoxStyle}"
+                         Grid.ColumnSpan="2"
+                         Grid.Row="0"
+                         Grid.Column="1" />
+
+                <!--URL-->
+                <TextBlock Text="URL"
+                           Grid.Row="1"
+                           Grid.Column="0"
+                           Margin="5"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center" />
+                <TextBox Text="{Binding NewServerUrl}"
+                         Style="{StaticResource TextBoxStyle}"
+                         Grid.ColumnSpan="2"
+                         Grid.Row="1"
+                         Grid.Column="1" />
+
+                <!--SP Field-->
+                <TextBlock Text="Story points field"
+                           Grid.Row="2"
+                           Grid.Column="0"
+                           Margin="5"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center" />
+                <TextBox Text="{Binding NewServerStoryPointsField}"
+                         Grid.Row="2"
+                         Grid.Column="1"
+                         Grid.ColumnSpan="2"
+                         Style="{StaticResource TextBoxStyle}" />
+
+                <!--Add button-->
+                <Button Grid.Row="3"
+                        Grid.Column="2"
+                        Padding="5"
+                        Background="SeaGreen"
+                        Command="{Binding CommandAddNewServer}">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <ip:PackIconModern Kind="Add" />
+                            <TextBlock Text="ADD"
+                                       VerticalAlignment="Center"
+                                       Margin="10 0" />
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+            </Grid>
+        </Expander>
+        <GroupBox Header="Servers"
+                  Grid.Row="1">
+            <ListView ItemsSource="{Binding Servers}">
+                <ListView.ItemTemplate>
+                    <DataTemplate DataType="l:ServerItemViewModel">
+                        <l:ServerItemView />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="BorderThickness"
+                                Value="1.5" />
+                        <Setter Property="BorderBrush"
+                                Value="DarkBlue" />
+                        <Setter Property="Margin"
+                                Value="5" />
+                        <Style.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius"
+                                        Value="5" />
+                            </Style>
+                        </Style.Resources>
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
+        </GroupBox>
     </Grid>
 </UserControl>

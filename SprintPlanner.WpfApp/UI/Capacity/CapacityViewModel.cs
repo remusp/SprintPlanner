@@ -92,28 +92,28 @@ namespace SprintPlanner.WpfApp.UI.Capacity
 
         public ICommand SearchCommand { get; private set; }
 
-        public void Flush()
+        public void PushData()
         {
-            Business.Data.Capacity.DaysInSprint = DaysInSprint;
-            Business.Data.Capacity.CapacityFactor = CapacityFactor;
-            Business.Data.Capacity.Users = Users.Select(u => u.GetModel()).ToList();
+            Business.AppData.Capacity.DaysInSprint = DaysInSprint;
+            Business.AppData.Capacity.CapacityFactor = CapacityFactor;
+            Business.AppData.Capacity.Users = Users.Select(u => u.GetModel()).ToList();
         }
 
-        public void Pull()
+        public void PullData()
         {
-            DaysInSprint = Business.Data.Capacity.DaysInSprint;
-            if (Business.Data?.Capacity?.Users != null)
+            DaysInSprint = Business.AppData.Capacity.DaysInSprint;
+            if (Business.AppData?.Capacity?.Users != null)
             {
-                Users = new ObservableCollection<UserDetails>(Business.Data.Capacity.Users?.Select(u => new UserDetails(u)));
+                Users = new ObservableCollection<UserDetails>(Business.AppData.Capacity.Users?.Select(u => new UserDetails(u)));
             }
 
-            CapacityFactor = Business.Data.Capacity.CapacityFactor;
+            CapacityFactor = Business.AppData.Capacity.CapacityFactor;
 
-            _sprintId = Business.Data.Sprint.SelectedSprint.Id;
+            _sprintId = Business.Plan?.Sprint?.Id ?? 0;
 
-            if (Business.Data?.Sprint?.Sprints != null)
+            if (Business.AppData?.SprintCrud?.Sprints != null)
             {
-                Sprints = new List<CoreSprint>(Business.Data.Sprint.Sprints);
+                Sprints = new List<CoreSprint>(Business.AppData.SprintCrud.Sprints);
                 SelectedSprint = Sprints.First();
             }
         }
@@ -147,6 +147,12 @@ namespace SprintPlanner.WpfApp.UI.Capacity
 
         private void AddFromComboSprintCommandExecute()
         {
+            if (SelectedSprint == null)
+            {
+                _window.ShowMessageAsync("Sprint not available!", "Make sure that credentials are set for the current server or that sprints are available in the plans list screen.");
+                return;
+            }
+
             AddAssigneesFromSprint(SelectedSprint.Id);
         }
 
@@ -192,24 +198,31 @@ namespace SprintPlanner.WpfApp.UI.Capacity
 
         private void SearchCommandExecute()
         {
-            if (string.IsNullOrWhiteSpace(SearchText) || SearchText.Length < 3)
+            try
             {
-                return;
-            }
+                if (string.IsNullOrWhiteSpace(SearchText) || SearchText.Length < 3)
+                {
+                    return;
+                }
 
-            var foundUsers = Business.Jira.SearchUsers(SearchText);
-            if (foundUsers == null || !foundUsers.Any())
+                var foundUsers = Business.Jira.SearchUsers(SearchText);
+                if (foundUsers == null || !foundUsers.Any())
+                {
+                    return;
+                }
+
+                FoundUsers = new ObservableCollection<SearchUserItem>(foundUsers.Select(fu => new SearchUserItem
+                {
+                    Name = fu.displayName,
+                    Email = fu.emailAddress,
+                    UserId = fu.name,
+                    AddCommand = _addUserCommand
+                }));
+            }
+            catch (Exception ex)
             {
-                return;
+                _window.ShowMessageAsync(ex.Message, ex.StackTrace);
             }
-
-            FoundUsers = new ObservableCollection<SearchUserItem>(foundUsers.Select(fu => new SearchUserItem 
-            { 
-                Name = fu.displayName, 
-                Email = fu.emailAddress, 
-                UserId = fu.name,
-                AddCommand = _addUserCommand
-            }));
         }
 
         private void AddUserExecute(SearchUserItem user)

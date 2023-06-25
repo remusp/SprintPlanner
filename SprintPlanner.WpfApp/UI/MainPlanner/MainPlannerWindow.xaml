@@ -8,10 +8,8 @@
                 xmlns:plan="clr-namespace:SprintPlanner.WpfApp.UI.Planning"
                 xmlns:sc="clr-namespace:SprintPlanner.WpfApp.UI.SprintCrud"
                 xmlns:cp="clr-namespace:SprintPlanner.WpfApp.UI.Capacity"
-                xmlns:lg="clr-namespace:SprintPlanner.WpfApp.UI.Login"
                 xmlns:ab="clr-namespace:SprintPlanner.WpfApp.UI.About"
                 xmlns:st="clr-namespace:SprintPlanner.WpfApp.UI.Stats"
-                xmlns:sui="clr-namespace:SprintPlanner.WpfApp.UI.SettingsUI"
                 xmlns:sv="clr-namespace:SprintPlanner.WpfApp.UI.Servers"
                 mc:Ignorable="d"
                 Title="Sprint Planner"
@@ -53,14 +51,6 @@
             </DataTemplate>
         </ResourceDictionary>
     </Window.Resources>
-    <mh:MetroWindow.RightWindowCommands>
-        <mh:WindowCommands>
-            <Image Source="{Binding LoggedInUserPictureData}" />
-            <Button Content="Logout"
-                    Visibility="{Binding LogoutVisibility}"
-                    Command="{Binding LogoutCommand}" />
-        </mh:WindowCommands>
-    </mh:MetroWindow.RightWindowCommands>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -90,22 +80,15 @@
                     <mh:HamburgerMenuIconItem Icon="{ip:Entypo Kind=BarGraph, Width=48, Height=48}"
                                               Command="{Binding StatsViewCommand}"
                                               IsEnabled="{Binding IsEnabledPlanning}"
-                                              Label="Team Capacity" />
+                                              Label="Stats" />
                 </mh:HamburgerMenuItemCollection>
 
             </mh:HamburgerMenu.ItemsSource>
             <mh:HamburgerMenu.OptionsItemsSource>
                 <mh:HamburgerMenuItemCollection>
-
-                    <mh:HamburgerMenuIconItem Icon="{ip:Octicons Kind=SignIn, Width=48, Height=48}"
-                                              Command="{Binding LoginViewCommand}"
-                                              Label="Login" />
                     <mh:HamburgerMenuIconItem Icon="{ip:FontAwesome Kind=ServerSolid, Width=48, Height=48}"
                                               Command="{Binding ServersViewCommand}"
                                               Label="Servers" />
-                    <mh:HamburgerMenuIconItem Icon="{ip:Material Kind=Settings, Width=48, Height=48}"
-                                              Command="{Binding SettingsViewCommand}"
-                                              Label="Settings" />
                     <mh:HamburgerMenuIconItem Icon="{ip:Material Kind=Information, Width=48, Height=48}"
                                               Command="{Binding AboutViewCommand}"
                                               Label="About" />
@@ -128,16 +111,8 @@
                     <DataTemplate DataType="{x:Type st:StatsViewModel}">
                         <st:StatsView />
                     </DataTemplate>
-                    <DataTemplate DataType="{x:Type lg:LoginViewModel}">
-                        <lg:LoginView HorizontalAlignment="Left"
-                                      VerticalAlignment="Top" />
-                    </DataTemplate>
                     <DataTemplate DataType="{x:Type ab:AboutViewModel}">
                         <ab:AboutView />
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type sui:SettingsViewModel}">
-                        <sui:SettingsView HorizontalAlignment="Left"
-                                          VerticalAlignment="Top" />
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type sv:ServersViewModel}">
                         <sv:ServersView />

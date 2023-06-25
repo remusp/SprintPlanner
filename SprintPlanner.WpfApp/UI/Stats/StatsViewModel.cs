@@ -15,14 +15,14 @@ namespace SprintPlanner.WpfApp.UI.Stats
             set { Set(() => Stats, value); }
         }
      
-        public void Flush()
+        public void PushData()
         {
             // Do nothing
         }
 
-        public void Pull()
+        public void PullData()
         {
-            decimal thresold = Business.Data.Capacity.CapacityFactor;
+            decimal thresold = Business.AppData.Capacity.CapacityFactor;
             Stats = new ObservableCollection<StatItem>();
             AddDevStat(thresold);
             AddQaStat(thresold);
@@ -78,18 +78,18 @@ namespace SprintPlanner.WpfApp.UI.Stats
 
         private decimal GetRoleCapacity(Role role)
         {
-            var users = Business.Data.Capacity.Users.Where(u => u.Role == role);
+            var users = Business.AppData.Capacity.Users.Where(u => u.Role == role);
             return users.Sum(u => u.Capacity);
         }
 
         private decimal GetPlannedWork(Func<Issue, bool> issueFilter)
         {
-            if (Business.Data.Sprint.Issues == null) 
+            if (Business.AppData.SprintCrud.Issues == null) 
             {
                 return 0;
             }
 
-            return Business.Data.Sprint.Issues
+            return Business.AppData.SprintCrud.Issues
                 .Where(i => i.fields.status.id != Settings.Default.STATUS_DONE
                     && issueFilter(i))
                 .Sum(i => i.fields.timetracking.remainingEstimateSeconds) / 3600m;

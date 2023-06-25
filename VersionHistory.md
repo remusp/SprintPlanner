@@ -2,7 +2,7 @@
  * Check server at login and guard against app crash
  * Fix story link after migration to .NET 6
  * Added the concept of sprint plan
-
+ * Added support for multiple servers
 
 ### Version 0.0.11 (2023-06-13)
  * Added splash screen

@@ -2,9 +2,9 @@
 
 namespace SprintPlanner.WpfApp
 {
-    public class UserDetails : WrappingViewModel<UserDetailsModel>
+    public class UserDetailsItem : WrappingViewModel<UserDetailsModel>
     {
-        public UserDetails(UserDetailsModel model) : base(model)
+        public UserDetailsItem(UserDetailsModel model) : base(model)
         {
         }
 

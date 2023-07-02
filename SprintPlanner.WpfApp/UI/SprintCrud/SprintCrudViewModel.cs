@@ -138,7 +138,7 @@ namespace SprintPlanner.WpfApp.UI.SprintCrud
                 {
                     IsBusy = false;
                 }
-                
+
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
@@ -239,7 +239,7 @@ namespace SprintPlanner.WpfApp.UI.SprintCrud
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(PlanName)) 
+            if (string.IsNullOrWhiteSpace(PlanName))
             {
                 await _window.ShowMessageAsync("Cannot create plan!", "Please input a plan name");
                 return;
@@ -248,13 +248,13 @@ namespace SprintPlanner.WpfApp.UI.SprintCrud
             var plan = new SprintPlan()
             {
                 Sprint = SelectedSprint,
-                Server = SelectedServer.Server
+                ServerId = SelectedServer.Server.Id
             };
 
             try
             {
                 string serialized = JsonConvert.SerializeObject(plan, Formatting.Indented);
-                var filePath = Path.Combine(GetPlansFolder(), $"{PlanName}.spl.json");
+                var filePath = Path.Combine(PathsHelper.GetPlansFolder(), $"{PlanName}.spl.json");
 
                 MessageDialogResult overwrite = MessageDialogResult.Negative;
                 if (File.Exists(filePath))
@@ -268,7 +268,7 @@ namespace SprintPlanner.WpfApp.UI.SprintCrud
 
                 File.WriteAllText(filePath, serialized);
 
-                if (overwrite == MessageDialogResult.Negative) 
+                if (overwrite == MessageDialogResult.Negative)
                 {
                     SprintPlanItems.Add(new SprintPlanItem { FullPath = filePath, Name = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(filePath)) });
                 }
@@ -279,12 +279,14 @@ namespace SprintPlanner.WpfApp.UI.SprintCrud
             }
         }
 
-        private void ExecuteOpenSprintPlan(SprintPlanItem planItem) 
+        private void ExecuteOpenSprintPlan(SprintPlanItem planItem)
         {
             try
             {
                 var plan = Business.Plan = JsonConvert.DeserializeObject<SprintPlan>(File.ReadAllText(planItem.FullPath));
-                bool loggedIn = Business.Jira.Login(plan.Server.Url, plan.Server.UserName, SecureHelper.ToSecure(plan.Server.Pass));
+                var server = Business.AppData.ServerModel.Servers.First(s => s.Id == plan.ServerId);
+
+                bool loggedIn = Business.Jira.Login(server.Url, server.UserName, SecureHelper.ToSecure(server.Pass));
                 if (!loggedIn)
                 {
                     _window.ShowMessageAsync("Login unavailable or expired", "Please login from the servers page");
@@ -297,16 +299,6 @@ namespace SprintPlanner.WpfApp.UI.SprintCrud
             {
                 _window.ShowMessageAsync(ex.Message, ex.StackTrace);
             }
-        }
-
-        private string GetPlansFolder()
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-            var appName = ((AssemblyTitleAttribute)assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute))).Title;
-
-            string plansFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), appName, "SprintPlans");
-            Directory.CreateDirectory(plansFolder);
-            return plansFolder;
         }
 
         private void SprintCrudViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -323,11 +315,11 @@ namespace SprintPlanner.WpfApp.UI.SprintCrud
                             {
                                 loggedIn = Business.Jira.Login(SelectedServer.Server.Url, SelectedServer.Server.UserName, SecureHelper.ToSecure(SelectedServer.Server.Pass));
                             }
-                            catch 
+                            catch
                             {
                                 // Ignore
                             }
-                            
+
                             if (!loggedIn)
                             {
                                 Business.Jira.Logout();
@@ -377,14 +369,14 @@ namespace SprintPlanner.WpfApp.UI.SprintCrud
 
         private void LoadPlans()
         {
-            var path = GetPlansFolder();
+            var path = PathsHelper.GetPlansFolder();
             var plans = Directory.GetFiles(path, "*.spl.json");
             SprintPlanItems = new ObservableCollection<SprintPlanItem>(plans?.Select(p => new SprintPlanItem { Name = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(p)), FullPath = p }));
         }
 
         private void LoadServers()
         {
-            if (Business.AppData.ServerModel?.Servers == null) 
+            if (Business.AppData.ServerModel?.Servers == null)
             {
                 return;
             }
@@ -396,7 +388,7 @@ namespace SprintPlanner.WpfApp.UI.SprintCrud
             }));
 
             var toSelect = Servers.FirstOrDefault(s => s.Server.Id.Equals(Business.AppData.SprintCrud.SelectedServer?.Id));
-            if (toSelect == null) 
+            if (toSelect == null)
             {
                 return;
             }

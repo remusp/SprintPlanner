@@ -28,9 +28,9 @@ namespace SprintPlanner.WpfApp.UI.Planning
             SyncLoadCommand = new DelegateCommand(SyncLoadComandExecute);
             ExportCommand = new DelegateCommand(ExportComandExecute);
             AssignCommand = new DelegateCommand<Assignation>(AssignCommandExecute);
-            
+
             UserLoads = new ObservableCollection<UserLoadViewModel>();
-            
+
             _window = w;
             _reportGenerator = new ReportGenerator();
         }
@@ -202,10 +202,10 @@ namespace SprintPlanner.WpfApp.UI.Planning
 
             return UserStatus.Normal;
         }
-        
+
         private void SyncLoadComandExecute()
         {
-            if (Business.Plan == null) 
+            if (Business.Plan == null)
             {
                 _window.ShowMessageAsync("No plan open!", "Open a plan from the plans list.");
                 return;
@@ -220,7 +220,8 @@ namespace SprintPlanner.WpfApp.UI.Planning
                 var capacities = new List<UserLoadViewModel>();
                 var team = new List<string>();
 
-                string storyPointsField = Business.Plan.Server.StoryPointsField;
+                var server = Business.AppData.ServerModel.Servers.First(s => s.Id == Business.Plan.ServerId);
+                string storyPointsField = server.StoryPointsField;
 
                 Stopwatch query1 = new Stopwatch();
                 query1.Start();
@@ -250,7 +251,7 @@ namespace SprintPlanner.WpfApp.UI.Planning
                 StoryPoints = (int)Math.Round(storyPointsRaw);
 
                 var loads = openAssignedIssues.Where(l => l.fields.issuetype.subtask || l.fields.subtasks.Count == 0).GroupBy(i => i.fields.assignee.name);
-                string link = new Uri(Business.Plan.Server.Url).Append("browse/").AbsoluteUri;
+                string link = new Uri(server.Url).Append("browse/").AbsoluteUri;
 
                 if (Business.AppData.Capacity.Users != null)
                 {

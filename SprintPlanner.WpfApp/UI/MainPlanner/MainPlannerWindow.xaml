@@ -66,6 +66,10 @@
                           Grid.Column="0">
             <mh:HamburgerMenu.ItemsSource>
                 <mh:HamburgerMenuItemCollection>
+                    <mh:HamburgerMenuIconItem Icon="{ip:FontAwesome Kind=UsersSolid, Width=48, Height=48}"
+                                              Command="{Binding CapacityViewCommand}"
+                                              IsEnabled="{Binding IsEnabledCapacity}"
+                                              Label="Team Capacity" />
                     <mh:HamburgerMenuIconItem Icon="{ip:Entypo Kind=Blackboard, Width=48, Height=48}"
                                               Command="{Binding SprintCrudViewCommand}"
                                               Label="Plans" />
@@ -73,10 +77,6 @@
                                               Command="{Binding PlanningViewCommand}"
                                               IsEnabled="{Binding IsEnabledPlanning}"
                                               Label="Work allocation" />
-                    <mh:HamburgerMenuIconItem Icon="{ip:Modern Kind=ScaleUnbalanced, Width=48, Height=48}"
-                                              Command="{Binding CapacityViewCommand}"
-                                              IsEnabled="{Binding IsEnabledCapacity}"
-                                              Label="Team Capacity" />
                     <mh:HamburgerMenuIconItem Icon="{ip:Entypo Kind=BarGraph, Width=48, Height=48}"
                                               Command="{Binding StatsViewCommand}"
                                               IsEnabled="{Binding IsEnabledPlanning}"
@@ -106,7 +106,7 @@
                         <plan:PlanningView />
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type cp:CapacityViewModel}">
-                        <cp:CapacityView HorizontalAlignment="Left" />
+                        <cp:CapacityView />
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type st:StatsViewModel}">
                         <st:StatsView />

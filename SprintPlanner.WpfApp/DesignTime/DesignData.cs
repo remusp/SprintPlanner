@@ -9,7 +9,7 @@ namespace SprintPlanner.WpfApp.DesignTime
         public static ServerItemViewModel ServerItemViewModelDesign => new ServerItemViewModel(new Server
         {
             Name = "My test Server Name",
-            Url = "https://www.mysuperurl.com/link",
+            Url = "https://www.mysuperurl.com/linkaaaaaaaaaaaaaaaaaa",
             StoryPointsField = "customfield_1234",
         }, null)
         {

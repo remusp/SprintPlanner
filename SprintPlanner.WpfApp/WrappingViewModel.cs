@@ -11,7 +11,7 @@ namespace SprintPlanner.WpfApp
             _model = model;
         }
 
-        public T GetModel()
+        public virtual T GetModel()
         {
             return _model;
         }

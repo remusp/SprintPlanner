@@ -1,5 +1,6 @@
 ﻿using MahApps.Metro.Controls;
 using Newtonsoft.Json;
+using SprintPlanner.Core;
 using SprintPlanner.Core.Logic;
 using SprintPlanner.FrameworkWPF;
 using SprintPlanner.WpfApp.UI.About;
@@ -69,7 +70,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
         public void Load()
         {
-            string dataFolder = GetAppDataFolder();
+            string dataFolder = PathsHelper.GetAppDataFolder();
 
             var sprintFilePath = Path.Combine(dataFolder, sprintFileName);
 
@@ -101,7 +102,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         {
             string serialized = JsonConvert.SerializeObject(Business.AppData, Formatting.Indented);
 
-            var sprintFilePath = Path.Combine(GetAppDataFolder(), sprintFileName);
+            var sprintFilePath = Path.Combine(PathsHelper.GetAppDataFolder(), sprintFileName);
             File.WriteAllText(sprintFilePath, serialized);
         }
 
@@ -114,16 +115,6 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
 
             (vm as IStorageManipulator)?.PullData();
             MainViewModel = vm;
-        }
-
-        private static string GetAppDataFolder()
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-            var appName = ((AssemblyTitleAttribute)assembly.GetCustomAttribute(typeof(AssemblyTitleAttribute))).Title;
-
-            var dataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName);
-            Directory.CreateDirectory(dataFolder);
-            return dataFolder;
         }
     }
 }

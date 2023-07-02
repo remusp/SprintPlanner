@@ -25,7 +25,7 @@
  * JIRA Cloud support
 
 ### Version 0.0.6 (2019-11-18)
- * Issues can now be reassigned using context menu
+ * Tasks can now be reassigned using context menu
  * Fixed Export to excel crash for story with no SP
  * Sprint data path default to MyDocuments, selectable sprint data path
  * Proper handling for percent availability and no capacity info

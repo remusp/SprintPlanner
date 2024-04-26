@@ -36,17 +36,17 @@ namespace SprintPlanner.Core
             var allAssignees = issues.Where(l => l.fields.assignee != null).Select(j => j.fields.assignee);
 
             List<Assignee> distinctAssignees;
-            if (allAssignees.Any(a => a.name == null))
+            if (allAssignees.Any(a => a.displayName == null))
             {
                 distinctAssignees = allAssignees.DistinctBy(a => a.accountId).ToList();
                 foreach (var assignee in distinctAssignees)
                 {
-                    assignee.name = assignee.accountId;
+                    assignee.displayName = assignee.accountId;
                 }
             }
             else
             {
-                distinctAssignees = allAssignees.DistinctBy(a => a.name).ToList();
+                distinctAssignees = allAssignees.DistinctBy(a => a.displayName).ToList();
             }
 
             return distinctAssignees;
@@ -83,30 +83,10 @@ namespace SprintPlanner.Core
                 issues.AddRange(deserializedCall.issues);
                 issueCount = deserializedCall.issues.Count;
 
-                AdaptCloudDataIfNeeded(deserializedCall.issues);
-
                 retries++;
             } while (issueCount >= pageSize);
 
             return new Tuple<List<Issue>, Dictionary<string, List<JContainer>>>(issues, customData);
-        }
-
-        private void AdaptCloudDataIfNeeded(List<Issue> issues)
-        {
-            var assignedIssues = issues.Where(i => i.fields.assignee != null).ToList();
-            _isCloud = IsCloudData(assignedIssues);
-            if (_isCloud)
-            {
-                foreach (var issue in assignedIssues)
-                {
-                    issue.fields.assignee.name = issue.fields.assignee.accountId;
-                }
-            }
-        }
-
-        private bool IsCloudData(List<Issue> issues)
-        {
-            return issues.Any(i => i.fields.assignee.accountId != null);
         }
 
         public Dictionary<int, string> GetBoards()
@@ -136,10 +116,9 @@ namespace SprintPlanner.Core
             return result;
         }
 
-        public byte[] GetPicture(string uid)
+        public byte[] GetPicture(string url)
         {
-            string uri = new Uri(ServerAddress).Append($"/secure/useravatar?ownerId={uid}").AbsoluteUri;
-            return _webRequester.HttpGetBinaryByWebRequest(uri, _username, _password);
+            return _webRequester.HttpGetBinaryByWebRequest(url, _username, _password);
         }
 
         public Assignee GetAssignee(string uid)
@@ -251,7 +230,7 @@ namespace SprintPlanner.Core
 
         public List<Assignee> SearchUsers(string searchText)
         {
-            string uri = new Uri(ServerAddress).Append($"/rest/api/2/user/search?username={searchText}").AbsoluteUri;
+            string uri = new Uri(ServerAddress).Append($"/rest/api/2/user/search?query={searchText}").AbsoluteUri;
             string response = _webRequester.HttpGetByWebRequest(uri, _username, _password);
             return JsonConvert.DeserializeObject<List<Assignee>>(response);
         }

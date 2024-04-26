@@ -124,10 +124,10 @@ namespace SprintPlanner.WpfApp.UI.Servers
                 if (isLoggedIn)
                 {
                     _model.Pass = Base64Encode(pwdContainer.Password.ToPlain());
-                    var assignee = tempJira.GetAssignee(UserName);
+                    var assignee = tempJira.SearchUsers(UserName)[0];
                     UserDisplayName = assignee.displayName;
                     UserEmail = assignee.emailAddress;
-                    UserPictureData = tempJira.GetPicture(assignee.name);
+                    UserPictureData = tempJira.GetPicture(assignee.avatarUrls._48x48);
                 }
                 else
                 {

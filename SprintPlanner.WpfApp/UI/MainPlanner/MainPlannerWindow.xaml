@@ -7,7 +7,7 @@
                 xmlns:ip="http://metro.mahapps.com/winfx/xaml/iconpacks"
                 xmlns:plan="clr-namespace:SprintPlanner.WpfApp.UI.Planning"
                 xmlns:sc="clr-namespace:SprintPlanner.WpfApp.UI.SprintCrud"
-                xmlns:cp="clr-namespace:SprintPlanner.WpfApp.UI.Capacity"
+                xmlns:tc="clr-namespace:SprintPlanner.WpfApp.UI.TeamsCrud"
                 xmlns:ab="clr-namespace:SprintPlanner.WpfApp.UI.About"
                 xmlns:st="clr-namespace:SprintPlanner.WpfApp.UI.Stats"
                 xmlns:sv="clr-namespace:SprintPlanner.WpfApp.UI.Servers"
@@ -69,7 +69,7 @@
                     <mh:HamburgerMenuIconItem Icon="{ip:FontAwesome Kind=UsersSolid, Width=48, Height=48}"
                                               Command="{Binding CapacityViewCommand}"
                                               IsEnabled="{Binding IsEnabledCapacity}"
-                                              Label="Team Capacity" />
+                                              Label="Teams" />
                     <mh:HamburgerMenuIconItem Icon="{ip:Entypo Kind=Blackboard, Width=48, Height=48}"
                                               Command="{Binding SprintCrudViewCommand}"
                                               Label="Plans" />
@@ -105,8 +105,8 @@
                     <DataTemplate DataType="{x:Type plan:PlanningViewModel}">
                         <plan:PlanningView />
                     </DataTemplate>
-                    <DataTemplate DataType="{x:Type cp:CapacityViewModel}">
-                        <cp:CapacityView />
+                    <DataTemplate DataType="{x:Type tc:TeamsCrudViewModel}">
+                        <tc:TeamsCrudView />
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type st:StatsViewModel}">
                         <st:StatsView />

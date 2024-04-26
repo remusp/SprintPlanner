@@ -18,7 +18,7 @@ using System.Windows.Input;
 
 namespace SprintPlanner.WpfApp.UI.Planning
 {
-    public class PlanningViewModel : ViewModelBase
+    public class PlanningViewModel : ViewModelBase, IStorageManipulator
     {
         private readonly ReportGenerator _reportGenerator;
         private readonly MetroWindow _window;
@@ -54,12 +54,28 @@ namespace SprintPlanner.WpfApp.UI.Planning
             set { Set(() => StoryPoints, value); }
         }
 
+        public string PlanName
+        {
+            get { return Get(() => PlanName); }
+            set { Set(() => PlanName, value); }
+        }
+
         public ICommand SyncLoadCommand { get; }
 
         public ObservableCollection<UserLoadViewModel> UserLoads
         {
             get { return Get(() => UserLoads); }
             set { Set(() => UserLoads, value); }
+        }
+
+        public void PullData()
+        {
+            PlanName = Business.Plan.PlanName;
+        }
+
+        public void PushData()
+        {
+            // Nothing to push yet
         }
 
         private void AddCapacity(List<UserLoadViewModel> capacities, IEnumerable<Issue> issues, UserDetailsModel user, string link, byte[] picture, UserStatus? explicitStatus = null)
@@ -231,7 +247,13 @@ namespace SprintPlanner.WpfApp.UI.Planning
                         "issuetype", "subtasks", "parent","summary",storyPointsField
                     };
 
-                var customFields = new List<string> { storyPointsField };
+                List<string> customFields = null;
+
+                if (!string.IsNullOrWhiteSpace(storyPointsField))
+                {
+                    mandatoryFields.Add(storyPointsField);
+                    customFields = new List<string> { storyPointsField };
+                }
 
                 var extendedIssues = Business.Jira.GetAllIssuesInSprint(Business.Plan.Sprint.Id, mandatoryFields, customFields);
                 Business.AppData.SprintCrud.Issues = extendedIssues.Item1;
@@ -250,7 +272,7 @@ namespace SprintPlanner.WpfApp.UI.Planning
 
                 StoryPoints = (int)Math.Round(storyPointsRaw);
 
-                var loads = openAssignedIssues.Where(l => l.fields.issuetype.subtask || l.fields.subtasks.Count == 0).GroupBy(i => i.fields.assignee.name);
+                var loads = openAssignedIssues.Where(l => l.fields.issuetype.subtask || l.fields.subtasks.Count == 0).GroupBy(i => i.fields.assignee.displayName);
                 string link = new Uri(server.Url).Append("browse/").AbsoluteUri;
 
                 if (Business.AppData.Capacity.Users != null)
@@ -262,7 +284,7 @@ namespace SprintPlanner.WpfApp.UI.Planning
 
                         try
                         {
-                            pictureData = Business.Jira.GetPicture(user.Uid);
+                            // pictureData = Business.Jira.GetPicture(user.Uid);
                         }
                         catch (WebException wex)
                         {
@@ -287,7 +309,8 @@ namespace SprintPlanner.WpfApp.UI.Planning
                         Uid = load.Key
                     };
 
-                    AddCapacity(capacities, load, user, link, Business.Jira.GetPicture(load.Key), UserStatus.External);
+                    byte[] picture = null; // Business.Jira.GetPicture(load.Key)
+                    AddCapacity(capacities, load, user, link, picture, UserStatus.External);
                 }
 
                 IEnumerable<Issue> unassignedIssues = openIssues.Where(i => (i.fields.assignee == null) && (i.fields.issuetype.subtask || i.fields.subtasks.Count == 0));

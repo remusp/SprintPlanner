@@ -8,7 +8,39 @@
              d:DesignHeight="450"
              d:DesignWidth="800">
     <Grid>
-        <DataGrid AutoGenerateColumns="False"
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <TextBlock Text="Story points"
+                   FontSize="24"
+                   FontWeight="DemiBold"
+                   Style="{StaticResource TextBlockStyle}" />
+        <TextBlock Text="{Binding StoryPoints}"
+                   FontSize="24"
+                   FontWeight="DemiBold"
+                   Style="{StaticResource TextBlockStyle}"
+                   Grid.Column="1" />
+        <!--<TextBlock Text="Committed story points"
+                   FontSize="24"
+                   FontWeight="DemiBold"
+                   Style="{StaticResource TextBlockStyle}"
+                   Grid.Row="1"
+                    />
+        <TextBlock Text="{Binding CommittedStoryPoints}"
+                   FontSize="24"
+                   FontWeight="DemiBold"
+                   Style="{StaticResource TextBlockStyle}"
+                   Grid.Row="1"
+                   Grid.Column="1"
+                    />-->
+        <DataGrid Grid.Row="1"
+                  Grid.ColumnSpan="2"
+            AutoGenerateColumns="False"
                   CanUserAddRows="False"
                   ItemsSource="{Binding Stats}">
             <DataGrid.Columns>

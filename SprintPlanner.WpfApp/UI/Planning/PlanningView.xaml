@@ -20,76 +20,27 @@
 
         <DockPanel HorizontalAlignment="Stretch"
                    Grid.Column="0">
-
-            <Grid VerticalAlignment="Top"
-                  DockPanel.Dock="Top"
-                  HorizontalAlignment="Stretch">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-             
-               
-            </Grid>
-
+            <TextBlock Text="{Binding PlanName}"
+                       DockPanel.Dock="Top"
+                       FontSize="24"
+                       FontWeight="DemiBold"
+                       Style="{StaticResource TextBlockStyle}" />
             <ScrollViewer PreviewMouseWheel="ListBox_PreviewMouseWheel"
-                          Margin="0, 0, 5, 0">
-                <StackPanel>
-                    <Grid VerticalAlignment="Top"
-                          HorizontalAlignment="Left"
-                          DockPanel.Dock="Right">
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="Story points"
-                                   FontSize="24"
-                                   FontWeight="DemiBold"
-                                   Style="{StaticResource TextBlockStyle}" />
-                        <TextBlock Text="{Binding StoryPoints}"
-                                   FontSize="24"
-                                   FontWeight="DemiBold"
-                                   Style="{StaticResource TextBlockStyle}"
-                                   Grid.Column="1" />
-                        <TextBlock Text="Committed story points"
-                                   FontSize="24"
-                                   FontWeight="DemiBold"
-                                   Style="{StaticResource TextBlockStyle}"
-                                   Grid.Row="1"
-                                   Visibility="Collapsed" />
-                        <TextBlock Text="{Binding CommittedStoryPoints}"
-                                   FontSize="24"
-                                   FontWeight="DemiBold"
-                                   Style="{StaticResource TextBlockStyle}"
-                                   Grid.Row="1"
-                                   Grid.Column="1"
-                                   Visibility="Collapsed" />
-                    </Grid>
-                    <ItemsControl Grid.Row="1"
-                                  Grid.ColumnSpan="4"
-                                  ItemsSource="{Binding UserLoads}"
-                                  Grid.IsSharedSizeScope="True"
-                                  DockPanel.Dock="Left"
-                                  HorizontalAlignment="Left">
+                          VerticalScrollBarVisibility="Auto">
+                <ItemsControl Grid.Row="1"
+                              Grid.ColumnSpan="4"
+                              ItemsSource="{Binding UserLoads}"
+                              Grid.IsSharedSizeScope="True"
+                              HorizontalAlignment="Left">
 
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <l:UserLoadView MinWidth="150"
-                                                HorizontalAlignment="Stretch" />
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-
-                </StackPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <l:UserLoadView MinWidth="150"
+                                            HorizontalAlignment="Stretch" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
             </ScrollViewer>
-
         </DockPanel>
         <mh:ProgressRing Grid.Row="1"
                          VerticalAlignment="Center"

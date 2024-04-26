@@ -54,6 +54,23 @@ namespace SprintPlanner.Core
             return byteResponse;
         }
 
+        public virtual byte[] HttpGetBinaryByWebRequest(string uri)
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
+            request.Method = "GET";
+            request.Accept = "application/json; charset=utf-8";
+
+            var response = (HttpWebResponse)request.GetResponse();
+
+            byte[] byteResponse = null;
+            using (Stream rs = response.GetResponseStream())
+            {
+                byteResponse = ReadFully(rs);
+            }
+
+            return byteResponse;
+        }
+
         /// <summary>
         /// Courtesy of Jon Skeet.
         /// Reads data from a stream until the end is reached. The

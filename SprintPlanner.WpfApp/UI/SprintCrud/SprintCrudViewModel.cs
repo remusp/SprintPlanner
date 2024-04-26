@@ -5,13 +5,13 @@ using SprintPlanner.Core;
 using SprintPlanner.Core.BusinessModel;
 using SprintPlanner.Core.Logic;
 using SprintPlanner.FrameworkWPF;
+using SprintPlanner.WpfApp.UI.TeamsCrud;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using CoreSprint = SprintPlanner.Core.BusinessModel.Sprint;
@@ -83,6 +83,18 @@ namespace SprintPlanner.WpfApp.UI.SprintCrud
             set { Set(() => SprintPlanItems, value); }
         }
 
+        public ObservableCollection<TeamItem> TeamItems
+        {
+            get { return Get(() => TeamItems); }
+            set { Set(() => TeamItems, value); }
+        }
+
+        public TeamItem SelectedTeamItem
+        {
+            get { return Get(() => SelectedTeamItem); }
+            set { Set(() => SelectedTeamItem, value); }
+        }
+
         public string PlanName
         {
             get { return Get(() => PlanName); }
@@ -111,6 +123,7 @@ namespace SprintPlanner.WpfApp.UI.SprintCrud
             _initializing = true;
             LoadServers();
             LoadBoardsAndSprints();
+            LoadTeams();
             LoadPlans();
             _initializing = false;
         }
@@ -235,20 +248,28 @@ namespace SprintPlanner.WpfApp.UI.SprintCrud
         {
             if (SelectedSprint == null)
             {
-                await _window.ShowMessageAsync("Cannot create plan!", "No sprint selected");
+                await _window.ShowMessageAsync("Cannot create plan!", "Please select a sprint.");
+                return;
+            }
+
+            if (SelectedTeamItem == null)
+            {
+                await _window.ShowMessageAsync("Cannot create plan!", "Please select a team.");
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(PlanName))
             {
-                await _window.ShowMessageAsync("Cannot create plan!", "Please input a plan name");
+                await _window.ShowMessageAsync("Cannot create plan!", "Please input a plan name.");
                 return;
             }
-
+            
             var plan = new SprintPlan()
             {
+                PlanName = PlanName,
                 Sprint = SelectedSprint,
-                ServerId = SelectedServer.Server.Id
+                ServerId = SelectedServer.Server.Id,
+                TeamAvailability = SelectedTeamItem.GetModel()
             };
 
             try
@@ -270,7 +291,7 @@ namespace SprintPlanner.WpfApp.UI.SprintCrud
 
                 if (overwrite == MessageDialogResult.Negative)
                 {
-                    SprintPlanItems.Add(new SprintPlanItem { FullPath = filePath, Name = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(filePath)) });
+                    SprintPlanItems.Add(new SprintPlanItem { FullPath = filePath, Name = PlanName });
                 }
             }
             catch (Exception ex)
@@ -372,6 +393,28 @@ namespace SprintPlanner.WpfApp.UI.SprintCrud
             var path = PathsHelper.GetPlansFolder();
             var plans = Directory.GetFiles(path, "*.spl.json");
             SprintPlanItems = new ObservableCollection<SprintPlanItem>(plans?.Select(p => new SprintPlanItem { Name = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(p)), FullPath = p }));
+        }
+
+        private void LoadTeams()
+        {
+            TeamItems = new ObservableCollection<TeamItem>();
+
+            var path = PathsHelper.GetTeamsFolder();
+            var teamFiles = Directory.GetFiles(path, "*.team.json");
+
+            foreach (var tf in teamFiles)
+            {
+                var team = JsonConvert.DeserializeObject<Team>(File.ReadAllText(tf));
+                var teamItem = new TeamItem(team)
+                {
+                    Name = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(tf)),
+                    FullPath = tf,
+                };
+
+                TeamItems.Add(teamItem);
+            }
+
+            SelectedTeamItem = TeamItems?.FirstOrDefault();
         }
 
         private void LoadServers()

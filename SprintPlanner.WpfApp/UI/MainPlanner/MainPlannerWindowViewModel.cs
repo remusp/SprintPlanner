@@ -4,7 +4,7 @@ using SprintPlanner.Core;
 using SprintPlanner.Core.Logic;
 using SprintPlanner.FrameworkWPF;
 using SprintPlanner.WpfApp.UI.About;
-using SprintPlanner.WpfApp.UI.Capacity;
+using SprintPlanner.WpfApp.UI.TeamsCrud;
 using SprintPlanner.WpfApp.UI.Planning;
 using SprintPlanner.WpfApp.UI.Servers;
 using SprintPlanner.WpfApp.UI.SprintCrud;
@@ -22,7 +22,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         private const string sprintFileName = "Sprint.app.json";
 
         private readonly AboutViewModel _aboutViewModel;
-        private readonly CapacityViewModel _capacityViewModel;
+        private readonly TeamsCrudViewModel _teamsCrudViewModel;
         private readonly StatsViewModel _statsViewModel;
         private readonly PlanningViewModel _planningViewModel;
         private readonly SprintCrudViewModel _sprintCrudViewModel;
@@ -34,7 +34,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
         {
             _window = w;
 
-            CapacityViewCommand = new DelegateCommand(() => SetView(_capacityViewModel));
+            CapacityViewCommand = new DelegateCommand(() => SetView(_teamsCrudViewModel));
             StatsViewCommand = new DelegateCommand(() => SetView(_statsViewModel));
             AboutViewCommand = new DelegateCommand(() => SetView(_aboutViewModel));
             ServersViewCommand = new DelegateCommand(() => SetView(_serversViewModel));
@@ -42,7 +42,7 @@ namespace SprintPlanner.WpfApp.UI.MainPlanner
             SprintCrudViewCommand = new DelegateCommand(() => SetView(_sprintCrudViewModel));
 
             _planningViewModel = new PlanningViewModel(w);
-            _capacityViewModel = new CapacityViewModel(w);
+            _teamsCrudViewModel = new TeamsCrudViewModel(w);
             _statsViewModel = new StatsViewModel();
             _sprintCrudViewModel = new SprintCrudViewModel(w, PlanningViewCommand);
 
